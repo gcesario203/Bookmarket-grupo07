@@ -418,7 +418,7 @@ public class Bookstore implements Serializable {
     /**
      * Returns a list of recommeded books based on Users
      *
-     * @param c_id - Cart Id
+     * @param c_id Customer id
      * @return Não implementado, Null
      */
     public static List<Book> getRecommendationByItens(int c_id) {
