@@ -298,7 +298,7 @@ public class Bookstore implements Serializable {
     	return getReviews().removeIf(r -> r.getId() == id);
     }
     
-    public static List<Review> getReviews(){
+    private static List<Review> getReviews(){
     	return reviewsByIds;
     }
     
@@ -306,13 +306,13 @@ public class Bookstore implements Serializable {
     	return getReviews().stream().filter(r -> r.getId() == id).findFirst();
     }
     
-    public List<Review> getReviewsByBook(Book book){
+    public static List<Review> getReviewsByBook(Book book){
     	return getReviews().stream()
     					   .filter(r -> r.getBook().getId() == book.getId())
     				 	   .collect(Collectors.toList());
     }
     
-    public List<Review> getReviewsByCustomer(Customer customer){
+    public static List<Review> getReviewsByCustomer(Customer customer){
     	return getReviews().stream()
 				   .filter(r -> r.getCustomer().getId() == customer.getId())
 			 	   .collect(Collectors.toList());
