@@ -705,9 +705,9 @@ public class Bookmarket {
     	private static final long serialVersionUID = 6239962163328790677L;
     	
     	int id;
-    	int value;
+    	double value;
     	
-    	public ChangeReviewAction(int id, int value) {
+    	public ChangeReviewAction(int id, double value) {
     		this.id = id;
     		
     		this.value = value;
@@ -728,9 +728,9 @@ public class Bookmarket {
     	
     	Customer customer;
     	Book book;
-    	int value;
+    	double value;
     	
-    	public CreateReviewAction(Customer customer, Book book, int value) {
+    	public CreateReviewAction(Customer customer, Book book, double value) {
     		this.customer = customer;
     		
     		this.book = book;

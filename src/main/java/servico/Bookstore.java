@@ -275,7 +275,7 @@ public class Bookstore implements Serializable {
         return customersById.get(random.nextInt(customersById.size()));
     }
     
-    public static Review createReview(Customer customer, Book book, int value) throws IOException {
+    public static Review createReview(Customer customer, Book book, double value) throws IOException {
     	if(!customersById.contains(customer))
     		throw new IOException("Cliente não cadastrado");
     	
@@ -289,7 +289,7 @@ public class Bookstore implements Serializable {
     	return review;
     }
     
-    public static boolean changeReviewValue(int id, int value) throws IOException {
+    public static boolean changeReviewValue(int id, double value) throws IOException {
     	Optional<Review> review = getReviewById(id);
     	
     	if(review.isEmpty())

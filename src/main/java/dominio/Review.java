@@ -17,9 +17,9 @@ public class Review implements Serializable {
 	
 	private final Book book;
 	
-	private int value;
+	private double value;
 	
-	public Review(int id, Customer customer, Book book, int value) throws IOException
+	public Review(int id, Customer customer, Book book, double value) throws IOException
 	{
 		this.id = id;
 		
@@ -30,7 +30,7 @@ public class Review implements Serializable {
 		this.setValue(value);
 	}
 	
-	public Review(Customer customer, Book book, int value) throws IOException
+	public Review(Customer customer, Book book, double value) throws IOException
 	{
 		this.id = (int) (Math.random() * 51);
 		
@@ -47,11 +47,11 @@ public class Review implements Serializable {
 		return this.id;
 	}
 	
-	public int getValue() {
+	public double getValue() {
 		return this.value;
 	}
 	
-	public void setValue(int value) throws IOException {
+	public void setValue(double value) throws IOException {
 		this.validateEvaluateValue();
 		
 		this.value = value;
