@@ -500,6 +500,10 @@ public class Bookstore implements Serializable {
     public static Book getABookAnyBook(Random random) {
         return booksById.get(random.nextInt(booksById.size()));
     }
+    
+    public static Customer getRandomCustomer(Random random) {
+        return customersById.get(random.nextInt(customersById.size()));
+    }
 
     /**
      * <pre>
@@ -1218,9 +1222,16 @@ public class Bookstore implements Serializable {
     }
 
     private static void populateEvaluation(Random rand) {
-
-        System.out.print("Creating ");
-        // to do
+    	int number = 1000;
+        System.out.print("Creating " + number + " reviews");
+        
+        for(int i = 0; i < number; i++) {
+        	try {
+				createReview(getRandomCustomer(rand), getABookAnyBook(rand),(int) (Math.random() * 6));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+        }
         
     }
 
