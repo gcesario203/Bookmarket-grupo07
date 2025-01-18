@@ -79,6 +79,7 @@ public class Bookstore implements Serializable {
     private static final List<Address> addressById;
     private static final Map<Address, Address> addressByAll;
     private static final List<Customer> customersById;
+    private static final List<Review> reviewsByIds;
     private static final Map<String, Customer> customersByUsername;
     private static final List<Author> authorsById;
     private static final List<Book> booksById;
@@ -87,7 +88,6 @@ public class Bookstore implements Serializable {
     private final Map<Book, Stock> stockByBook;
     private final List<Cart> cartsById;
     private final List<Order> ordersById;
-    private final List<Review> reviewsByIds;
     private final LinkedList<Order> ordersByCreation;
     private final int id;
 
@@ -100,6 +100,7 @@ public class Bookstore implements Serializable {
         countryByName = new HashMap<>();
         addressById = new ArrayList<>();
         addressByAll = new HashMap<>();
+        reviewsByIds = new ArrayList<>();
         customersById = new ArrayList<>();
         customersByUsername = new HashMap<>();
         authorsById = new ArrayList<>();
@@ -117,7 +118,6 @@ public class Bookstore implements Serializable {
         this.id = id;
         cartsById = new ArrayList<>();
         ordersById = new ArrayList<>();
-        reviewsByIds = new ArrayList<>();
         ordersByCreation = new LinkedList<>();
         stockByBook = new HashMap<>();
     }
@@ -274,6 +274,50 @@ public class Bookstore implements Serializable {
     private Customer getACustomerAnyCustomer(Random random) {
         return customersById.get(random.nextInt(customersById.size()));
     }
+    
+    public static Review createReview(Customer customer, Book book, int value) throws IOException {
+    	Review review = new Review(customer, book, value);
+    	
+    	reviewsByIds.add(review);
+    	
+    	return review;
+    }
+    
+    public static boolean changeReviewValue(int id, int value) throws IOException {
+    	Optional<Review> review = getReviewById(id);
+    	
+    	if(review.isEmpty())
+    		return false;
+    	
+    	review.get().setValue(value);
+    	
+    	return true;
+    }
+    
+    public static boolean removeReviewById(int id) {
+    	return getReviews().removeIf(r -> r.getId() == id);
+    }
+    
+    public static List<Review> getReviews(){
+    	return reviewsByIds;
+    }
+    
+    public static Optional<Review> getReviewById(int id){
+    	return getReviews().stream().filter(r -> r.getId() == id).findFirst();
+    }
+    
+    public List<Review> getReviewsByBook(Book book){
+    	return getReviews().stream()
+    					   .filter(r -> r.getBook().getId() == book.getId())
+    				 	   .collect(Collectors.toList());
+    }
+    
+    public List<Review> getReviewsByCustomer(Customer customer){
+    	return getReviews().stream()
+				   .filter(r -> r.getCustomer().getId() == customer.getId())
+			 	   .collect(Collectors.toList());
+    }
+
 
     /**
      * <pre>
@@ -602,49 +646,6 @@ public class Bookstore implements Serializable {
         return ordersById;
     }
     
-    public Review createReview(Customer customer, Book book, int value) throws IOException {
-    	Review review = new Review(customer, book, value);
-    	
-    	this.reviewsByIds.add(review);
-    	
-    	return review;
-    }
-    
-    public boolean changeReviewValue(int id, int value) throws IOException {
-    	Optional<Review> review = getReviewById(id);
-    	
-    	if(review.isEmpty())
-    		return false;
-    	
-    	review.get().setValue(value);
-    	
-    	return true;
-    }
-    
-    public boolean removeReviewById(int id) {
-    	return getReviews().removeIf(r -> r.getId() == id);
-    }
-    
-    public List<Review> getReviews(){
-    	return this.reviewsByIds;
-    }
-    
-    public Optional<Review> getReviewById(int id){
-    	return getReviews().stream().filter(r -> r.getId() == id).findFirst();
-    }
-    
-    public List<Review> getReviewsByBook(Book book){
-    	return getReviews().stream()
-    					   .filter(r -> r.getBook().getId() == book.getId())
-    				 	   .collect(Collectors.toList());
-    }
-    
-    public List<Review> getReviewsByCustomer(Customer customer){
-    	return getReviews().stream()
-				   .filter(r -> r.getCustomer().getId() == customer.getId())
-			 	   .collect(Collectors.toList());
-    }
-
     /**
      *
      * @param subject
