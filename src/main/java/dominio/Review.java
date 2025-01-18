@@ -32,7 +32,7 @@ public class Review implements Serializable {
 	
 	public Review(Customer customer, Book book, double value) throws IOException
 	{
-		this.id = (int) (Math.random() * 51);
+		this.id = (int) (Math.random());
 		
 		this.customer = customer;
 		
