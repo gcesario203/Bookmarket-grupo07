@@ -13,8 +13,11 @@ import dominio.Country;
 import dominio.Customer;
 import dominio.Order;
 import dominio.OrderLine;
+import dominio.Review;
 import dominio.Stock;
 import util.TPCW_Util;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Descrição da Arquitetura do Bookstore
@@ -78,10 +82,12 @@ public class Bookstore implements Serializable {
     private static final Map<String, Customer> customersByUsername;
     private static final List<Author> authorsById;
     private static final List<Book> booksById;
+    
 
     private final Map<Book, Stock> stockByBook;
     private final List<Cart> cartsById;
     private final List<Order> ordersById;
+    private final List<Review> reviewsByIds;
     private final LinkedList<Order> ordersByCreation;
     private final int id;
 
@@ -111,6 +117,7 @@ public class Bookstore implements Serializable {
         this.id = id;
         cartsById = new ArrayList<>();
         ordersById = new ArrayList<>();
+        reviewsByIds = new ArrayList<>();
         ordersByCreation = new LinkedList<>();
         stockByBook = new HashMap<>();
     }
@@ -593,6 +600,49 @@ public class Bookstore implements Serializable {
      */
     public List<Order> getOrdersById() {
         return ordersById;
+    }
+    
+    public Review createReview(Customer customer, Book book, int value) throws IOException {
+    	Review review = new Review(customer, book, value);
+    	
+    	this.reviewsByIds.add(review);
+    	
+    	return review;
+    }
+    
+    public boolean changeReviewValue(int id, int value) throws IOException {
+    	Optional<Review> review = getReviewById(id);
+    	
+    	if(review.isEmpty())
+    		return false;
+    	
+    	review.get().setValue(value);
+    	
+    	return true;
+    }
+    
+    public boolean removeReviewById(int id) {
+    	return getReviews().removeIf(r -> r.getId() == id);
+    }
+    
+    public List<Review> getReviews(){
+    	return this.reviewsByIds;
+    }
+    
+    public Optional<Review> getReviewById(int id){
+    	return getReviews().stream().filter(r -> r.getId() == id).findFirst();
+    }
+    
+    public List<Review> getReviewsByBook(Book book){
+    	return getReviews().stream()
+    					   .filter(r -> r.getBook().getId() == book.getId())
+    				 	   .collect(Collectors.toList());
+    }
+    
+    public List<Review> getReviewsByCustomer(Customer customer){
+    	return getReviews().stream()
+				   .filter(r -> r.getCustomer().getId() == customer.getId())
+			 	   .collect(Collectors.toList());
     }
 
     /**
@@ -1080,7 +1130,7 @@ public class Bookstore implements Serializable {
         System.out.println(" Done");
     }
 
-    void populateInstanceBookstore(int number, Random rand, long now) {
+    public void populateInstanceBookstore(int number, Random rand, long now) {
         populateOrders(number, rand, now);
         populateStocks(number, rand, now);
 
