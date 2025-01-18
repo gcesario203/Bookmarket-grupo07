@@ -9,17 +9,17 @@ import java.io.Serializable;
 public class Evaluate implements Serializable {
 	private static final long serialVersionUID = -4063511252485472431L;
 	
-	private final Order order;
+	private final Customer customer;
 	
-	private final OrderLine orderLine;
+	private final Book book;
 	
 	private final int value;
 	
-	public Evaluate(Order order, OrderLine orderLine, int value) throws IOException
+	public Evaluate(Customer customer, Book book, int value) throws IOException
 	{
-		this.order = order;
+		this.customer = customer;
 		
-		this.orderLine = orderLine;
+		this.book = book;
 		
 		this.value = value;
 		
@@ -30,12 +30,12 @@ public class Evaluate implements Serializable {
 		return this.value;
 	}
 	
-	public Order getOrder() {
-		return this.order;
+	public Customer getCustomer() {
+		return this.customer;
 	}
 	
-	public OrderLine getOrderLine() {
-		return this.orderLine;
+	public Book getBook() {
+		return this.book;
 	}
 	
 	
