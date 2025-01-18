@@ -6,9 +6,13 @@ import dominio.Book;
 import dominio.Cart;
 import dominio.Customer;
 import dominio.Order;
+import dominio.Review;
+
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -301,8 +305,85 @@ public class BookstoreTest {
         Order result = instance.confirmBuy(customerId, cartId, comment, ccType, ccNumber, ccName, ccExpiry, shipping, shippingDate, addressId, now);
         assertEquals(expResult, result);
     }
-
-
+    
+    @Test
+    public void shouldHasPopulatedReviews() {
+    	assertEquals(instance.getReviews().size(), 1000);
+    }
+    
+    @Test(expected = IOException.class)
+    public void cannotCreateReviewWithInvalidValue() throws IOException {
+    	Customer customer = instance.getCustomer(1);
+    	
+    	Optional<Book> book = instance.getBook(1);
+    	
+    	instance.createReview(customer, book.get(), -1);
+    }
+    
+    @Test
+    public void shouldGetTheCorrectReviewById() {
+    	Review review = instance.getReviews().getFirst();
+    	
+    	assertEquals(review.getId(), instance.getReviewById(review.getId()).get().getId());
+    }
+    
+    @Test
+    public void shouldGetTheCorrectReviewByCustomer() {
+    	Review review = instance.getReviews().getFirst();
+    	
+    	boolean condition = instance.getReviewsByCustomer(review.getCustomer())
+    								.stream()
+    								.allMatch(r -> r.getCustomer().getId() == review.getCustomer().getId());
+    	assertTrue(condition);
+    }
+    
+    @Test
+    public void shouldGetTheCorrectReviewByBook() {
+    	Review review = instance.getReviews().getFirst();
+    	
+    	boolean condition = instance.getReviewsByBook(review.getBook())
+    								.stream()
+    								.allMatch(r -> r.getBook().getId() == review.getBook().getId());
+    	assertTrue(condition);
+    }
+    
+    @Test
+    public void shouldChangeAReview() throws IOException {
+    	Review review = instance.getReviews().getFirst();
+    	
+    	double randomValue = Math.random() * 6;
+    	
+    	double lastReview = review.getValue();
+    	
+    	if(randomValue == lastReview)
+    		randomValue = Math.random() * 6;
+    	
+    	instance.changeReviewValue(review.getId(), randomValue);
+    	
+    	Review changedReview = instance.getReviewById(review.getId()).get();
+    	
+    	assertTrue(randomValue == changedReview.getValue());
+    	
+    	assertFalse(lastReview == changedReview.getValue());
+    	
+    	assertTrue(changedReview.getId() == review.getId());
+    }
+    
+    @Test
+    public void shouldRemoveAReview() throws IOException {
+    	Review review = instance.getReviews().getFirst();
+    	
+    	instance.removeReviewById(review.getId());
+    	
+    	Optional<Review> removedReview = instance.getReviewById(review.getId());
+    	
+    	assertTrue(removedReview.isEmpty());
+    	
+    	int teste = instance.getReviews().size();
+    	assertEquals(instance.getReviews().size(), 999);
+    	
+    	instance.createReview(review.getCustomer(), review.getBook(), review.getValue());
+    }
 
 
     

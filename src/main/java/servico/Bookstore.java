@@ -304,7 +304,7 @@ public class Bookstore implements Serializable {
     	return getReviews().removeIf(r -> r.getId() == id);
     }
     
-    private static List<Review> getReviews(){
+    public static List<Review> getReviews(){
     	return reviewsByIds;
     }
     
