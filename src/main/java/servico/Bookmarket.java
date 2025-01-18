@@ -5,7 +5,10 @@ import dominio.Book;
 import dominio.Cart;
 import dominio.Customer;
 import dominio.Order;
+import dominio.Review;
 import dominio.Stock;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -215,6 +218,15 @@ public class Bookmarket {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public static Review createReview(Customer customer, Book book, int value) {
+    	try {
+    		return (Review) stateMachine.execute(new CreateReviewAction(customer, book, value));
+    	}
+    	catch(Exception e) {
+    		throw new RuntimeException(e);
+    	}
     }
 
     /**
@@ -615,7 +627,32 @@ public class Bookmarket {
          */
         public abstract Object executeOnBookstore(Stream<Bookstore> bookstore);
     }
-
+    
+    protected static class CreateReviewAction extends BookstoreAction {
+    	private static final long serialVersionUID = 6039962163328790677L;
+    	
+    	Customer customer;
+    	Book book;
+    	int value;
+    	
+    	public CreateReviewAction(Customer customer, Book book, int value) {
+    		this.customer = customer;
+    		
+    		this.book = book;
+    		
+    		this.value = value;
+    	}
+    	
+		@Override
+		public Object executeOnBookstore(Stream<Bookstore> bookstore) {
+			try {
+				return Bookstore.createReview(this.customer, this.book, this.value);	
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+	        }
+		}
+    }
     /**
      * Classe que implementa as ações relacionadas a criação de cliente.
      */
