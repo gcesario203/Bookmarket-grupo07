@@ -2,15 +2,16 @@ package dominio;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Random;
 import java.util.UUID;
 
 /*
  * Classe que possui a avaliação de um item de pedido de algum livro adquirido por um cliente
  */
-public class Evaluate implements Serializable {
+public class Review implements Serializable {
 	private static final long serialVersionUID = -4063511252485472431L;
 	
-	private final UUID id;
+	private final int id;
 	
 	private final Customer customer;
 	
@@ -18,7 +19,7 @@ public class Evaluate implements Serializable {
 	
 	private final int value;
 	
-	public Evaluate(UUID id, Customer customer, Book book, int value) throws IOException
+	public Review(int id, Customer customer, Book book, int value) throws IOException
 	{
 		this.id = id;
 		
@@ -31,9 +32,9 @@ public class Evaluate implements Serializable {
 		this.validateEvaluateValue();
 	}
 	
-	public Evaluate(Customer customer, Book book, int value) throws IOException
+	public Review(Customer customer, Book book, int value) throws IOException
 	{
-		this.id = UUID.randomUUID();
+		this.id = (int) (Math.random() * 51);
 		
 		this.customer = customer;
 		
@@ -44,7 +45,7 @@ public class Evaluate implements Serializable {
 		this.validateEvaluateValue();
 	}
 	
-	public string getId() {
+	public int getId() {
 		return this.id;
 	}
 	
