@@ -276,6 +276,12 @@ public class Bookstore implements Serializable {
     }
     
     public static Review createReview(Customer customer, Book book, int value) throws IOException {
+    	if(!customersById.contains(customer))
+    		throw new IOException("Cliente não cadastrado");
+    	
+    	if(!booksById.contains(book))
+    		throw new IOException("Livro não cadastrado");
+    	
     	Review review = new Review(customer, book, value);
     	
     	reviewsByIds.add(review);
