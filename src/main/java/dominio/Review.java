@@ -51,7 +51,7 @@ public class Review implements Serializable {
 		return this.value;
 	}
 	
-	public int setValue(int value) throws IOException {
+	public void setValue(int value) throws IOException {
 		this.validateEvaluateValue();
 		
 		this.value = value;
