@@ -379,10 +379,23 @@ public class BookstoreTest {
     	
     	assertTrue(removedReview.isEmpty());
     	
-    	int teste = instance.getReviews().size();
     	assertEquals(instance.getReviews().size(), 999);
     	
     	instance.createReview(review.getCustomer(), review.getBook(), review.getValue());
+    }
+    
+    @Test(expected = IOException.class)
+    public void cannotCreateAReviewWithoutAExistingCustomer() throws IOException {
+    	Book book = instance.getBook(1).get();
+    	
+    	instance.createReview(new Customer(-2, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, null, null, null), book, 2);
+    }
+    
+    @Test(expected = IOException.class)
+    public void cannotCreateAReviewWithoutAExistingBook() throws IOException {
+    	Customer customer = instance.getCustomer(1);
+    	
+    	instance.createReview(customer, new Book(-2, null, null, null, null, null, null, null, 0, null, null, 0, null, null, null), 0);
     }
 
 
