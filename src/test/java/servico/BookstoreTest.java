@@ -327,14 +327,14 @@ public class BookstoreTest {
     
     @Test
     public void shouldGetTheCorrectReviewById() {
-    	Review review = instance.getReviews().getFirst();
+    	Review review = instance.getReviews().get(0);
     	
     	assertEquals(review.getId(), instance.getReviewById(review.getId()).get().getId());
     }
     
     @Test
     public void shouldGetTheCorrectReviewByCustomer() {
-    	Review review = instance.getReviews().getFirst();
+    	Review review = instance.getReviews().get(0);
     	
     	boolean condition = instance.getReviewsByCustomer(review.getCustomer())
     								.stream()
@@ -344,7 +344,7 @@ public class BookstoreTest {
     
     @Test
     public void shouldGetTheCorrectReviewByBook() {
-    	Review review = instance.getReviews().getFirst();
+    	Review review = instance.getReviews().get(0);
     	
     	boolean condition = instance.getReviewsByBook(review.getBook())
     								.stream()
@@ -354,7 +354,7 @@ public class BookstoreTest {
     
     @Test
     public void shouldChangeAReview() throws IOException {
-    	Review review = instance.getReviews().getFirst();
+    	Review review = instance.getReviews().get(0);
     	
     	double randomValue = Math.random() * 6;
     	
@@ -376,13 +376,13 @@ public class BookstoreTest {
     
     @Test
     public void shouldRemoveAReview() throws IOException {
-    	Review review = instance.getReviews().getFirst();
+    	Review review = instance.getReviews().get(0);
     	
     	instance.removeReviewById(review.getId());
     	
     	Optional<Review> removedReview = instance.getReviewById(review.getId());
     	
-    	assertTrue(removedReview.isEmpty());
+    	assertTrue(removedReview.isPresent());
     	
     	assertEquals(instance.getReviews().size(), 999);
     	

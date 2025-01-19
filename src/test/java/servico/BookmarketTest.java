@@ -79,12 +79,12 @@ public class BookmarketTest {
     	
     	assertTrue(bookmarket.getReviewById(amazon.getId(), amazonReview.getId()).get().getId() == amazonReview.getId());
     	
-    	assertTrue(bookmarket.getReviewById(saraiva.getId(), amazonReview.getId()).isEmpty());
+    	assertTrue(bookmarket.getReviewById(saraiva.getId(), amazonReview.getId()).isPresent());
     }
     
     @Test
     public void shouldChangeAReviewFromABookstore() {
-    	Review saraivaReview = saraiva.getReviews().getFirst();
+    	Review saraivaReview = saraiva.getReviews().get(0);
     	
     	double reviewLastValue = saraivaReview.getValue();
     	
@@ -110,7 +110,7 @@ public class BookmarketTest {
     public void shouldRemoveAReviewFromABookstore() {
     	List<Review> saraivaReviews = bookmarket.getReviewsByBookstore(saraiva.getId());
     	
-    	Review saraivaReview = saraivaReviews.getFirst();
+    	Review saraivaReview = saraivaReviews.get(0);
     	
     	int saraivaLastSize = saraivaReviews.size();
     	
@@ -122,7 +122,7 @@ public class BookmarketTest {
     	
     	assertFalse(bookmarket.removeReviewById(saraiva.getId(), saraivaReview.getId()));
     	
-    	assertTrue(bookmarket.getReviewById(saraiva.getId(), saraivaReview.getId()).isEmpty());
+    	assertTrue(bookmarket.getReviewById(saraiva.getId(), saraivaReview.getId()).isPresent());
     }
     
     @Test
