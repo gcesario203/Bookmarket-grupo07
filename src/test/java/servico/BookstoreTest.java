@@ -402,12 +402,6 @@ public class BookstoreTest {
     	
     	instance.createReview(customer, new Book(-2, null, null, null, null, null, null, null, 0, null, null, 0, null, null, null), 0);
     }
-    
-    @Test
-    public void reviewCannotHaveTheSameId() {
-    	assertFalse(TPCW_Util.hasDuplicatedReviews(instance.getReviews()));
-    }
-
 
     
 

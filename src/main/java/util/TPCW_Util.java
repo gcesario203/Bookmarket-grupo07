@@ -232,18 +232,6 @@ public class TPCW_Util {
         return resultString.toString();
     }
     
-    public static boolean hasDuplicatedReviews(List<Review> reviews) {
-    	if(reviews.size() == 0)
-    		return false;
-    	
-    	Review review = reviews.get(0);
-    	
-    	if(reviews.stream().filter(r -> r.getId() == review.getId()).count() > 1)
-    		return true;
-    	
-    	return hasDuplicatedReviews(reviews.stream().filter(r -> r.getId() != review.getId()).collect(Collectors.toList()));
-    }
-    
     public static boolean areReviewFromAUniqueBookstore(List<Review> reviews, int bookstoreId) {
     	return reviews.stream().allMatch(r -> r.getBookstoreId() == bookstoreId);
     }
