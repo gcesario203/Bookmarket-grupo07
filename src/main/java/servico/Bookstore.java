@@ -292,7 +292,7 @@ public class Bookstore implements Serializable {
     public boolean changeReviewValue(String id, double value) throws IOException {
     	Optional<Review> review = getReviewById(id);
     	
-    	if(review.isPresent())
+    	if(!review.isPresent())
     		return false;
     	
     	review.get().setValue(value);

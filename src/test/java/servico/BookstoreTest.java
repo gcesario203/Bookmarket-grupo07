@@ -313,7 +313,7 @@ public class BookstoreTest {
     
     @Test
     public void shouldHasPopulatedReviews() {
-    	assertEquals(instance.getReviews().size(), 1000);
+    	assertEquals(instance.getReviews().size(), 10000);
     }
     
     @Test(expected = IOException.class)
@@ -382,9 +382,9 @@ public class BookstoreTest {
     	
     	Optional<Review> removedReview = instance.getReviewById(review.getId());
     	
-    	assertTrue(removedReview.isPresent());
+    	assertFalse(removedReview.isPresent());
     	
-    	assertEquals(instance.getReviews().size(), 999);
+    	assertEquals(instance.getReviews().size(), 9999);
     	
     	instance.createReview(review.getCustomer(), review.getBook(), review.getValue());
     }

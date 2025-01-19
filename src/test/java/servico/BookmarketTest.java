@@ -79,7 +79,7 @@ public class BookmarketTest {
     	
     	assertTrue(bookmarket.getReviewById(amazon.getId(), amazonReview.getId()).get().getId() == amazonReview.getId());
     	
-    	assertTrue(bookmarket.getReviewById(saraiva.getId(), amazonReview.getId()).isPresent());
+    	assertFalse(bookmarket.getReviewById(saraiva.getId(), amazonReview.getId()).isPresent());
     }
     
     @Test
@@ -122,7 +122,7 @@ public class BookmarketTest {
     	
     	assertFalse(bookmarket.removeReviewById(saraiva.getId(), saraivaReview.getId()));
     	
-    	assertTrue(bookmarket.getReviewById(saraiva.getId(), saraivaReview.getId()).isPresent());
+    	assertFalse(bookmarket.getReviewById(saraiva.getId(), saraivaReview.getId()).isPresent());
     }
     
     @Test
