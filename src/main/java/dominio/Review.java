@@ -11,7 +11,7 @@ import java.util.UUID;
 public class Review implements Serializable {
 	private static final long serialVersionUID = -4063511252485472431L;
 	
-	private final int id;
+	private final String id;
 	
 	private final Customer customer;
 	
@@ -19,7 +19,7 @@ public class Review implements Serializable {
 	
 	private double value;
 	
-	public Review(int id, Customer customer, Book book, double value) throws IOException
+	public Review(String id, Customer customer, Book book, double value) throws IOException
 	{
 		this.id = id;
 		
@@ -32,7 +32,7 @@ public class Review implements Serializable {
 	
 	public Review(Customer customer, Book book, double value) throws IOException
 	{
-		this.id = (int) (Math.random() * 10000);
+		this.id = UUID.randomUUID().toString();
 		
 		this.customer = customer;
 		
@@ -43,7 +43,7 @@ public class Review implements Serializable {
 		this.validateEvaluateValue();
 	}
 	
-	public int getId() {
+	public String getId() {
 		return this.id;
 	}
 	

@@ -230,7 +230,7 @@ public class Bookmarket {
     	}
     }
     
-    public static Optional<Review> getReviewById(int id){
+    public static Optional<Review> getReviewById(String id){
     	return (Optional<Review>) stateMachine.execute(new GetReviewByIdAction(id));
     }
     
@@ -242,7 +242,7 @@ public class Bookmarket {
     	return (List<Review>) stateMachine.execute(new GetReviewByCustomerAction(customer));
     }
     
-    public static boolean removeReviewById(int id) {
+    public static boolean removeReviewById(String id) {
     	return (boolean) stateMachine.execute(new RemoveReviewsByIdAction(id));
     }
 
@@ -648,9 +648,9 @@ public class Bookmarket {
     protected static class GetReviewByIdAction extends BookstoreAction{
     	private static final long serialVersionUID = 6439962163328790677L;
     	
-    	int id;
+    	String id;
     	
-    	public GetReviewByIdAction(int id) {
+    	public GetReviewByIdAction(String id) {
     		this.id = id;
     	}
 		@Override
@@ -690,9 +690,9 @@ public class Bookmarket {
     protected static class RemoveReviewsByIdAction extends BookstoreAction{
     	private static final long serialVersionUID = 6439962163328790677L;
     	
-    	int id;
+    	String id;
     	
-    	public RemoveReviewsByIdAction(int id) {
+    	public RemoveReviewsByIdAction(String id) {
     		this.id = id;
     	}
 		@Override
@@ -704,10 +704,10 @@ public class Bookmarket {
     protected static class ChangeReviewAction extends BookstoreAction{
     	private static final long serialVersionUID = 6239962163328790677L;
     	
-    	int id;
+    	String id;
     	double value;
     	
-    	public ChangeReviewAction(int id, double value) {
+    	public ChangeReviewAction(String id, double value) {
     		this.id = id;
     		
     		this.value = value;
