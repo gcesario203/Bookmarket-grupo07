@@ -79,7 +79,6 @@ public class Bookstore implements Serializable {
     private static final List<Address> addressById;
     private static final Map<Address, Address> addressByAll;
     private static final List<Customer> customersById;
-    private static final List<Review> reviewsByIds;
     private static final Map<String, Customer> customersByUsername;
     private static final List<Author> authorsById;
     private static final List<Book> booksById;
@@ -87,6 +86,7 @@ public class Bookstore implements Serializable {
 
     private final Map<Book, Stock> stockByBook;
     private final List<Cart> cartsById;
+    private final List<Review> reviewsByIds;
     private final List<Order> ordersById;
     private final LinkedList<Order> ordersByCreation;
     private final int id;
@@ -100,7 +100,6 @@ public class Bookstore implements Serializable {
         countryByName = new HashMap<>();
         addressById = new ArrayList<>();
         addressByAll = new HashMap<>();
-        reviewsByIds = new ArrayList<>();
         customersById = new ArrayList<>();
         customersByUsername = new HashMap<>();
         authorsById = new ArrayList<>();
@@ -118,6 +117,7 @@ public class Bookstore implements Serializable {
         this.id = id;
         cartsById = new ArrayList<>();
         ordersById = new ArrayList<>();
+        reviewsByIds = new ArrayList<>();
         ordersByCreation = new LinkedList<>();
         stockByBook = new HashMap<>();
     }
@@ -275,7 +275,7 @@ public class Bookstore implements Serializable {
         return customersById.get(random.nextInt(customersById.size()));
     }
     
-    public static Review createReview(Customer customer, Book book, double value) throws IOException {
+    public Review createReview(Customer customer, Book book, double value) throws IOException {
     	if(!customersById.contains(customer))
     		throw new IOException("Cliente não cadastrado");
     	
@@ -289,7 +289,7 @@ public class Bookstore implements Serializable {
     	return review;
     }
     
-    public static boolean changeReviewValue(String id, double value) throws IOException {
+    public boolean changeReviewValue(String id, double value) throws IOException {
     	Optional<Review> review = getReviewById(id);
     	
     	if(review.isEmpty())
@@ -300,25 +300,25 @@ public class Bookstore implements Serializable {
     	return true;
     }
     
-    public static boolean removeReviewById(String id) {
+    public boolean removeReviewById(String id) {
     	return getReviews().removeIf(r -> r.getId() == id);
     }
     
-    public static List<Review> getReviews(){
-    	return reviewsByIds;
+    public List<Review> getReviews(){
+    	return this.reviewsByIds;
     }
     
-    public static Optional<Review> getReviewById(String id){
+    public Optional<Review> getReviewById(String id){
     	return getReviews().stream().filter(r -> r.getId() == id).findFirst();
     }
     
-    public static List<Review> getReviewsByBook(Book book){
+    public List<Review> getReviewsByBook(Book book){
     	return getReviews().stream()
     					   .filter(r -> r.getBook().getId() == book.getId())
     				 	   .collect(Collectors.toList());
     }
     
-    public static List<Review> getReviewsByCustomer(Customer customer){
+    public List<Review> getReviewsByCustomer(Customer customer){
     	return getReviews().stream()
 				   .filter(r -> r.getCustomer().getId() == customer.getId())
 			 	   .collect(Collectors.toList());
@@ -499,10 +499,6 @@ public class Bookstore implements Serializable {
      */
     public static Book getABookAnyBook(Random random) {
         return booksById.get(random.nextInt(booksById.size()));
-    }
-    
-    public static Customer getRandomCustomer(Random random) {
-        return customersById.get(random.nextInt(customersById.size()));
     }
 
     /**
@@ -1144,9 +1140,21 @@ public class Bookstore implements Serializable {
     public void populateInstanceBookstore(int number, Random rand, long now) {
         populateOrders(number, rand, now);
         populateStocks(number, rand, now);
-
+        populateReviews(number, rand);
     }
-
+    
+    private void populateReviews(int number, Random rand) {
+        System.out.print("Creating " + number + " reviews");
+        
+        for(int i = 0; i < number; i++) {
+        	try {
+				createReview(getACustomerAnyCustomer(rand), getABookAnyBook(rand),(int) (Math.random() * 6));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+        }
+        
+    }
     private void populateStocks(int number, Random rand, long now) {
         System.out.print("Creating " + number + " stocks...");
         for (int i = 0; i < number; i++) {
@@ -1222,17 +1230,6 @@ public class Bookstore implements Serializable {
     }
 
     private static void populateEvaluation(Random rand) {
-    	int number = 1000;
-        System.out.print("Creating " + number + " reviews");
-        
-        for(int i = 0; i < number; i++) {
-        	try {
-				createReview(getRandomCustomer(rand), getABookAnyBook(rand),(int) (Math.random() * 6));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-        }
-        
     }
 
 }
