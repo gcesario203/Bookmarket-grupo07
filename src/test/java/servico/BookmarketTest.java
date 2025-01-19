@@ -75,7 +75,7 @@ public class BookmarketTest {
     	
     	Book amazonBook = amazon.getABookAnyBook(new Random(0));
     	
-    	Review amazonReview = bookmarket.createReview(amazon.getId(), amazonCustomer, amazonBook, Math.random() * 6);
+    	Review amazonReview = bookmarket.createReview(amazon.getId(), amazonCustomer, amazonBook, Math.random() * 5);
     	
     	assertTrue(bookmarket.getReviewById(amazon.getId(), amazonReview.getId()).get().getId() == amazonReview.getId());
     	
