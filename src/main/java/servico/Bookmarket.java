@@ -221,7 +221,7 @@ public class Bookmarket {
         }
     }
     
-    public static Review createReview(int bookstoreId, Customer customer, Book book, int value) {
+    public static Review createReview(int bookstoreId, Customer customer, Book book, double value) {
     	try {
     		return (Review) stateMachine.execute(new CreateReviewAction(customer, book, value, bookstoreId));
     	}
@@ -249,6 +249,14 @@ public class Bookmarket {
     
     public static boolean removeReviewById(int bookstoreId,String id) {
     	return (boolean) stateMachine.execute(new RemoveReviewsByIdAction(id, bookstoreId));
+    }
+    
+    public static boolean changeReviewValue(int bookstoreId, String id, double value) {
+    	return (boolean) stateMachine.execute(new ChangeReviewAction(id, value, bookstoreId));
+    }
+    
+    public static List<Review> getReviewsByBookstore(int bookstoreId){
+    	return (List<Review>) stateMachine.execute(new GetReviewsByBookstoreAction(bookstoreId));
     }
 
     /**
@@ -691,6 +699,17 @@ public class Bookmarket {
 		@Override
 		public Object executeOnBookstore(Stream<Bookstore> bookstore) {
 			return getBookstoreById(bookstore).getReviewById(this.id);
+		}
+    }
+    
+    protected static class GetReviewsByBookstoreAction extends ExpecificBookstoreAction{
+    	public GetReviewsByBookstoreAction(int bookstoreId) {
+    		super(bookstoreId);
+    	}
+    	
+		@Override
+		public Object executeOnBookstore(Stream<Bookstore> bookstore) {
+			return getBookstoreById(bookstore).getReviews();
 		}
     }
     

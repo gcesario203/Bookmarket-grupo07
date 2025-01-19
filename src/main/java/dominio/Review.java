@@ -17,9 +17,11 @@ public class Review implements Serializable {
 	
 	private final Book book;
 	
+	private final int bookstoreId;
+	
 	private double value;
 	
-	public Review(String id, Customer customer, Book book, double value) throws IOException
+	public Review(String id, Customer customer, Book book, double value, int bookstoreId) throws IOException
 	{
 		this.id = id;
 		
@@ -27,10 +29,12 @@ public class Review implements Serializable {
 		
 		this.book = book;
 		
+		this.bookstoreId = bookstoreId;
+		
 		this.setValue(value);
 	}
 	
-	public Review(Customer customer, Book book, double value) throws IOException
+	public Review(Customer customer, Book book, double value, int bookstoreId) throws IOException
 	{
 		this.id = UUID.randomUUID().toString();
 		
@@ -39,6 +43,8 @@ public class Review implements Serializable {
 		this.book = book;
 		
 		this.value = value;
+		
+		this.bookstoreId = bookstoreId;
 		
 		this.validateEvaluateValue();
 	}
@@ -63,6 +69,10 @@ public class Review implements Serializable {
 	
 	public Book getBook() {
 		return this.book;
+	}
+	
+	public int getBookstoreId() {
+		return this.bookstoreId;
 	}
 	
 	

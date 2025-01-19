@@ -3,6 +3,10 @@ package util;
 
 import java.util.*;
 
+import dominio.Book;
+import dominio.Customer;
+import dominio.Review;
+
 /**
  * *<img src="./doc-files/TPCW_Util.png" alt="TPCW_Util">
  */
@@ -225,6 +229,30 @@ public class TPCW_Util {
         }
 
         return resultString.toString();
+    }
+    
+    public static boolean hasDuplicatedReviews(List<Review> reviews) {
+    	if(reviews.isEmpty())
+    		return false;
+    	
+    	Review review = reviews.getFirst();
+    	
+    	if(reviews.stream().filter(r -> r.getId() == review.getId()).count() > 1)
+    		return true;
+    	
+    	return hasDuplicatedReviews(reviews.stream().filter(r -> r.getId() != review.getId()).toList());
+    }
+    
+    public static boolean areReviewFromAUniqueBookstore(List<Review> reviews, int bookstoreId) {
+    	return reviews.stream().allMatch(r -> r.getBookstoreId() == bookstoreId);
+    }
+    
+    public static boolean areAllReviewsFromTheSameBook(List<Review> reviews, Book book) {
+    	return reviews.stream().allMatch(r -> r.getBook().getId() == book.getId());
+    }
+    
+    public static boolean areAllReviewsFromTheSameCustomer(List<Review> reviews, Customer customer) {
+    	return reviews.stream().allMatch(r -> r.getCustomer().getId() == customer.getId());
     }
 
 }

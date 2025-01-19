@@ -7,6 +7,7 @@ import dominio.Cart;
 import dominio.Customer;
 import dominio.Order;
 import dominio.Review;
+import util.TPCW_Util;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -404,19 +405,7 @@ public class BookstoreTest {
     
     @Test
     public void reviewCannotHaveTheSameId() {
-    	assertFalse(hasDuplicatedReviews(instance.getReviews()));
-    }
-    
-    private boolean hasDuplicatedReviews(List<Review> reviews) {
-    	if(reviews.isEmpty())
-    		return false;
-    	
-    	Review review = reviews.getFirst();
-    	
-    	if(reviews.stream().filter(r -> r.getId() == review.getId()).count() > 1)
-    		return true;
-    	
-    	return hasDuplicatedReviews(reviews.stream().filter(r -> r.getId() != review.getId()).toList());
+    	assertFalse(TPCW_Util.hasDuplicatedReviews(instance.getReviews()));
     }
 
 

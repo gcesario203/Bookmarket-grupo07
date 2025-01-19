@@ -41,12 +41,12 @@ public class ReviewTest {
     	
     	Optional<Book> book = instance.getBook(1);
     	
-    	new Review(customer, book.get(), 6);
+    	new Review(customer, book.get(), 6, instance.getId());
     	
-    	new Review(customer, book.get(), -6);
+    	new Review(customer, book.get(), -6, instance.getId());
     	
-    	new Review(customer, book.get(),383836);
+    	new Review(customer, book.get(),383836, instance.getId());
     	
-    	new Review(customer, book.get(), 6);
+    	new Review(customer, book.get(), 6, instance.getId());
     }
 }
