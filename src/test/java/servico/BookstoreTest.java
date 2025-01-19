@@ -14,6 +14,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -396,6 +400,23 @@ public class BookstoreTest {
     	Customer customer = instance.getCustomer(1);
     	
     	instance.createReview(customer, new Book(-2, null, null, null, null, null, null, null, 0, null, null, 0, null, null, null), 0);
+    }
+    
+    @Test
+    public void reviewCannotHaveTheSameId() {
+    	assertFalse(hasDuplicatedReviews(instance.getReviews()));
+    }
+    
+    private boolean hasDuplicatedReviews(List<Review> reviews) {
+    	if(reviews.isEmpty())
+    		return false;
+    	
+    	Review review = reviews.getFirst();
+    	
+    	if(reviews.stream().filter(r -> r.getId() == review.getId()).count() > 1)
+    		return true;
+    	
+    	return hasDuplicatedReviews(reviews.stream().filter(r -> r.getId() != review.getId()).toList());
     }
 
 
