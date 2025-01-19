@@ -386,7 +386,7 @@ public class BookstoreTest {
     	
     	assertEquals(instance.getReviews().size(), 9999);
     	
-    	instance.createReview(review.getCustomer(), review.getBook(), review.getValue());
+    	instance.createReview(review.getCustomer(), review.getBook(), 2);
     }
     
     @Test(expected = IOException.class)
