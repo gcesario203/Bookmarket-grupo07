@@ -2,6 +2,7 @@ package util;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import dominio.Book;
 import dominio.Customer;
@@ -232,15 +233,15 @@ public class TPCW_Util {
     }
     
     public static boolean hasDuplicatedReviews(List<Review> reviews) {
-    	if(reviews.isEmpty())
+    	if(reviews.size() == 0)
     		return false;
     	
-    	Review review = reviews.getFirst();
+    	Review review = reviews.get(0);
     	
     	if(reviews.stream().filter(r -> r.getId() == review.getId()).count() > 1)
     		return true;
     	
-    	return hasDuplicatedReviews(reviews.stream().filter(r -> r.getId() != review.getId()).toList());
+    	return hasDuplicatedReviews(reviews.stream().filter(r -> r.getId() != review.getId()).collect(Collectors.toList()));
     }
     
     public static boolean areReviewFromAUniqueBookstore(List<Review> reviews, int bookstoreId) {
