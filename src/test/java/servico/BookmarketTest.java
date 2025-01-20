@@ -52,6 +52,8 @@ public class BookmarketTest {
     	List<Review> allReviews = bookmarket.getReviews();
     	
     	assertEquals(reviewsFromAmazon.size() + reviewsFromSaraiva.size(), allReviews.size());
+    	
+    	assertFalse(reviewsFromAmazon.equals(reviewsFromSaraiva));
     }
     
     @Test
