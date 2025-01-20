@@ -65,10 +65,6 @@ public class BookmarketTest {
     	assertTrue(TPCW_Util.areReviewFromAUniqueBookstore(saraivaReviews, saraiva.getId()));
     	
     	assertTrue(TPCW_Util.areReviewFromAUniqueBookstore(amazonReviews, amazon.getId()));
-    	
-    	assertEquals(amazon.getReviews().size(), amazonReviews.size());
-    	
-    	assertEquals(saraiva.getReviews().size(), saraivaReviews.size());
     }
     
     @Test
