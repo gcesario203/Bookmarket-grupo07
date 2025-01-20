@@ -358,7 +358,7 @@ public class BookstoreTest {
     	
     	double randomValue = Math.random() * 6;
     	
-    	double lastReview = review.getValue();
+    	double lastReview = review.getRating();
     	
     	if(randomValue == lastReview)
     		randomValue = Math.random() * 6;
@@ -367,9 +367,9 @@ public class BookstoreTest {
     	
     	Review changedReview = instance.getReviewById(review.getId()).get();
     	
-    	assertTrue(randomValue == changedReview.getValue());
+    	assertTrue(randomValue == changedReview.getRating());
     	
-    	assertFalse(lastReview == changedReview.getValue());
+    	assertFalse(lastReview == changedReview.getRating());
     	
     	assertTrue(changedReview.getId() == review.getId());
     }

@@ -19,9 +19,9 @@ public class Review implements Serializable {
 	
 	private final int bookstoreId;
 	
-	private double value;
+	private double rating;
 	
-	public Review(String id, Customer customer, Book book, double value, int bookstoreId) throws IOException
+	public Review(String id, Customer customer, Book book, double rating, int bookstoreId) throws IOException
 	{
 		this.id = id;
 		
@@ -31,7 +31,7 @@ public class Review implements Serializable {
 		
 		this.bookstoreId = bookstoreId;
 		
-		this.setValue(value);
+		this.setRating(rating);
 	}
 	
 	public Review(Customer customer, Book book, double value, int bookstoreId) throws IOException
@@ -42,25 +42,25 @@ public class Review implements Serializable {
 		
 		this.book = book;
 		
-		this.value = value;
+		this.rating = value;
 		
 		this.bookstoreId = bookstoreId;
 		
-		this.validateEvaluateValue();
+		this.validateRatingValue();
 	}
 	
 	public String getId() {
 		return this.id;
 	}
 	
-	public double getValue() {
-		return this.value;
+	public double getRating() {
+		return this.rating;
 	}
 	
-	public void setValue(double value) throws IOException {
-		this.validateEvaluateValue();
+	public void setRating(double value) throws IOException {
+		this.validateRatingValue();
 		
-		this.value = value;
+		this.rating = value;
 	}
 	
 	public Customer getCustomer() {
@@ -76,8 +76,8 @@ public class Review implements Serializable {
 	}
 	
 	
-	private void validateEvaluateValue() throws IOException {
-		if(this.value < 0 || this.value > 5)
+	private void validateRatingValue() throws IOException {
+		if(this.rating < 0 || this.rating > 5)
 			throw new IOException("Avaliação com valor inválido");
 	}
 }

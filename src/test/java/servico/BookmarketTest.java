@@ -86,7 +86,7 @@ public class BookmarketTest {
     public void shouldChangeAReviewFromABookstore() {
     	Review saraivaReview = saraiva.getReviews().get(0);
     	
-    	double reviewLastValue = saraivaReview.getValue();
+    	double reviewLastValue = saraivaReview.getRating();
     	
     	double newValue = Math.random() * 6;
     	
@@ -101,9 +101,9 @@ public class BookmarketTest {
     	
     	assertEquals(changedSaraivaReview.getId(), saraivaReview.getId());
     	
-    	assertTrue(changedSaraivaReview.getValue() == newValue);
+    	assertTrue(changedSaraivaReview.getRating() == newValue);
     	
-    	assertFalse(changedSaraivaReview.getValue() == reviewLastValue);
+    	assertFalse(changedSaraivaReview.getRating() == reviewLastValue);
     }
     
     @Test

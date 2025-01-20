@@ -295,7 +295,7 @@ public class Bookstore implements Serializable {
     	if(!review.isPresent())
     		return false;
     	
-    	review.get().setValue(value);
+    	review.get().setRating(value);
     	
     	return true;
     }
