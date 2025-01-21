@@ -88,7 +88,7 @@ public class BookmarketTest {
     	
     	double newValue = Math.random() * 6;
     	
-    	while(reviewLastValue == newValue)
+    	while(reviewLastValue == newValue || newValue > 5)
     		newValue = Math.random() * 6;
     	
     	boolean result = bookmarket.changeReviewValue(saraiva.getId(), saraivaReview.getId(), newValue);
