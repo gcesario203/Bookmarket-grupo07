@@ -36,17 +36,34 @@ public class ReviewTest {
     }
     
     @Test(expected = IOException.class)
-    public void ShouldThrowExceptionWhenCreateWithInvalidValue() throws IOException {
+    public void ShouldThrowExceptionWhenCreateWithInvalidValueBiggerThanFive() throws IOException {
     	Customer customer = instance.getCustomer(1);
     	
     	Optional<Book> book = instance.getBook(1);
     	
     	new Review(customer, book.get(), 6, instance.getId());
-    	
-    	new Review(customer, book.get(), -6, instance.getId());
-    	
-    	new Review(customer, book.get(),383836, instance.getId());
-    	
-    	new Review(customer, book.get(), 6, instance.getId());
+
+    }
+
+    @Test(expected = IOException.class)
+    public void ShouldThrowExceptionWhenCreateWithInvalidValueSmallerThanZero() throws IOException {
+    	Customer customer = instance.getCustomer(1);
+
+    	Optional<Book> book = instance.getBook(1);
+
+    	new Review(customer, book.get(), -1, instance.getId());
+
+    }
+
+    @Test
+    public void ShouldCreateReviewWithValidValue() throws IOException {
+    	Customer customer = instance.getCustomer(1);
+
+    	Optional<Book> book = instance.getBook(1);
+
+    	Review review = new Review(customer, book.get(), 3, instance.getId());
+
+    	assertEquals(3, review.getRating(), 0);
+
     }
 }
