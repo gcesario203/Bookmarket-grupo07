@@ -8,3 +8,8 @@
 /bookMarketCore/nbproject/
 
 .idea
+
+
+.classpath
+.project
+.settings/*

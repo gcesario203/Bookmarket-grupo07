@@ -13,8 +13,11 @@ import dominio.Country;
 import dominio.Customer;
 import dominio.Order;
 import dominio.OrderLine;
+import dominio.Review;
 import dominio.Stock;
 import util.TPCW_Util;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Descrição da Arquitetura do Bookstore
@@ -78,9 +82,11 @@ public class Bookstore implements Serializable {
     private static final Map<String, Customer> customersByUsername;
     private static final List<Author> authorsById;
     private static final List<Book> booksById;
+    
 
     private final Map<Book, Stock> stockByBook;
     private final List<Cart> cartsById;
+    private final List<Review> reviewsByIds;
     private final List<Order> ordersById;
     private final LinkedList<Order> ordersByCreation;
     private final int id;
@@ -111,6 +117,7 @@ public class Bookstore implements Serializable {
         this.id = id;
         cartsById = new ArrayList<>();
         ordersById = new ArrayList<>();
+        reviewsByIds = new ArrayList<>();
         ordersByCreation = new LinkedList<>();
         stockByBook = new HashMap<>();
     }
@@ -267,6 +274,56 @@ public class Bookstore implements Serializable {
     private Customer getACustomerAnyCustomer(Random random) {
         return customersById.get(random.nextInt(customersById.size()));
     }
+    
+    public Review createReview(Customer customer, Book book, double value) throws IOException {
+    	if(!customersById.contains(customer))
+    		throw new IOException("Cliente não cadastrado");
+    	
+    	if(!booksById.contains(book))
+    		throw new IOException("Livro não cadastrado");
+    	
+    	Review review = new Review(customer, book, value, this.id);
+    	
+    	reviewsByIds.add(review);
+    	
+    	return review;
+    }
+    
+    public boolean changeReviewValue(String id, double value) throws IOException {
+    	Optional<Review> review = getReviewById(id);
+    	
+    	if(!review.isPresent())
+    		return false;
+    	
+    	review.get().setRating(value);
+    	
+    	return true;
+    }
+    
+    public boolean removeReviewById(String id) {
+    	return getReviews().removeIf(r -> r.getId() == id);
+    }
+    
+    public List<Review> getReviews(){
+    	return this.reviewsByIds;
+    }
+    
+    public Optional<Review> getReviewById(String id){
+    	return getReviews().stream().filter(r -> r.getId() == id).findFirst();
+    }
+    
+    public List<Review> getReviewsByBook(Book book){
+    	return getReviews().stream()
+    					   .filter(r -> r.getBook().getId() == book.getId())
+    				 	   .collect(Collectors.toList());
+    }
+    
+    public List<Review> getReviewsByCustomer(Customer customer){
+    	return getReviews().stream()
+				   .filter(r -> r.getCustomer().getId() == customer.getId())
+			 	   .collect(Collectors.toList());
+    }
+
 
     /**
      * <pre>
@@ -594,7 +651,7 @@ public class Bookstore implements Serializable {
     public List<Order> getOrdersById() {
         return ordersById;
     }
-
+    
     /**
      *
      * @param subject
@@ -1080,12 +1137,24 @@ public class Bookstore implements Serializable {
         System.out.println(" Done");
     }
 
-    void populateInstanceBookstore(int number, Random rand, long now) {
+    public void populateInstanceBookstore(int number, Random rand, long now) {
         populateOrders(number, rand, now);
         populateStocks(number, rand, now);
-
+        populateReviews(number, rand);
     }
-
+    
+    private void populateReviews(int number, Random rand) {
+        System.out.print("Creating " + number + " reviews");
+        
+        for(int i = 0; i < number; i++) {
+        	try {
+				createReview(getACustomerAnyCustomer(rand), getABookAnyBook(rand),(int) (Math.random() * 6));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+        }
+        
+    }
     private void populateStocks(int number, Random rand, long now) {
         System.out.print("Creating " + number + " stocks...");
         for (int i = 0; i < number; i++) {
@@ -1161,10 +1230,6 @@ public class Bookstore implements Serializable {
     }
 
     private static void populateEvaluation(Random rand) {
-
-        System.out.print("Creating ");
-        // to do
-        
     }
 
 }

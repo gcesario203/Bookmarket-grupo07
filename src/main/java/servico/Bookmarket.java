@@ -5,12 +5,16 @@ import dominio.Book;
 import dominio.Cart;
 import dominio.Customer;
 import dominio.Order;
+import dominio.Review;
 import dominio.Stock;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -215,6 +219,44 @@ public class Bookmarket {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public static Review createReview(int bookstoreId, Customer customer, Book book, double value) {
+    	try {
+    		return (Review) stateMachine.execute(new CreateReviewAction(customer, book, value, bookstoreId));
+    	}
+    	catch(Exception e) {
+    		throw new RuntimeException(e);
+    	}
+    }
+    
+    public static List<Review> getReviews()
+    {
+    	return (List<Review>) stateMachine.execute(new GetReviewsAction());
+    }
+    
+    public static Optional<Review> getReviewById(int bookstoreId, String id){
+    	return (Optional<Review>) stateMachine.execute(new GetReviewByIdAction(id, bookstoreId));
+    }
+    
+    public static List<Review> getReviewsByBook(int bookstoreId,Book book){
+    	return (List<Review>) stateMachine.execute(new GetReviewByBookAction(book, bookstoreId));
+    }
+    
+    public static List<Review> getReviewsByCustomer(int bookstoreId,Customer customer){
+    	return (List<Review>) stateMachine.execute(new GetReviewByCustomerAction(customer, bookstoreId));
+    }
+    
+    public static boolean removeReviewById(int bookstoreId,String id) {
+    	return (boolean) stateMachine.execute(new RemoveReviewsByIdAction(id, bookstoreId));
+    }
+    
+    public static boolean changeReviewValue(int bookstoreId, String id, double value) {
+    	return (boolean) stateMachine.execute(new ChangeReviewAction(id, value, bookstoreId));
+    }
+    
+    public static List<Review> getReviewsByBookstore(int bookstoreId){
+    	return (List<Review>) stateMachine.execute(new GetReviewsByBookstoreAction(bookstoreId));
     }
 
     /**
@@ -586,6 +628,22 @@ public class Bookmarket {
             throw new RuntimeException(e);
         }
     }
+    
+    protected static abstract class ExpecificBookstoreAction extends BookstoreAction{
+    	
+    	int bookstoreId;
+    	
+    	public ExpecificBookstoreAction(int bookstoreId) {
+    		this.bookstoreId = bookstoreId;
+    	}
+    	
+    	protected Bookstore getBookstoreById(Stream<Bookstore> bookstores) {
+    		return bookstores.filter(b -> b.getId() == this.bookstoreId).findFirst().get();
+    	}
+    	
+    	@Override
+    	public abstract Object executeOnBookstore(Stream<Bookstore> bookstore);
+    }
 
     /**
      * Classe abstrata para representar os métodos padrões da implementação das
@@ -615,7 +673,140 @@ public class Bookmarket {
          */
         public abstract Object executeOnBookstore(Stream<Bookstore> bookstore);
     }
+    
+    protected static class GetReviewsAction extends BookstoreAction{
+    	private static final long serialVersionUID = 7439962163328790677L;
 
+		@Override
+		public Object executeOnBookstore(Stream<Bookstore> bookstore) {
+			List<Review> reviews = new ArrayList<Review>();
+			
+			bookstore.forEach(b -> reviews.addAll(b.getReviews()));
+			
+			return reviews;
+		}
+    }
+    
+    protected static class GetReviewByIdAction extends ExpecificBookstoreAction{
+    	private static final long serialVersionUID = 6439962163328790677L;
+    	
+    	String id;
+    	
+    	public GetReviewByIdAction(String id, int bookstoreId) {
+    		super(bookstoreId);
+    		this.id = id;
+    	}
+		@Override
+		public Object executeOnBookstore(Stream<Bookstore> bookstore) {
+			return getBookstoreById(bookstore).getReviewById(this.id);
+		}
+    }
+    
+    protected static class GetReviewsByBookstoreAction extends ExpecificBookstoreAction{
+    	public GetReviewsByBookstoreAction(int bookstoreId) {
+    		super(bookstoreId);
+    	}
+    	
+		@Override
+		public Object executeOnBookstore(Stream<Bookstore> bookstore) {
+			return getBookstoreById(bookstore).getReviews();
+		}
+    }
+    
+    protected static class GetReviewByBookAction extends ExpecificBookstoreAction{
+    	private static final long serialVersionUID = 6439962163328790677L;
+    	
+    	Book book;
+    	
+    	public GetReviewByBookAction(Book book, int bookstoreId) {
+    		super(bookstoreId);
+    		this.book = book;
+    	}
+		@Override
+		public Object executeOnBookstore(Stream<Bookstore> bookstore) {
+			return getBookstoreById(bookstore).getReviewsByBook(this.book);
+		}
+    }
+    
+    protected static class GetReviewByCustomerAction extends ExpecificBookstoreAction{
+    	private static final long serialVersionUID = 6439962163328790677L;
+    	
+    	Customer customer;
+    	
+    	public GetReviewByCustomerAction(Customer customer, int bookstoreId) {
+    		super(bookstoreId);
+    		this.customer = customer;
+    	}
+		@Override
+		public Object executeOnBookstore(Stream<Bookstore> bookstore) {
+			return getBookstoreById(bookstore).getReviewsByCustomer(this.customer);
+		}
+    }
+    
+    protected static class RemoveReviewsByIdAction extends ExpecificBookstoreAction{
+    	private static final long serialVersionUID = 6439962163328790677L;
+    	
+    	String id;
+    	
+    	public RemoveReviewsByIdAction(String id, int bookstoreId) {
+    		super(bookstoreId);
+    		this.id = id;
+    	}
+		@Override
+		public Object executeOnBookstore(Stream<Bookstore> bookstore) {
+			return getBookstoreById(bookstore).removeReviewById(this.id);
+		}
+    }
+    
+    protected static class ChangeReviewAction extends ExpecificBookstoreAction{
+    	private static final long serialVersionUID = 6239962163328790677L;
+    	
+    	String id;
+    	double value;
+    	
+    	public ChangeReviewAction(String id, double value, int bookstoreId) {
+    		super(bookstoreId);
+    		this.id = id;
+    		
+    		this.value = value;
+    	}
+
+		@Override
+		public Object executeOnBookstore(Stream<Bookstore> bookstore) {
+			try {
+				return getBookstoreById(bookstore).changeReviewValue(id, value);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+    }
+    
+    protected static class CreateReviewAction extends ExpecificBookstoreAction {
+    	private static final long serialVersionUID = 6039962163328790677L;
+    	
+    	Customer customer;
+    	Book book;
+    	double value;
+    	
+    	public CreateReviewAction(Customer customer, Book book, double value, int bookstoreId) {
+    		super(bookstoreId);
+    		this.customer = customer;
+    		
+    		this.book = book;
+    		
+    		this.value = value;
+    	}
+    	
+		@Override
+		public Object executeOnBookstore(Stream<Bookstore> bookstore) {
+			try {
+				return getBookstoreById(bookstore).createReview(this.customer, this.book, this.value);	
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+	        }
+		}
+    }
     /**
      * Classe que implementa as ações relacionadas a criação de cliente.
      */
