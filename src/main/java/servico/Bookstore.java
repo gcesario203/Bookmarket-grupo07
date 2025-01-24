@@ -289,7 +289,7 @@ public class Bookstore implements Serializable {
     	return review;
     }
     
-    public boolean changeReviewValue(String id, double value) throws IOException {
+    public boolean changeReviewValue(int id, double value) throws IOException {
     	Optional<Review> review = getReviewById(id);
     	
     	if(!review.isPresent())
@@ -300,7 +300,7 @@ public class Bookstore implements Serializable {
     	return true;
     }
     
-    public boolean removeReviewById(String id) {
+    public boolean removeReviewById(int id) {
     	return getReviews().removeIf(r -> r.getId() == id);
     }
     
@@ -308,7 +308,7 @@ public class Bookstore implements Serializable {
     	return this.reviewsByIds;
     }
     
-    public Optional<Review> getReviewById(String id){
+    public Optional<Review> getReviewById(int id){
     	return getReviews().stream().filter(r -> r.getId() == id).findFirst();
     }
     

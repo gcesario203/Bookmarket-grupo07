@@ -2,8 +2,7 @@ package dominio;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Random;
-import java.util.UUID;
+import servico.IdGenerator;
 
 /*
  * Classe que possui a avaliação de um item de pedido de algum livro adquirido por um cliente
@@ -11,7 +10,7 @@ import java.util.UUID;
 public class Review implements Serializable {
 	private static final long serialVersionUID = -4063511252485472431L;
 	
-	private final String id;
+	private final int id;
 	
 	private final Customer customer;
 	
@@ -21,22 +20,9 @@ public class Review implements Serializable {
 	
 	private double rating;
 	
-	public Review(String id, Customer customer, Book book, double rating, int bookstoreId) throws IOException
-	{
-		this.id = id;
-		
-		this.customer = customer;
-		
-		this.book = book;
-		
-		this.bookstoreId = bookstoreId;
-		
-		this.setRating(rating);
-	}
-	
 	public Review(Customer customer, Book book, double rating, int bookstoreId) throws IOException
 	{
-		this.id = UUID.randomUUID().toString();
+		this.id = IdGenerator.getInstance().getNextReviewId();;
 		
 		this.customer = customer;
 		
@@ -47,7 +33,7 @@ public class Review implements Serializable {
 		this.setRating(rating);
 	}
 	
-	public String getId() {
+	public int getId() {
 		return this.id;
 	}
 	
