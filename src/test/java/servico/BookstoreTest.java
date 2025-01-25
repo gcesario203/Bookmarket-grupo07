@@ -416,8 +416,8 @@ public class BookstoreTest {
     @Test
     public void ShouldReturnNewBookstoreId() {
         int expResult = 24;
-        instance = new Bookstore(expResult);
-        int result = instance.getId();
+        Bookstore testBookstore = new Bookstore(expResult);
+        int result = testBookstore.getId();
         assertEquals(expResult, result);
     }
 
@@ -429,22 +429,47 @@ public class BookstoreTest {
         Random random = new Random();
         Book result = Bookstore.getABookAnyBook(random);
         assertNotNull(result);
-}
+    }
 
     /**
      * Test of getOrdersById method, of class Bookstore.
      */
-    //@Test
-    public void testGetOrdersById() {
-        System.out.println("getOrdersById");
-        Bookstore instance = null;
-        List<Order> expResult = null;
+    @Test
+    public void ShouldReturnCreatedInstanceOrdersId() {
         List<Order> result = instance.getOrdersById();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        for(int i = 0; i < 10000; i++) {
+            assertEquals(i, result.get(i).getId());
+        }
     }
 
+    @Test
+    public void ShouldReturnNewBookstoreOrdersId() {
+        long seed = 1;
+        long now = System.currentTimeMillis();
+        int items = 2;
+        int customers = 2;
+        int addresses = 2;
+        int authors = 1;
+        int orders = 10;
+        Random rand = new Random();
+        Bookstore.populate(seed, now, items, customers, addresses, authors);
+        Bookstore bookStore1 = new Bookstore(13);
+        Bookstore bookStore2 = new Bookstore(14);
+        bookStore1.populateInstanceBookstore(orders, rand, now);
+        bookStore2.populateInstanceBookstore(orders, rand, now);
+
+        List<Order> result1 = bookStore1.getOrdersById();
+        for(int i = 0; i < 10; i++) {
+            assertEquals(i, result1.get(i).getId());
+        }
+
+        List<Order> result2 = bookStore2.getOrdersById();
+        for(int i = 0; i < 10; i++) {
+            assertEquals(i, result2.get(i).getId());
+        }
+
+        assertNotSame(result2,result1);
+    }
     
 
     /**
