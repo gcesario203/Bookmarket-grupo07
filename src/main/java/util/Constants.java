@@ -69,4 +69,14 @@ public class Constants {
             "Dollars", "Baht", "Dollars", "Lira", "Bolivar",
             "Kwacha"
     };
+
+    public enum Subject {
+        ARTS, BIOGRAPHIES, BUSINESS, CHILDREN, COMPUTERS, COOKING, HEALTH, HISTORY, HOME, HUMOR,
+        LITERATURE, MYSTERY, NON_FICTION, PARENTING, POLITICS, REFERENCE, RELIGION, ROMANCE,
+        SELF_HELP, SCIENCE_NATURE, SCIENCE_FICTION, SPORTS, YOUTH, TRAVEL
+    }
+
+    public enum Backing {
+        HARDBACK, PAPERBACK, USED, AUDIO, LIMITED_EDITION
+    }
 }

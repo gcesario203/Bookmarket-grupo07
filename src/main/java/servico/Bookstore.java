@@ -1005,53 +1005,7 @@ public class Bookstore implements Serializable {
         System.out.println(" Done");
     }
 
-    /**
-     * Este método irá popular quais assuntos são possíveis de serem buscados
-     * pelo consumidor.
-     */
-    private static final String[] SUBJECTS = {"ARTS", "BIOGRAPHIES", "BUSINESS", "CHILDREN",
-        "COMPUTERS", "COOKING", "HEALTH", "HISTORY",
-        "HOME", "HUMOR", "LITERATURE", "MYSTERY",
-        "NON-FICTION", "PARENTING", "POLITICS",
-        "REFERENCE", "RELIGION", "ROMANCE",
-        "SELF-HELP", "SCIENCE-NATURE", "SCIENCE_FICTION",
-        "SPORTS", "YOUTH", "TRAVEL"};
-    private static final String[] BACKINGS = {"HARDBACK", "PAPERBACK", "USED", "AUDIO",
-        "LIMITED-EDITION"};
-
-    private static void populateBooks(int number, Random rand) {
-
-        System.out.print("Creating " + number + " books...");
-
-        for (int i = 0; i < number; i++) {
-            if (i % 10000 == 0) {
-                System.out.print(".");
-            }
-            Author author = getAnAuthorAnyAuthor(rand);
-            Date pubdate = TPCW_Util.getRandomPublishdate(rand);
-            double srp = TPCW_Util.getRandomInt(rand, 100, 99999) / 100.0;
-            String subject = SUBJECTS[rand.nextInt(SUBJECTS.length)];
-            String title = subject + " " + TPCW_Util.getRandomString(rand, 14, 60);
-            createBook(
-                    title,
-                    pubdate,
-                    TPCW_Util.getRandomString(rand, 14, 60),
-                    SUBJECTS[rand.nextInt(SUBJECTS.length)],
-                    TPCW_Util.getRandomString(rand, 100, 500),
-                    "img" + i % 100 + "/thumb_" + i + ".gif",
-                    "img" + i % 100 + "/image_" + i + ".gif",
-                    srp,
-                    new Date(pubdate.getTime()
-                            + TPCW_Util.getRandomInt(rand, 1, 30) * 86400000 /* a day */),
-                    TPCW_Util.getRandomString(rand, 13, 13),
-                    TPCW_Util.getRandomInt(rand, 20, 9999),
-                    BACKINGS[rand.nextInt(BACKINGS.length)],
-                    (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
-                    + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
-                    + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0),
-                    author);
-        }
-
+    private static void setRelatedBooks(int number, Random rand) {
         for (int i = 0; i < number; i++) {
             Book book = booksById.get(i);
             HashSet<Book> related = new HashSet<>();
@@ -1061,18 +1015,54 @@ public class Bookstore implements Serializable {
                     related.add(relatedBook);
                 }
             }
-            Book[] relatedArray = new Book[]{booksById.get(TPCW_Util.getRandomInt(rand, 0, number - 1)),
-                booksById.get(TPCW_Util.getRandomInt(rand, 0, number - 1)),
-                booksById.get(TPCW_Util.getRandomInt(rand, 0, number - 1)),
-                booksById.get(TPCW_Util.getRandomInt(rand, 0, number - 1)),
-                booksById.get(TPCW_Util.getRandomInt(rand, 0, number - 1))};
-            relatedArray = related.toArray(relatedArray);
+            Book[] relatedArray = related.toArray(new Book[0]);
             book.setRelated1(relatedArray[0]);
             book.setRelated2(relatedArray[1]);
             book.setRelated3(relatedArray[2]);
             book.setRelated4(relatedArray[3]);
             book.setRelated5(relatedArray[4]);
         }
+    }
+
+    /**
+     * Este método irá popular quais assuntos são possíveis de serem buscados
+     * pelo consumidor.
+     */
+    private static void populateBooks(int number, Random rand) {
+        System.out.print("Creating " + number + " books...");
+
+        for (int i = 0; i < number; i++) {
+            if (i % 10000 == 0) {
+                System.out.print(".");
+            }
+
+            Author author = getAnAuthorAnyAuthor(rand);
+            Date pubdate = TPCW_Util.getRandomPublishdate(rand);
+            double srp = TPCW_Util.getRandomInt(rand, 100, 99999) / 100.0;
+            Subject subject = Subject.values()[rand.nextInt(Subject.values().length)];
+            String title = subject.name() + " " + TPCW_Util.getRandomString(rand, 14, 60);
+            Backing backing = Backing.values()[rand.nextInt(Backing.values().length)];
+
+            createBook(
+                    title,
+                    pubdate,
+                    TPCW_Util.getRandomString(rand, 14, 60), // Publisher
+                    subject.name(), // Usando subject como string
+                    TPCW_Util.getRandomString(rand, 100, 500), // Description
+                    "img" + i % 100 + "/thumb_" + i + ".gif", // Thumbnail
+                    "img" + i % 100 + "/image_" + i + ".gif", // Image
+                    srp, // SRP
+                    new Date(pubdate.getTime() + TPCW_Util.getRandomInt(rand, 1, 30) * 86400000L), // Availability date
+                    TPCW_Util.getRandomString(rand, 13, 13), // ISBN
+                    TPCW_Util.getRandomInt(rand, 20, 9999), // Stock
+                    backing.name(), // Usando backing como string
+                    (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
+                            + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
+                            + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0), // Dimensions
+                    author
+            );
+        }
+        setRelatedBooks(number, rand);
 
         System.out.println(" Done");
     }
