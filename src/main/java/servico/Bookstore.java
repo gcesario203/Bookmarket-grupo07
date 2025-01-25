@@ -35,7 +35,7 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static util.Constants.*;
+import static util.BookstoreConstants.*;
 
 /**
  * Descrição da Arquitetura do Bookstore

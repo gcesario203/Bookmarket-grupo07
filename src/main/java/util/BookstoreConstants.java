@@ -1,6 +1,6 @@
 package util;
 
-public class Constants {
+public class BookstoreConstants {
     public static final String[] COUNTRIES = {
             "United States", "United Kingdom", "Canada",
             "Germany", "France", "Japan", "Netherlands",
