@@ -235,7 +235,7 @@ public class Bookmarket {
     	return (List<Review>) stateMachine.execute(new GetReviewsAction());
     }
     
-    public static Optional<Review> getReviewById(int bookstoreId, String id){
+    public static Optional<Review> getReviewById(int bookstoreId, int id){
     	return (Optional<Review>) stateMachine.execute(new GetReviewByIdAction(id, bookstoreId));
     }
     
@@ -247,11 +247,11 @@ public class Bookmarket {
     	return (List<Review>) stateMachine.execute(new GetReviewByCustomerAction(customer, bookstoreId));
     }
     
-    public static boolean removeReviewById(int bookstoreId,String id) {
+    public static boolean removeReviewById(int bookstoreId,int id) {
     	return (boolean) stateMachine.execute(new RemoveReviewsByIdAction(id, bookstoreId));
     }
     
-    public static boolean changeReviewValue(int bookstoreId, String id, double value) {
+    public static boolean changeReviewValue(int bookstoreId, int id, double value) {
     	return (boolean) stateMachine.execute(new ChangeReviewAction(id, value, bookstoreId));
     }
     
@@ -690,9 +690,9 @@ public class Bookmarket {
     protected static class GetReviewByIdAction extends ExpecificBookstoreAction{
     	private static final long serialVersionUID = 6439962163328790677L;
     	
-    	String id;
+    	int id;
     	
-    	public GetReviewByIdAction(String id, int bookstoreId) {
+    	public GetReviewByIdAction(int id, int bookstoreId) {
     		super(bookstoreId);
     		this.id = id;
     	}
@@ -746,9 +746,9 @@ public class Bookmarket {
     protected static class RemoveReviewsByIdAction extends ExpecificBookstoreAction{
     	private static final long serialVersionUID = 6439962163328790677L;
     	
-    	String id;
+    	int id;
     	
-    	public RemoveReviewsByIdAction(String id, int bookstoreId) {
+    	public RemoveReviewsByIdAction(int id, int bookstoreId) {
     		super(bookstoreId);
     		this.id = id;
     	}
@@ -761,10 +761,10 @@ public class Bookmarket {
     protected static class ChangeReviewAction extends ExpecificBookstoreAction{
     	private static final long serialVersionUID = 6239962163328790677L;
     	
-    	String id;
+    	int id;
     	double value;
     	
-    	public ChangeReviewAction(String id, double value, int bookstoreId) {
+    	public ChangeReviewAction(int id, double value, int bookstoreId) {
     		super(bookstoreId);
     		this.id = id;
     		

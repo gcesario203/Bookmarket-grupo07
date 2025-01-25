@@ -6,7 +6,6 @@ import java.util.Random;
 
 import org.junit.BeforeClass;
 
-import servico.Bookmarket;
 import servico.Bookstore;
 
 import static org.junit.Assert.assertEquals;
@@ -65,5 +64,17 @@ public class ReviewTest {
 
     	assertEquals(3, review.getRating(), 0);
 
+    }
+
+    @Test
+    public void ShouldCreateReviewsWithSequentialIds() throws IOException {
+    	Customer customer = instance.getCustomer(1);
+
+    	Optional<Book> book = instance.getBook(1);
+
+    	Review review1 = new Review(customer, book.get(), 3, instance.getId());
+    	Review review2 = new Review(customer, book.get(), 3, instance.getId());
+
+    	assertEquals(review1.getId() + 1, review2.getId());
     }
 }

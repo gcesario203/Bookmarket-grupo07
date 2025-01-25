@@ -360,7 +360,7 @@ public class BookstoreTest {
     	
     	double lastReview = review.getRating();
     	
-    	if(randomValue == lastReview)
+    	while(randomValue == lastReview || randomValue > 5)
     		randomValue = Math.random() * 6;
     	
     	instance.changeReviewValue(review.getId(), randomValue);
