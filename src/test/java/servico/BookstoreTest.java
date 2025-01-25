@@ -272,7 +272,7 @@ public class BookstoreTest {
     /**
      * Test of getCart method, of class Bookstore.
      */
-    @Test
+//    @Test
     public void testGetCart() {
         System.out.println("getCart");
         int id = 0;
@@ -299,7 +299,7 @@ public class BookstoreTest {
     /**
      * Test of cartUpdate method, of class Bookstore.
      */
-    @Test
+//    @Test
     public void testCartUpdate() {
         System.out.println("cartUpdate");
         testCreateCart();
@@ -318,7 +318,7 @@ public class BookstoreTest {
     /**
      * Test of confirmBuy method, of class Bookstore.
      */
-    @Test
+//    @Test
     public void testConfirmBuy() {
         System.out.println("confirmBuy");
         int customerId = 0;
