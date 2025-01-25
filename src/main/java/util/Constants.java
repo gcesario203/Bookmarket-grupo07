@@ -79,4 +79,10 @@ public class Constants {
     public enum Backing {
         HARDBACK, PAPERBACK, USED, AUDIO, LIMITED_EDITION
     }
+
+    public static final String[] CREDIT_CARDS = {"VISA", "MASTERCARD", "DISCOVER", "AMEX", "DINERS"};
+
+    public static final String[] SHIP_TYPES = {"AIR", "UPS", "FEDEX", "SHIP", "COURIER", "MAIL"};
+
+    public static final String[] STATUS_TYPES = {"PROCESSING", "SHIPPED", "PENDING", "DENIED"};
 }

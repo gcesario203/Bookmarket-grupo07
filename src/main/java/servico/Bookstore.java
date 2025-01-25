@@ -15,7 +15,6 @@ import dominio.Order;
 import dominio.OrderLine;
 import dominio.Review;
 import dominio.Stock;
-import util.Constants.*;
 import util.TPCW_Util;
 
 import java.io.IOException;
@@ -1105,36 +1104,34 @@ public class Bookstore implements Serializable {
     }
 
     private void populateOrders(int number, Random rand, long now) {
-        String[] credit_cards = {"VISA", "MASTERCARD", "DISCOVER",
-            "AMEX", "DINERS"};
-        String[] ship_types = {"AIR", "UPS", "FEDEX", "SHIP", "COURIER",
-            "MAIL"};
-        String[] status_types = {"PROCESSING", "SHIPPED", "PENDING",
-            "DENIED"};
-
         System.out.print("Creating " + number + " orders...");
 
         for (int i = 0; i < number; i++) {
             if (i % 10000 == 0) {
                 System.out.print(".");
             }
+
             int nBooks = TPCW_Util.getRandomInt(rand, 1, 5);
             Cart cart = new Cart(-1, null);
             String comment = TPCW_Util.getRandomString(rand, 20, 100);
+
             for (int j = 0; j < nBooks; j++) {
                 Book book = getABookAnyBook(rand);
                 int quantity = TPCW_Util.getRandomInt(rand, 1, 300);
+
                 if (!stockByBook.containsKey(book)) {
                     double cost = TPCW_Util.getRandomInt(rand, 50, 100) / 100.0;
                     int stock = TPCW_Util.getRandomInt(rand, 300, 400);
                     stockByBook.put(book, new Stock(this.id, book, cost, stock));
                 }
+
                 cart.changeLine(stockByBook.get(book), book, quantity);
             }
 
             Customer customer = getACustomerAnyCustomer(rand);
+
             CCTransaction ccTransact = new CCTransaction(
-                    credit_cards[rand.nextInt(credit_cards.length)],
+                    CREDIT_CARDS[rand.nextInt(CREDIT_CARDS.length)],
                     TPCW_Util.getRandomLong(rand, 1000000000000000L, 9999999999999999L),
                     TPCW_Util.getRandomString(rand, 14, 30),
                     new Date(now + TPCW_Util.getRandomInt(rand, 10, 730) * 86400000 /* a day */),
@@ -1142,15 +1139,17 @@ public class Bookstore implements Serializable {
                     cart.total(customer.getDiscount()),
                     new Date(now),
                     getACountryAnyCountry(rand));
+
             long orderDate = now - TPCW_Util.getRandomInt(rand, 53, 60) * 86400000 /* a day */;
             long shipDate = orderDate + TPCW_Util.getRandomInt(rand, 0, 7) * 86400000 /* a day */;
+
             createOrder(
                     customer,
                     new Date(orderDate),
                     cart, comment,
-                    ship_types[rand.nextInt(ship_types.length)],
+                    SHIP_TYPES[rand.nextInt(SHIP_TYPES.length)],
                     new Date(shipDate),
-                    status_types[rand.nextInt(status_types.length)],
+                    STATUS_TYPES[rand.nextInt(STATUS_TYPES.length)],
                     getAnAddressAnyAddress(rand),
                     getAnAddressAnyAddress(rand),
                     ccTransact);
