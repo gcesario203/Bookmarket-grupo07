@@ -403,26 +403,22 @@ public class BookstoreTest {
     	instance.createReview(customer, new Book(-2, null, null, null, null, null, null, null, 0, null, null, 0, null, null, null), 0);
     }
 
-    
-
-
-
-
-
-
-
     /**
      * Test of getId method, of class Bookstore.
      */
-    //@Test
-    public void testGetId() {
-        System.out.println("getId");
-        Bookstore instance = null;
+    @Test
+    public void ShouldReturnCreatedInstanceId() {
         int expResult = 0;
         int result = instance.getId();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    }
+
+    @Test
+    public void ShouldReturnNewBookstoreId() {
+        int expResult = 24;
+        instance = new Bookstore(expResult);
+        int result = instance.getId();
+        assertEquals(expResult, result);
     }
 
     /**
