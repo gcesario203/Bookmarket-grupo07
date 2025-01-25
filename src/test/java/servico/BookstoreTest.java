@@ -1,12 +1,6 @@
 package servico;
 
-import dominio.Address;
-import dominio.Author;
-import dominio.Book;
-import dominio.Cart;
-import dominio.Customer;
-import dominio.Order;
-import dominio.Review;
+import dominio.*;
 import util.TPCW_Util;
 
 import java.io.IOException;
@@ -63,6 +57,22 @@ public class BookstoreTest {
 
     @After
     public void tearDown() {
+    }
+
+
+    /**
+     * Test of populateInstanceBookstore method, of class Bookstore.
+     */
+    @Test
+    public void shouldPopulateInstanceBookstore() {
+        System.out.println("populateInstanceBookstore");
+        int number = 0;
+        Random rand = null;
+        long now = 0L;
+        Bookstore instance = null;
+        instance.populateInstanceBookstore(number, rand, now);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
     }
 
     /**
@@ -246,7 +256,7 @@ public class BookstoreTest {
     /**
      * Test of getCart method, of class Bookstore.
      */
-    // @Test
+    @Test
     public void testGetCart() {
         System.out.println("getCart");
         int id = 0;
@@ -273,7 +283,7 @@ public class BookstoreTest {
     /**
      * Test of cartUpdate method, of class Bookstore.
      */
-    // @Test
+    @Test
     public void testCartUpdate() {
         System.out.println("cartUpdate");
         testCreateCart();
@@ -292,7 +302,7 @@ public class BookstoreTest {
     /**
      * Test of confirmBuy method, of class Bookstore.
      */
-    // @Test
+    @Test
     public void testConfirmBuy() {
         System.out.println("confirmBuy");
         int customerId = 0;
@@ -407,14 +417,14 @@ public class BookstoreTest {
      * Test of getId method, of class Bookstore.
      */
     @Test
-    public void ShouldReturnCreatedInstanceId() {
+    public void shouldReturnCreatedInstanceId() {
         int expResult = 0;
         int result = instance.getId();
         assertEquals(expResult, result);
     }
 
     @Test
-    public void ShouldReturnNewBookstoreId() {
+    public void shouldReturnNewBookstoreId() {
         int expResult = 24;
         Bookstore testBookstore = new Bookstore(expResult);
         int result = testBookstore.getId();
@@ -425,7 +435,7 @@ public class BookstoreTest {
      * Test of getABookAnyBook method, of class Bookstore.
      */
     @Test
-    public void ShouldReturnAnyBook() {
+    public void shouldReturnAnyBook() {
         Random random = new Random();
         Book result = Bookstore.getABookAnyBook(random);
         assertNotNull(result);
@@ -475,33 +485,19 @@ public class BookstoreTest {
     /**
      * Test of updateStock method, of class Bookstore.
      */
-    //@Test
-    public void testUpdateStock() {
-        System.out.println("updateStock");
-        int bId = 0;
-        double cost = 0.0;
-        Bookstore instance = null;
-        instance.updateStock(bId, cost);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    @Test
+    public void ShouldupdateStockBook() {
+        Book book = instance.getABookAnyBook(new Random());
+        Stock stockBook = instance.getStock(book.getId());
+        double previosCost = stockBook.getCost();
+        double newCost = 10.0;
+        if (newCost == previosCost) {
+            newCost = 20.0;
+        }
+        instance.updateStock(book.getId(), newCost);
+        assertEquals(newCost, instance.getStock(book.getId()).getCost(), 0.0);
     }
 
-    
-
-    /**
-     * Test of populateInstanceBookstore method, of class Bookstore.
-     */
-    //@Test
-    public void testPopulateInstanceBookstore() {
-        System.out.println("populateInstanceBookstore");
-        int number = 0;
-        Random rand = null;
-        long now = 0L;
-        Bookstore instance = null;
-        instance.populateInstanceBookstore(number, rand, now);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
 
     /**
      * Test of getRecommendationByItens method, of class Bookstore.
