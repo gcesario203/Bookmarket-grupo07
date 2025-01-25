@@ -717,6 +717,10 @@ public class Bookstore implements Serializable {
         return stock;
     }
 
+    public List<Stock> getStocks(){
+    	return new ArrayList<>(stockByBook.values());
+    }
+
     /**
      * For all the clients that bought this book in the last 10000 orders, what
      * are the five most sold books except this one.

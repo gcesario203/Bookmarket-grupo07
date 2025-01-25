@@ -65,14 +65,30 @@ public class BookstoreTest {
      */
     @Test
     public void shouldPopulateInstanceBookstore() {
-        System.out.println("populateInstanceBookstore");
-        int number = 0;
-        Random rand = null;
-        long now = 0L;
-        Bookstore instance = null;
-        instance.populateInstanceBookstore(number, rand, now);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        long seed = 0;
+        long now = System.currentTimeMillis();
+        int items = 83;
+        int customers = 4;
+        int addresses = 13;
+        int authors = 1;
+        int orders = 30;
+        Random rand = new Random();
+        Bookstore.populate(seed, now, items, customers, addresses, authors);
+        Bookstore bookstore = new Bookstore(21);
+        bookstore.populateInstanceBookstore(orders, rand, now);
+
+        List<Order> instanced_orders = bookstore.getOrdersById();
+        List<Review> reviews = bookstore.getReviews();
+        Author author = bookstore.getBook(0).get().getAuthor();
+        List<Book> result = bookstore.getBooksByAuthor(author.getLname());
+        List<Stock> stock = bookstore.getStocks();
+
+        assertEquals(30, instanced_orders.size());
+        assertEquals(30, reviews.size());
+        assertTrue(stock.size() > 30);
+        assertTrue(stock.get(0).getQty() > 0);
+        assertTrue(stock.get(0).getCost() > 0);
+        assertEquals(stock.get(0).getIdBookstore(),bookstore.getId());
     }
 
     /**
