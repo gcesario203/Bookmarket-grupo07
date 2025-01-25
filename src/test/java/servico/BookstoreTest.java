@@ -422,46 +422,14 @@ public class BookstoreTest {
     }
 
     /**
-     * Test of getRecommendationByItens method, of class Bookstore.
-     */
-    //@Test
-    public void testGetRecommendationByItens() {
-        System.out.println("getRecommendationByItens");
-        int c_id = 0;
-        List<Book> expResult = null;
-        List<Book> result = Bookstore.getRecommendationByItens(c_id);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getRecommendationByUsers method, of class Bookstore.
-     */
-    //@Test
-    public void testGetRecommendationByUsers() {
-        System.out.println("getRecommendationByUsers");
-        int c_id = 0;
-        List<Book> expResult = null;
-        List<Book> result = Bookstore.getRecommendationByUsers(c_id);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of getABookAnyBook method, of class Bookstore.
      */
-    //@Test
-    public void testGetABookAnyBook() {
-        System.out.println("getABookAnyBook");
-        Random random = null;
-        Book expResult = null;
+    @Test
+    public void ShouldReturnAnyBook() {
+        Random random = new Random();
         Book result = Bookstore.getABookAnyBook(random);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        assertNotNull(result);
+}
 
     /**
      * Test of getOrdersById method, of class Bookstore.
@@ -506,6 +474,34 @@ public class BookstoreTest {
         long now = 0L;
         Bookstore instance = null;
         instance.populateInstanceBookstore(number, rand, now);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of getRecommendationByItens method, of class Bookstore.
+     */
+    //@Test
+    public void testGetRecommendationByItens() {
+        System.out.println("getRecommendationByItens");
+        int c_id = 0;
+        List<Book> expResult = null;
+        List<Book> result = Bookstore.getRecommendationByItens(c_id);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of getRecommendationByUsers method, of class Bookstore.
+     */
+    //@Test
+    public void testGetRecommendationByUsers() {
+        System.out.println("getRecommendationByUsers");
+        int c_id = 0;
+        List<Book> expResult = null;
+        List<Book> result = Bookstore.getRecommendationByUsers(c_id);
+        assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
