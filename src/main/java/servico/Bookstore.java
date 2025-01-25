@@ -35,6 +35,8 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static util.BookstoreConstants.*;
+
 /**
  * Descrição da Arquitetura do Bookstore
  *
@@ -926,77 +928,14 @@ public class Bookstore implements Serializable {
      * consumidor.
      */
     private static void populateCountries() {
-        String[] countries = {"United States", "United Kingdom", "Canada",
-            "Germany", "France", "Japan", "Netherlands",
-            "Italy", "Switzerland", "Australia", "Algeria",
-            "Argentina", "Armenia", "Austria", "Azerbaijan",
-            "Bahamas", "Bahrain", "Bangla Desh", "Barbados",
-            "Belarus", "Belgium", "Bermuda", "Bolivia",
-            "Botswana", "Brazil", "Bulgaria", "Cayman Islands",
-            "Chad", "Chile", "China", "Christmas Island",
-            "Colombia", "Croatia", "Cuba", "Cyprus",
-            "Czech Republic", "Denmark", "Dominican Republic",
-            "Eastern Caribbean", "Ecuador", "Egypt",
-            "El Salvador", "Estonia", "Ethiopia",
-            "Falkland Island", "Faroe Island", "Fiji",
-            "Finland", "Gabon", "Gibraltar", "Greece", "Guam",
-            "Hong Kong", "Hungary", "Iceland", "India",
-            "Indonesia", "Iran", "Iraq", "Ireland", "Israel",
-            "Jamaica", "Jordan", "Kazakhstan", "Kuwait",
-            "Lebanon", "Luxembourg", "Malaysia", "Mexico",
-            "Mauritius", "New Zealand", "Norway", "Pakistan",
-            "Philippines", "Poland", "Portugal", "Romania",
-            "Russia", "Saudi Arabia", "Singapore", "Slovakia",
-            "South Africa", "South Korea", "Spain", "Sudan",
-            "Sweden", "Taiwan", "Thailand", "Trinidad",
-            "Turkey", "Venezuela", "Zambia"};
+            System.out.print("Creating " + COUNTRIES.length + " countries...");
 
-        double[] exchanges = {1, .625461, 1.46712, 1.86125, 6.24238, 121.907,
-            2.09715, 1842.64, 1.51645, 1.54208, 65.3851,
-            0.998, 540.92, 13.0949, 3977, 1, .3757,
-            48.65, 2, 248000, 38.3892, 1, 5.74, 4.7304,
-            1.71, 1846, .8282, 627.1999, 494.2, 8.278,
-            1.5391, 1677, 7.3044, 23, .543, 36.0127,
-            7.0707, 15.8, 2.7, 9600, 3.33771, 8.7,
-            14.9912, 7.7, .6255, 7.124, 1.9724, 5.65822,
-            627.1999, .6255, 309.214, 1, 7.75473, 237.23,
-            74.147, 42.75, 8100, 3000, .3083, .749481,
-            4.12, 37.4, 0.708, 150, .3062, 1502, 38.3892,
-            3.8, 9.6287, 25.245, 1.87539, 7.83101,
-            52, 37.8501, 3.9525, 190.788, 15180.2,
-            24.43, 3.7501, 1.72929, 43.9642, 6.25845,
-            1190.15, 158.34, 5.282, 8.54477, 32.77, 37.1414,
-            6.1764, 401500, 596, 2447.7};
+            for (int i = 0; i < COUNTRIES.length; i++) {
+                createCountry(COUNTRIES[i], CURRENCIES[i], EXCHANGES[i]);
+            }
 
-        String[] currencies = {"Dollars", "Pounds", "Dollars", "Deutsche Marks",
-            "Francs", "Yen", "Guilders", "Lira", "Francs",
-            "Dollars", "Dinars", "Pesos", "Dram",
-            "Schillings", "Manat", "Dollars", "Dinar", "Taka",
-            "Dollars", "Rouble", "Francs", "Dollars",
-            "Boliviano", "Pula", "Real", "Lev", "Dollars",
-            "Franc", "Pesos", "Yuan Renmimbi", "Dollars",
-            "Pesos", "Kuna", "Pesos", "Pounds", "Koruna",
-            "Kroner", "Pesos", "Dollars", "Sucre", "Pounds",
-            "Colon", "Kroon", "Birr", "Pound", "Krone",
-            "Dollars", "Markka", "Franc", "Pound", "Drachmas",
-            "Dollars", "Dollars", "Forint", "Krona", "Rupees",
-            "Rupiah", "Rial", "Dinar", "Punt", "Shekels",
-            "Dollars", "Dinar", "Tenge", "Dinar", "Pounds",
-            "Francs", "Ringgit", "Pesos", "Rupees", "Dollars",
-            "Kroner", "Rupees", "Pesos", "Zloty", "Escudo",
-            "Leu", "Rubles", "Riyal", "Dollars", "Koruna",
-            "Rand", "Won", "Pesetas", "Dinar", "Krona",
-            "Dollars", "Baht", "Dollars", "Lira", "Bolivar",
-            "Kwacha"};
-
-        System.out.print("Creating " + countries.length + " countries...");
-
-        for (int i = 0; i < countries.length; i++) {
-            createCountry(countries[i], currencies[i], exchanges[i]);
+            System.out.println(" Done");
         }
-
-        System.out.println(" Done");
-    }
 
     private static void populateAddresses(int number, Random rand) {
         System.out.print("Creating " + number + " addresses...");
@@ -1065,53 +1004,7 @@ public class Bookstore implements Serializable {
         System.out.println(" Done");
     }
 
-    /**
-     * Este método irá popular quais assuntos são possíveis de serem buscados
-     * pelo consumidor.
-     */
-    private static final String[] SUBJECTS = {"ARTS", "BIOGRAPHIES", "BUSINESS", "CHILDREN",
-        "COMPUTERS", "COOKING", "HEALTH", "HISTORY",
-        "HOME", "HUMOR", "LITERATURE", "MYSTERY",
-        "NON-FICTION", "PARENTING", "POLITICS",
-        "REFERENCE", "RELIGION", "ROMANCE",
-        "SELF-HELP", "SCIENCE-NATURE", "SCIENCE_FICTION",
-        "SPORTS", "YOUTH", "TRAVEL"};
-    private static final String[] BACKINGS = {"HARDBACK", "PAPERBACK", "USED", "AUDIO",
-        "LIMITED-EDITION"};
-
-    private static void populateBooks(int number, Random rand) {
-
-        System.out.print("Creating " + number + " books...");
-
-        for (int i = 0; i < number; i++) {
-            if (i % 10000 == 0) {
-                System.out.print(".");
-            }
-            Author author = getAnAuthorAnyAuthor(rand);
-            Date pubdate = TPCW_Util.getRandomPublishdate(rand);
-            double srp = TPCW_Util.getRandomInt(rand, 100, 99999) / 100.0;
-            String subject = SUBJECTS[rand.nextInt(SUBJECTS.length)];
-            String title = subject + " " + TPCW_Util.getRandomString(rand, 14, 60);
-            createBook(
-                    title,
-                    pubdate,
-                    TPCW_Util.getRandomString(rand, 14, 60),
-                    SUBJECTS[rand.nextInt(SUBJECTS.length)],
-                    TPCW_Util.getRandomString(rand, 100, 500),
-                    "img" + i % 100 + "/thumb_" + i + ".gif",
-                    "img" + i % 100 + "/image_" + i + ".gif",
-                    srp,
-                    new Date(pubdate.getTime()
-                            + TPCW_Util.getRandomInt(rand, 1, 30) * 86400000 /* a day */),
-                    TPCW_Util.getRandomString(rand, 13, 13),
-                    TPCW_Util.getRandomInt(rand, 20, 9999),
-                    BACKINGS[rand.nextInt(BACKINGS.length)],
-                    (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
-                    + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
-                    + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0),
-                    author);
-        }
-
+    private static void setRelatedBooks(int number, Random rand) {
         for (int i = 0; i < number; i++) {
             Book book = booksById.get(i);
             HashSet<Book> related = new HashSet<>();
@@ -1121,18 +1014,54 @@ public class Bookstore implements Serializable {
                     related.add(relatedBook);
                 }
             }
-            Book[] relatedArray = new Book[]{booksById.get(TPCW_Util.getRandomInt(rand, 0, number - 1)),
-                booksById.get(TPCW_Util.getRandomInt(rand, 0, number - 1)),
-                booksById.get(TPCW_Util.getRandomInt(rand, 0, number - 1)),
-                booksById.get(TPCW_Util.getRandomInt(rand, 0, number - 1)),
-                booksById.get(TPCW_Util.getRandomInt(rand, 0, number - 1))};
-            relatedArray = related.toArray(relatedArray);
+            Book[] relatedArray = related.toArray(new Book[0]);
             book.setRelated1(relatedArray[0]);
             book.setRelated2(relatedArray[1]);
             book.setRelated3(relatedArray[2]);
             book.setRelated4(relatedArray[3]);
             book.setRelated5(relatedArray[4]);
         }
+    }
+
+    /**
+     * Este método irá popular quais assuntos são possíveis de serem buscados
+     * pelo consumidor.
+     */
+    private static void populateBooks(int number, Random rand) {
+        System.out.print("Creating " + number + " books...");
+
+        for (int i = 0; i < number; i++) {
+            if (i % 10000 == 0) {
+                System.out.print(".");
+            }
+
+            Author author = getAnAuthorAnyAuthor(rand);
+            Date pubdate = TPCW_Util.getRandomPublishdate(rand);
+            double srp = TPCW_Util.getRandomInt(rand, 100, 99999) / 100.0;
+            Subject subject = Subject.values()[rand.nextInt(Subject.values().length)];
+            String title = subject.name() + " " + TPCW_Util.getRandomString(rand, 14, 60);
+            Backing backing = Backing.values()[rand.nextInt(Backing.values().length)];
+
+            createBook(
+                    title,
+                    pubdate,
+                    TPCW_Util.getRandomString(rand, 14, 60),
+                    subject.name(),
+                    TPCW_Util.getRandomString(rand, 100, 500),
+                    "img" + i % 100 + "/thumb_" + i + ".gif",
+                    "img" + i % 100 + "/image_" + i + ".gif",
+                    srp,
+                    new Date(pubdate.getTime() + TPCW_Util.getRandomInt(rand, 1, 30) * 86400000L),
+                    TPCW_Util.getRandomString(rand, 13, 13),
+                    TPCW_Util.getRandomInt(rand, 20, 9999),
+                    backing.name(),
+                    (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
+                            + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
+                            + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0),
+                    author
+            );
+        }
+        setRelatedBooks(number, rand);
 
         System.out.println(" Done");
     }
@@ -1175,36 +1104,34 @@ public class Bookstore implements Serializable {
     }
 
     private void populateOrders(int number, Random rand, long now) {
-        String[] credit_cards = {"VISA", "MASTERCARD", "DISCOVER",
-            "AMEX", "DINERS"};
-        String[] ship_types = {"AIR", "UPS", "FEDEX", "SHIP", "COURIER",
-            "MAIL"};
-        String[] status_types = {"PROCESSING", "SHIPPED", "PENDING",
-            "DENIED"};
-
         System.out.print("Creating " + number + " orders...");
 
         for (int i = 0; i < number; i++) {
             if (i % 10000 == 0) {
                 System.out.print(".");
             }
+
             int nBooks = TPCW_Util.getRandomInt(rand, 1, 5);
             Cart cart = new Cart(-1, null);
             String comment = TPCW_Util.getRandomString(rand, 20, 100);
+
             for (int j = 0; j < nBooks; j++) {
                 Book book = getABookAnyBook(rand);
                 int quantity = TPCW_Util.getRandomInt(rand, 1, 300);
+
                 if (!stockByBook.containsKey(book)) {
                     double cost = TPCW_Util.getRandomInt(rand, 50, 100) / 100.0;
                     int stock = TPCW_Util.getRandomInt(rand, 300, 400);
                     stockByBook.put(book, new Stock(this.id, book, cost, stock));
                 }
+
                 cart.changeLine(stockByBook.get(book), book, quantity);
             }
 
             Customer customer = getACustomerAnyCustomer(rand);
+
             CCTransaction ccTransact = new CCTransaction(
-                    credit_cards[rand.nextInt(credit_cards.length)],
+                    CREDIT_CARDS[rand.nextInt(CREDIT_CARDS.length)],
                     TPCW_Util.getRandomLong(rand, 1000000000000000L, 9999999999999999L),
                     TPCW_Util.getRandomString(rand, 14, 30),
                     new Date(now + TPCW_Util.getRandomInt(rand, 10, 730) * 86400000 /* a day */),
@@ -1212,15 +1139,17 @@ public class Bookstore implements Serializable {
                     cart.total(customer.getDiscount()),
                     new Date(now),
                     getACountryAnyCountry(rand));
+
             long orderDate = now - TPCW_Util.getRandomInt(rand, 53, 60) * 86400000 /* a day */;
             long shipDate = orderDate + TPCW_Util.getRandomInt(rand, 0, 7) * 86400000 /* a day */;
+
             createOrder(
                     customer,
                     new Date(orderDate),
                     cart, comment,
-                    ship_types[rand.nextInt(ship_types.length)],
+                    SHIP_TYPES[rand.nextInt(SHIP_TYPES.length)],
                     new Date(shipDate),
-                    status_types[rand.nextInt(status_types.length)],
+                    STATUS_TYPES[rand.nextInt(STATUS_TYPES.length)],
                     getAnAddressAnyAddress(rand),
                     getAnAddressAnyAddress(rand),
                     ccTransact);
