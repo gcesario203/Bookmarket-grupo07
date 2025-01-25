@@ -1045,19 +1045,19 @@ public class Bookstore implements Serializable {
             createBook(
                     title,
                     pubdate,
-                    TPCW_Util.getRandomString(rand, 14, 60), // Publisher
-                    subject.name(), // Usando subject como string
-                    TPCW_Util.getRandomString(rand, 100, 500), // Description
-                    "img" + i % 100 + "/thumb_" + i + ".gif", // Thumbnail
-                    "img" + i % 100 + "/image_" + i + ".gif", // Image
-                    srp, // SRP
-                    new Date(pubdate.getTime() + TPCW_Util.getRandomInt(rand, 1, 30) * 86400000L), // Availability date
-                    TPCW_Util.getRandomString(rand, 13, 13), // ISBN
-                    TPCW_Util.getRandomInt(rand, 20, 9999), // Stock
-                    backing.name(), // Usando backing como string
+                    TPCW_Util.getRandomString(rand, 14, 60),
+                    subject.name(),
+                    TPCW_Util.getRandomString(rand, 100, 500),
+                    "img" + i % 100 + "/thumb_" + i + ".gif",
+                    "img" + i % 100 + "/image_" + i + ".gif",
+                    srp,
+                    new Date(pubdate.getTime() + TPCW_Util.getRandomInt(rand, 1, 30) * 86400000L),
+                    TPCW_Util.getRandomString(rand, 13, 13),
+                    TPCW_Util.getRandomInt(rand, 20, 9999),
+                    backing.name(),
                     (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
                             + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
-                            + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0), // Dimensions
+                            + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0),
                     author
             );
         }
