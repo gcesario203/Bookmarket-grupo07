@@ -462,7 +462,7 @@ public class Bookmarket {
                     SHOPPING_ID, I_ID, ids, quantities,
                     System.currentTimeMillis()));
             if (cart.getLines().isEmpty()) {
-                Book book = Bookstore.getABookAnyBook(random);
+                Book book = getExistingBookInAStock(storeId);
                 cart = (Cart) stateMachine.execute(new CartUpdateAction(storeId,
                         SHOPPING_ID, book.getId(), new ArrayList<>(),
                         new ArrayList<>(), System.currentTimeMillis()));
@@ -471,6 +471,14 @@ public class Bookmarket {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    private static Book getExistingBookInAStock(int storeId) {
+    	Bookstore bookstoreInstance = getBookstoreStream().filter(bk -> bk.getId() == storeId)
+    									.collect(Collectors.toList())
+    									.get(0);
+    	
+    	return bookstoreInstance.getStocks().get(0).getBook();
     }
 
     /**
@@ -582,17 +590,6 @@ public class Bookmarket {
                     System.currentTimeMillis(), items, customers, addresses,
                     authors, orders));
         } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     *
-     */
-    public static void checkpoint() {
-        try {
-            stateMachine.checkpoint();
-        } catch (UmbrellaException e) {
             throw new RuntimeException(e);
         }
     }

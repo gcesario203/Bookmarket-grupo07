@@ -21,10 +21,6 @@ public class StateMachine {
         return action.executeOn(getStateStream());
     }
 
-    public void checkpoint() {
-
-    }
-
     public Stream<Bookstore> getStateStream() {
         return state.stream();
     }
