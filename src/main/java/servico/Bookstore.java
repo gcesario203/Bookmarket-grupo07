@@ -543,19 +543,19 @@ public class Bookstore implements Serializable {
      * @return uma lista de livros
      */
     public static List<Book> getBooksByTitle(String title) {
-        Pattern regex = Pattern.compile("^" + title);
         ArrayList<Book> books = new ArrayList<>();
         for (Book book : booksById) {
-            if (regex.matcher(book.getTitle()).matches()) {
+            if (book.getTitle().startsWith(title)) {
                 books.add(book);
                 if (books.size() > 50) {
                     break;
                 }
             }
         }
-        Collections.sort(books, (Book a, Book b) -> a.getTitle().compareTo(b.getTitle()));
+        books.sort((a, b) -> a.getTitle().compareTo(b.getTitle()));
         return books;
     }
+
 
     /**
      * Returns a list of books that were written by an specific author.
@@ -687,7 +687,6 @@ public class Bookstore implements Serializable {
         book.setImage(image);
         book.setThumbnail(thumbnail);
         book.setPubDate(new Date(now));
-        //updateRelatedBooks(book);
     }
 
     /**
@@ -822,9 +821,12 @@ public class Bookstore implements Serializable {
         if (bId != null) {
             cart.increaseLine(stockByBook.get(getBook(bId).get()), getBook(bId).get(), 1);
         }
-
-        for (int i = 0; i < bIds.size(); i++) {
-            cart.changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
+        
+        if((bIds != null && bIds.size() > 0) && (quantities != null && quantities.size() > 0)) 
+        {
+            for (int i = 0; i < bIds.size(); i++) {
+                cart.changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
+            }
         }
 
         cart.setTime(new Date(now));
@@ -910,6 +912,9 @@ public class Bookstore implements Serializable {
      */
     public static boolean populate(long seed, long now, int items, int customers,
             int addresses, int authors) {
+    	if(items < 0 || customers < 0 || addresses < 0 || authors < 0)
+    		throw new RuntimeException("Parametros invalidos");
+    	
         if (populated) {
             return false;
         }
@@ -1077,6 +1082,9 @@ public class Bookstore implements Serializable {
     }
     
     private void populateReviews(int number, Random rand) {
+    	if(number < 0)
+    		throw new RuntimeException("Parâmetros inválidos");
+    		
         System.out.print("Creating " + number + " reviews");
         
         for(int i = 0; i < number; i++) {

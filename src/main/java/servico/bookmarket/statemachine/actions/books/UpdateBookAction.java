@@ -2,6 +2,7 @@ package servico.bookmarket.statemachine.actions.books;
 
 import java.util.stream.Stream;
 
+import dominio.Book;
 import servico.Bookstore;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 
@@ -46,6 +47,8 @@ public class UpdateBookAction extends BookstoreAction {
     @Override
     public Object executeOnBookstore(Stream<Bookstore> bookstore) {
         Bookstore.updateBook(bId, image, thumbnail, now);
+        
+        bookstore.forEach(bk -> bk.updateStock(bId, cost));
         return null;
     }
 }
