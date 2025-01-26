@@ -13,6 +13,7 @@ import org.junit.Test;
 import dominio.Book;
 import dominio.Customer;
 import dominio.Review;
+import servico.bookmarket.Bookmarket;
 import util.TPCW_Util;
 
 public class BookmarketTest {
