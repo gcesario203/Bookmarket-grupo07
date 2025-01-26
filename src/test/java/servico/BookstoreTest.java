@@ -1,12 +1,6 @@
 package servico;
 
-import dominio.Address;
-import dominio.Author;
-import dominio.Book;
-import dominio.Cart;
-import dominio.Customer;
-import dominio.Order;
-import dominio.Review;
+import dominio.*;
 import util.TPCW_Util;
 
 import java.io.IOException;
@@ -63,6 +57,38 @@ public class BookstoreTest {
 
     @After
     public void tearDown() {
+    }
+
+
+    /**
+     * Test of populateInstanceBookstore method, of class Bookstore.
+     */
+    @Test
+    public void shouldPopulateInstanceBookstore() {
+        long seed = 0;
+        long now = System.currentTimeMillis();
+        int items = 83;
+        int customers = 4;
+        int addresses = 13;
+        int authors = 1;
+        int orders = 30;
+        Random rand = new Random();
+        Bookstore.populate(seed, now, items, customers, addresses, authors);
+        Bookstore bookstore = new Bookstore(21);
+        bookstore.populateInstanceBookstore(orders, rand, now);
+
+        List<Order> instanced_orders = bookstore.getOrdersById();
+        List<Review> reviews = bookstore.getReviews();
+        Author author = bookstore.getBook(0).get().getAuthor();
+        List<Book> result = bookstore.getBooksByAuthor(author.getLname());
+        List<Stock> stock = bookstore.getStocks();
+
+        assertEquals(30, instanced_orders.size());
+        assertEquals(30, reviews.size());
+        assertTrue(stock.size() > 30);
+        assertTrue(stock.get(0).getQty() > 0);
+        assertTrue(stock.get(0).getCost() > 0);
+        assertEquals(stock.get(0).getIdBookstore(),bookstore.getId());
     }
 
     /**
@@ -246,7 +272,7 @@ public class BookstoreTest {
     /**
      * Test of getCart method, of class Bookstore.
      */
-    // @Test
+//    @Test
     public void testGetCart() {
         System.out.println("getCart");
         int id = 0;
@@ -273,7 +299,7 @@ public class BookstoreTest {
     /**
      * Test of cartUpdate method, of class Bookstore.
      */
-    // @Test
+//    @Test
     public void testCartUpdate() {
         System.out.println("cartUpdate");
         testCreateCart();
@@ -292,7 +318,7 @@ public class BookstoreTest {
     /**
      * Test of confirmBuy method, of class Bookstore.
      */
-    // @Test
+//    @Test
     public void testConfirmBuy() {
         System.out.println("confirmBuy");
         int customerId = 0;
@@ -403,27 +429,91 @@ public class BookstoreTest {
     	instance.createReview(customer, new Book(-2, null, null, null, null, null, null, null, 0, null, null, 0, null, null, null), 0);
     }
 
-    
-
-
-
-
-
-
-
     /**
      * Test of getId method, of class Bookstore.
      */
-    //@Test
-    public void testGetId() {
-        System.out.println("getId");
-        Bookstore instance = null;
+    @Test
+    public void shouldReturnCreatedInstanceId() {
         int expResult = 0;
         int result = instance.getId();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
+
+    @Test
+    public void shouldReturnNewBookstoreId() {
+        int expResult = 24;
+        Bookstore testBookstore = new Bookstore(expResult);
+        int result = testBookstore.getId();
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of getABookAnyBook method, of class Bookstore.
+     */
+    @Test
+    public void shouldReturnAnyBook() {
+        Random random = new Random();
+        Book result = Bookstore.getABookAnyBook(random);
+        assertNotNull(result);
+    }
+
+    /**
+     * Test of getOrdersById method, of class Bookstore.
+     */
+    @Test
+    public void ShouldReturnCreatedInstanceOrdersId() {
+        List<Order> result = instance.getOrdersById();
+        for(int i = 0; i < 10000; i++) {
+            assertEquals(i, result.get(i).getId());
+        }
+    }
+
+    @Test
+    public void ShouldReturnNewBookstoreOrdersId() {
+        long seed = 1;
+        long now = System.currentTimeMillis();
+        int items = 2;
+        int customers = 2;
+        int addresses = 2;
+        int authors = 1;
+        int orders = 10;
+        Random rand = new Random();
+        Bookstore.populate(seed, now, items, customers, addresses, authors);
+        Bookstore bookStore1 = new Bookstore(13);
+        Bookstore bookStore2 = new Bookstore(14);
+        bookStore1.populateInstanceBookstore(orders, rand, now);
+        bookStore2.populateInstanceBookstore(orders, rand, now);
+
+        List<Order> result1 = bookStore1.getOrdersById();
+        for(int i = 0; i < 10; i++) {
+            assertEquals(i, result1.get(i).getId());
+        }
+
+        List<Order> result2 = bookStore2.getOrdersById();
+        for(int i = 0; i < 10; i++) {
+            assertEquals(i, result2.get(i).getId());
+        }
+
+        assertNotSame(result2,result1);
+    }
+    
+
+    /**
+     * Test of updateStock method, of class Bookstore.
+     */
+    @Test
+    public void ShouldupdateStockBook() {
+        Book book = instance.getABookAnyBook(new Random());
+        Stock stockBook = instance.getStock(book.getId());
+        double previosCost = stockBook.getCost();
+        double newCost = 10.0;
+        if (newCost == previosCost) {
+            newCost = 20.0;
+        }
+        instance.updateStock(book.getId(), newCost);
+        assertEquals(newCost, instance.getStock(book.getId()).getCost(), 0.0);
+    }
+
 
     /**
      * Test of getRecommendationByItens method, of class Bookstore.
@@ -449,67 +539,6 @@ public class BookstoreTest {
         List<Book> expResult = null;
         List<Book> result = Bookstore.getRecommendationByUsers(c_id);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getABookAnyBook method, of class Bookstore.
-     */
-    //@Test
-    public void testGetABookAnyBook() {
-        System.out.println("getABookAnyBook");
-        Random random = null;
-        Book expResult = null;
-        Book result = Bookstore.getABookAnyBook(random);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getOrdersById method, of class Bookstore.
-     */
-    //@Test
-    public void testGetOrdersById() {
-        System.out.println("getOrdersById");
-        Bookstore instance = null;
-        List<Order> expResult = null;
-        List<Order> result = instance.getOrdersById();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    
-
-    /**
-     * Test of updateStock method, of class Bookstore.
-     */
-    //@Test
-    public void testUpdateStock() {
-        System.out.println("updateStock");
-        int bId = 0;
-        double cost = 0.0;
-        Bookstore instance = null;
-        instance.updateStock(bId, cost);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    
-
-    /**
-     * Test of populateInstanceBookstore method, of class Bookstore.
-     */
-    //@Test
-    public void testPopulateInstanceBookstore() {
-        System.out.println("populateInstanceBookstore");
-        int number = 0;
-        Random rand = null;
-        long now = 0L;
-        Bookstore instance = null;
-        instance.populateInstanceBookstore(number, rand, now);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
