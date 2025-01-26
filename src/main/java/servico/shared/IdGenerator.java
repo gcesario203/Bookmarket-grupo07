@@ -1,4 +1,4 @@
-package servico;
+package servico.shared;
 
 public class IdGenerator {
     private static IdGenerator instance;

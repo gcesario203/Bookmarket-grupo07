@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
+import servico.shared.IdGenerator;
 
 public class IdGeneratorTest {
 

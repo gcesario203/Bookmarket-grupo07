@@ -2,7 +2,7 @@ package dominio;
 
 import java.io.IOException;
 import java.io.Serializable;
-import servico.IdGenerator;
+import servico.shared.IdGenerator;
 
 /*
  * Classe que possui a avaliação de um item de pedido de algum livro adquirido por um cliente
