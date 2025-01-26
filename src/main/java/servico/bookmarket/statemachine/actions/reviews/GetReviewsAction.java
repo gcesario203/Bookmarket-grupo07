@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import dominio.Review;
-import servico.Bookstore;
+import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 
 public class GetReviewsAction extends BookstoreAction{

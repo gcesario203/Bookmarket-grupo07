@@ -1,4 +1,4 @@
-package servico;
+package servico.bookstore;
 
 /* 
  * Bookstore.java - holds all the data and operations of the bookstore.
@@ -15,6 +15,7 @@ import dominio.Order;
 import dominio.OrderLine;
 import dominio.Review;
 import dominio.Stock;
+import servico.bookstore.utils.Counter;
 import util.TPCW_Util;
 
 import java.io.IOException;
@@ -601,25 +602,6 @@ public class Bookstore implements Serializable {
             }
         });
         return books.subList(0, books.size() >= 50 ? 50 : books.size());
-    }
-
-    
-
-    /**
-     * Counter Object to help on counting books processes.
-     *
-     */
-    protected static class Counter {
-
-        /**
-         *
-         */
-        public Book book;
-
-        /**
-         *
-         */
-        public int count;
     }
 
     /**

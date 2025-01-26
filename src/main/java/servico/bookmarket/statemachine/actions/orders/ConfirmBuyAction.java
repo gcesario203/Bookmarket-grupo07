@@ -3,7 +3,7 @@ package servico.bookmarket.statemachine.actions.orders;
 import java.util.Date;
 import java.util.stream.Stream;
 
-import servico.Bookstore;
+import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.ExpecificBookstoreAction;
 
 /**

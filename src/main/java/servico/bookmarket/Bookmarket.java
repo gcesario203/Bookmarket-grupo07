@@ -7,7 +7,7 @@ import dominio.Customer;
 import dominio.Order;
 import dominio.Review;
 import dominio.Stock;
-import servico.Bookstore;
+import servico.bookstore.Bookstore;
 import servico.bookmarket.exceptions.UmbrellaException;
 import servico.bookmarket.statemachine.StateMachine;
 import servico.bookmarket.statemachine.actions.books.UpdateBookAction;

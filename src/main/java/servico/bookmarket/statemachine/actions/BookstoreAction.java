@@ -3,7 +3,7 @@ package servico.bookmarket.statemachine.actions;
 import java.io.Serializable;
 import java.util.stream.Stream;
 
-import servico.Bookstore;
+import servico.bookstore.Bookstore;
 import servico.bookmarket.interfaces.Action;
 
 /**

@@ -3,7 +3,7 @@ package servico.bookmarket.statemachine.actions.reviews;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import servico.Bookstore;
+import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.ExpecificBookstoreAction;
 
 public class ChangeReviewAction extends ExpecificBookstoreAction{

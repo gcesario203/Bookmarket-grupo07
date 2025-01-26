@@ -2,7 +2,7 @@ package servico.bookmarket.statemachine.actions.reviews;
 
 import java.util.stream.Stream;
 
-import servico.Bookstore;
+import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.ExpecificBookstoreAction;
 
 public class RemoveReviewsByIdAction extends ExpecificBookstoreAction{
