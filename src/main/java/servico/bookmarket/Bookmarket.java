@@ -1,16 +1,38 @@
-package servico;
+package servico.bookmarket;
 
 import dominio.Address;
 import dominio.Book;
 import dominio.Cart;
 import dominio.Customer;
 import dominio.Order;
+import dominio.Review;
 import dominio.Stock;
+import servico.bookstore.Bookstore;
+import servico.bookmarket.exceptions.UmbrellaException;
+import servico.bookmarket.statemachine.StateMachine;
+import servico.bookmarket.statemachine.actions.books.UpdateBookAction;
+import servico.bookmarket.statemachine.actions.carts.CartUpdateAction;
+import servico.bookmarket.statemachine.actions.carts.CreateCartAction;
+import servico.bookmarket.statemachine.actions.customers.CreateCustomerAction;
+import servico.bookmarket.statemachine.actions.customers.RefreshCustomerSessionAction;
+import servico.bookmarket.statemachine.actions.orders.ConfirmBuyAction;
+import servico.bookmarket.statemachine.actions.reviews.ChangeReviewAction;
+import servico.bookmarket.statemachine.actions.reviews.CreateReviewAction;
+import servico.bookmarket.statemachine.actions.reviews.GetReviewByBookAction;
+import servico.bookmarket.statemachine.actions.reviews.GetReviewByCustomerAction;
+import servico.bookmarket.statemachine.actions.reviews.GetReviewByIdAction;
+import servico.bookmarket.statemachine.actions.reviews.GetReviewsAction;
+import servico.bookmarket.statemachine.actions.reviews.GetReviewsByBookstoreAction;
+import servico.bookmarket.statemachine.actions.reviews.RemoveReviewsByIdAction;
+import servico.bookmarket.statemachine.actions.shared.PopulateAction;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,56 +67,6 @@ import util.TPCW_Util;
  *
  */
 public class Bookmarket {
-
-    private interface Action<STATE> {
-
-        Object executeOn(STATE sm);
-    }
-
-    private static class StateMachine {
-
-        private final List<Bookstore> state;
-
-        public StateMachine(final List object) {
-            this.state = object;
-        }
-
-        Object execute(Action action) {
-            return action.executeOn(getStateStream());
-        }
-
-        void checkpoint() {
-
-        }
-
-        public Stream<Bookstore> getStateStream() {
-            return state.stream();
-        }
-
-        private static StateMachine create(Bookstore... state) {
-            List list = new ArrayList();
-            try {
-                list.addAll(Arrays.asList(state));
-            } catch (Exception e) {
-                throw new UmbrellaException(e);
-            }
-            return new StateMachine(list);
-        }
-
-    }
-
-    private static class UmbrellaException extends RuntimeException {
-
-        /**
-         * Default Generated SerialUID
-         */
-        private static final long serialVersionUID = 8525983676993371110L;
-
-        public UmbrellaException(Exception e) {
-            super(e);
-        }
-
-    }
     private static Random random;
     private static StateMachine stateMachine;
 
@@ -215,6 +187,44 @@ public class Bookmarket {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public static Review createReview(int bookstoreId, Customer customer, Book book, double value) {
+    	try {
+    		return (Review) stateMachine.execute(new CreateReviewAction(customer, book, value, bookstoreId));
+    	}
+    	catch(Exception e) {
+    		throw new RuntimeException(e);
+    	}
+    }
+    
+    public static List<Review> getReviews()
+    {
+    	return (List<Review>) stateMachine.execute(new GetReviewsAction());
+    }
+    
+    public static Optional<Review> getReviewById(int bookstoreId, int id){
+    	return (Optional<Review>) stateMachine.execute(new GetReviewByIdAction(id, bookstoreId));
+    }
+    
+    public static List<Review> getReviewsByBook(int bookstoreId,Book book){
+    	return (List<Review>) stateMachine.execute(new GetReviewByBookAction(book, bookstoreId));
+    }
+    
+    public static List<Review> getReviewsByCustomer(int bookstoreId,Customer customer){
+    	return (List<Review>) stateMachine.execute(new GetReviewByCustomerAction(customer, bookstoreId));
+    }
+    
+    public static boolean removeReviewById(int bookstoreId,int id) {
+    	return (boolean) stateMachine.execute(new RemoveReviewsByIdAction(id, bookstoreId));
+    }
+    
+    public static boolean changeReviewValue(int bookstoreId, int id, double value) {
+    	return (boolean) stateMachine.execute(new ChangeReviewAction(id, value, bookstoreId));
+    }
+    
+    public static List<Review> getReviewsByBookstore(int bookstoreId){
+    	return (List<Review>) stateMachine.execute(new GetReviewsByBookstoreAction(bookstoreId));
     }
 
     /**
@@ -452,7 +462,7 @@ public class Bookmarket {
                     SHOPPING_ID, I_ID, ids, quantities,
                     System.currentTimeMillis()));
             if (cart.getLines().isEmpty()) {
-                Book book = Bookstore.getABookAnyBook(random);
+                Book book = getExistingBookInAStock(storeId);
                 cart = (Cart) stateMachine.execute(new CartUpdateAction(storeId,
                         SHOPPING_ID, book.getId(), new ArrayList<>(),
                         new ArrayList<>(), System.currentTimeMillis()));
@@ -461,6 +471,14 @@ public class Bookmarket {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    private static Book getExistingBookInAStock(int storeId) {
+    	Bookstore bookstoreInstance = getBookstoreStream().filter(bk -> bk.getId() == storeId)
+    									.collect(Collectors.toList())
+    									.get(0);
+    	
+    	return bookstoreInstance.getStocks().get(0).getBook();
     }
 
     /**
@@ -573,402 +591,6 @@ public class Bookmarket {
                     authors, orders));
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     *
-     */
-    public static void checkpoint() {
-        try {
-            stateMachine.checkpoint();
-        } catch (UmbrellaException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Classe abstrata para representar os métodos padrões da implementação das
-     * ações na {@linkplain Bookstore}.
-     *
-     */
-    protected static abstract class BookstoreAction implements Action<Stream<Bookstore>>,
-            Serializable {
-
-        /**
-         * Determina em qual {@linkplain Bookstore} a ação será executada.
-         *
-         * @param sm
-         * @return
-         */
-        @Override
-        public Object executeOn(Stream<Bookstore> sm) {
-            return executeOnBookstore(sm);
-        }
-
-        /**
-         * Método abstrato que será implementado na classe concreta determinando
-         * qual ação será executada no {@linkplain Bookstore}.
-         *
-         * @param bookstore
-         * @return
-         */
-        public abstract Object executeOnBookstore(Stream<Bookstore> bookstore);
-    }
-
-    /**
-     * Classe que implementa as ações relacionadas a criação de cliente.
-     */
-    protected static class CreateCustomerAction extends BookstoreAction {
-
-        private static final long serialVersionUID = 6039962163348790677L;
-
-        String fname;
-        String lname;
-        String street1;
-        String street2;
-        String city;
-        String state;
-        String zip;
-        String countryName;
-        String phone;
-        String email;
-        double discount;
-        Date birthdate;
-        String data;
-        long now;
-
-        /**
-         * Método construtor da classe.
-         *
-         * @param fname
-         * @param lname
-         * @param street1
-         * @param street2
-         * @param city
-         * @param state
-         * @param zip
-         * @param countryName
-         * @param phone
-         * @param email
-         * @param discount
-         * @param birthdate
-         * @param data
-         * @param now
-         */
-        public CreateCustomerAction(String fname, String lname, String street1,
-                String street2, String city, String state, String zip,
-                String countryName, String phone, String email,
-                double discount, Date birthdate, String data, long now) {
-            this.fname = fname;
-            this.lname = lname;
-            this.street1 = street1;
-            this.street2 = street2;
-            this.city = city;
-            this.state = state;
-            this.zip = zip;
-            this.countryName = countryName;
-            this.phone = phone;
-            this.email = email;
-            this.discount = discount;
-            this.birthdate = birthdate;
-            this.data = data;
-            this.now = now;
-        }
-
-        /**
-         * Método que injeta o cliente com suas respectivas informações dentro
-         * da {@linkplain Bookstore}.
-         *
-         * @param bookstore
-         * @return
-         */
-        @Override
-        public Object executeOnBookstore(Stream<Bookstore> bookstore) {
-            return Bookstore.createCustomer(fname, lname, street1, street2,
-                    city, state, zip, countryName, phone, email, discount,
-                    birthdate, data, now);
-        }
-    }
-
-    /**
-     * Classe que implementa as ações relacionadas a sessão do cliente.
-     */
-    protected static class RefreshCustomerSessionAction extends BookstoreAction {
-
-        private static final long serialVersionUID = -5391031909452321478L;
-
-        int cId;
-        long now;
-
-        /**
-         * Método construtor da classe.
-         *
-         * @param id
-         * @param now
-         */
-        public RefreshCustomerSessionAction(int id, long now) {
-            cId = id;
-            this.now = now;
-        }
-
-        /**
-         * Executa a função do {@linkplain Bookstore} que atualiza a sessão do
-         * cliente.
-         *
-         * @param bookstore
-         * @return
-         */
-        @Override
-        public Object executeOnBookstore(Stream<Bookstore> bookstore) {
-            Bookstore.refreshCustomerSession(cId, now);
-            return null;
-        }
-    }
-
-    /**
-     * Classe que implementa as ações relacionadas a atualização do livro.
-     */
-    protected static class UpdateBookAction extends BookstoreAction {
-
-        private static final long serialVersionUID = -745697943594643776L;
-
-        int bId;
-        double cost;
-        String image;
-        String thumbnail;
-        long now;
-
-        /**
-         * Método construtor da classe.
-         *
-         * @param id
-         * @param cost
-         * @param image
-         * @param thumbnail
-         * @param now
-         */
-        public UpdateBookAction(int id, double cost, String image,
-                String thumbnail, long now) {
-            bId = id;
-            this.cost = cost;
-            this.image = image;
-            this.thumbnail = thumbnail;
-            this.now = now;
-        }
-
-        /**
-         * Executa o método na {@linkplain Bookstore} que atualiza os dados de
-         * um livro específico.
-         *
-         * @param bookstore
-         * @return
-         */
-        @Override
-        public Object executeOnBookstore(Stream<Bookstore> bookstore) {
-            Bookstore.updateBook(bId, image, thumbnail, now);
-            return null;
-        }
-    }
-
-    /**
-     * Classe que implementa as ações relacionadas a criação do carrinho de
-     * compras.
-     */
-    protected static class CreateCartAction extends BookstoreAction {
-
-        private static final long serialVersionUID = 8255648428785854052L;
-
-        long now, storeId;
-
-        /**
-         * Método construtor do carrinho de compras para um
-         * {@linkplain Bookstore} específico.
-         *
-         * @param idBookstore
-         * @param now
-         */
-        public CreateCartAction(int idBookstore, long now) {
-            this.now = now;
-            this.storeId = idBookstore;
-        }
-
-        /**
-         * Cria um carrinho de compras para um {@linkplain Bookstore}
-         * específico.
-         *
-         * @param bookstore
-         * @return
-         */
-        @Override
-        public Object executeOnBookstore(Stream<Bookstore> bookstore) {
-            return bookstore.filter(bs -> bs.getId() == this.storeId).findFirst().get().createCart(now);
-        }
-    }
-
-    /**
-     * Classe que implementa as ações relacionadas a atualização do carrinho de
-     * compras.
-     */
-    protected static class CartUpdateAction extends BookstoreAction {
-
-        private static final long serialVersionUID = -6062032194650262105L;
-
-        final int cId, storeId;
-        final Integer bId;
-        final List<Integer> bIds;
-        final List<Integer> quantities;
-        final long now;
-
-        /**
-         * Método construtor da classe.
-         *
-         * @param storeId
-         * @param id
-         * @param id2
-         * @param ids
-         * @param quantities
-         * @param now
-         */
-        public CartUpdateAction(int storeId, int id, Integer id2, List<Integer> ids,
-                List<Integer> quantities, long now) {
-            this.storeId = storeId;
-            cId = id;
-            bId = id2;
-            bIds = ids;
-            this.quantities = quantities;
-            this.now = now;
-        }
-
-        /**
-         * Atualiza um carrinho de compras em um {@linkplain Bookstore}.
-         *
-         * @param bookstore
-         * @return
-         */
-        @Override
-        public Object executeOnBookstore(Stream<Bookstore> bookstore) {
-            return bookstore.filter(bs -> bs.getId() == this.storeId).findFirst().get().cartUpdate(cId, bId, bIds, quantities, now);
-        }
-    }
-
-    /**
-     * Classe que implementa as ações relacionadas a confirmação de compra.
-     */
-    protected static class ConfirmBuyAction extends BookstoreAction {
-
-        private static final long serialVersionUID = -6180290851118139002L;
-
-        final int customerId, storeId, cartId;
-        String comment;
-        String ccType;
-        long ccNumber;
-        String ccName;
-        Date ccExpiry;
-        String shipping;
-        Date shippingDate;
-        int addressId;
-        long now;
-
-        /**
-         * Método construtor da classe.
-         *
-         * @param storeId
-         * @param customerId
-         * @param cartId
-         * @param comment
-         * @param ccType
-         * @param ccNumber
-         * @param ccName
-         * @param ccExpiry
-         * @param shipping
-         * @param shippingDate
-         * @param addressId
-         * @param now
-         */
-        public ConfirmBuyAction(int storeId, int customerId, int cartId,
-                String comment, String ccType, long ccNumber,
-                String ccName, Date ccExpiry, String shipping,
-                Date shippingDate, int addressId, long now) {
-            this.storeId = storeId;
-            this.customerId = customerId;
-            this.cartId = cartId;
-            this.comment = comment;
-            this.ccType = ccType;
-            this.ccNumber = ccNumber;
-            this.ccName = ccName;
-            this.ccExpiry = ccExpiry;
-            this.shipping = shipping;
-            this.shippingDate = shippingDate;
-            this.addressId = addressId;
-            this.now = now;
-        }
-
-        /**
-         * Confirma a compra de um carrinho de compras de um
-         * {@linkplain Bookstore}.
-         *
-         * @param bookstore
-         * @return
-         */
-        @Override
-        public Object executeOnBookstore(Stream<Bookstore> bookstore) {
-            return bookstore.filter(bs -> bs.getId() == this.storeId).findFirst().get().confirmBuy(customerId, cartId, comment, ccType,
-                    ccNumber, ccName, ccExpiry, shipping, shippingDate,
-                    addressId, now);
-        }
-    }
-
-    /**
-     * Classe que implementa as ações relacionadas a preenchimento dos dados do
-     * {@linkplain Bookstore}.
-     */
-    protected static class PopulateAction extends BookstoreAction {
-
-        private static final long serialVersionUID = -5240430799502573886L;
-
-        long seed;
-        long now;
-        int items;
-        int customers;
-        int addresses;
-        int authors;
-        int orders;
-
-        /**
-         * Método construtor da classe.
-         *
-         * @param seed
-         * @param now
-         * @param items
-         * @param customers
-         * @param addresses
-         * @param authors
-         * @param orders
-         */
-        public PopulateAction(long seed, long now, int items, int customers,
-                int addresses, int authors, int orders) {
-            this.seed = seed;
-            this.now = now;
-            this.items = items;
-            this.customers = customers;
-            this.addresses = addresses;
-            this.authors = authors;
-            this.orders = orders;
-        }
-
-        /**
-         * Popula os dados do {@linkplain Bookstore}.
-         *
-         * @param bookstore
-         * @return
-         */
-        @Override
-        public Object executeOnBookstore(Stream<Bookstore> bookstore) {
-            Bookstore.populate(seed, now, items, customers, addresses, authors);
-            Random rand = new Random(seed);
-            bookstore.forEach(instance -> instance.populateInstanceBookstore(orders, rand, now));
-            return true;
         }
     }
 
