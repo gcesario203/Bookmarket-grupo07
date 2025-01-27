@@ -39,15 +39,11 @@ jobs:
           echo "Type         Covered   Missed   Total    Coverage"
           echo "------------------------------------------------"
 
-          xml_content=$(cat target/site/jacoco/jacoco.xml)
-
-          for TYPE in INSTRUCTION LINE BRANCH METHOD CLASS; do
-            line=$(echo "$xml_content" | grep "<counter type=\"$TYPE\"" | head -1)
-            if [ ! -z "$line" ]; then
-              COVERED=$(echo "$line" | grep -o 'covered="[0-9]*"' | grep -o '[0-9]*')
-              MISSED=$(echo "$line" | grep -o 'missed="[0-9]*"' | grep -o '[0-9]*')
-              TOTAL=$((COVERED + MISSED))
-              COVERAGE=$(echo "scale=2; 100 * $COVERED / $TOTAL" | bc)
-              printf "%-12s %-9s %-9s %-9s %6.2f%%\n" "$TYPE" "$COVERED" "$MISSED" "$TOTAL" "$COVERAGE"
-            fi
-          done
+          cat target/site/jacoco/jacoco.xml | grep "<counter type=" | while read -r line; do
+            TYPE=$(echo $line | grep -o 'type="[^"]*"' | cut -d'"' -f2)
+            COVERED=$(echo $line | grep -o 'covered="[^"]*"' | cut -d'"' -f2)
+            MISSED=$(echo $line | grep -o 'missed="[^"]*"' | cut -d'"' -f2)
+            TOTAL=$((COVERED + MISSED))
+            COVERAGE=$(echo "scale=2; 100 * $COVERED / $TOTAL" | bc)
+            printf "%-12s %-9s %-9s %-9s %6.2f%%\n" "$TYPE" "$COVERED" "$MISSED" "$TOTAL" "$COVERAGE"
+          done | sort | uniq
