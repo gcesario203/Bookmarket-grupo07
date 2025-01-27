@@ -36,14 +36,4 @@ jobs:
       - name: Display coverage report
         run: |
           echo "=== Coverage Report ==="
-          echo "Type         Covered   Missed   Total    Coverage"
-          echo "------------------------------------------------"
-
-          cat target/site/jacoco/jacoco.xml | grep "<counter type=" | while read -r line; do
-            TYPE=$(echo $line | grep -o 'type="[^"]*"' | cut -d'"' -f2)
-            COVERED=$(echo $line | grep -o 'covered="[^"]*"' | cut -d'"' -f2)
-            MISSED=$(echo $line | grep -o 'missed="[^"]*"' | cut -d'"' -f2)
-            TOTAL=$((COVERED + MISSED))
-            COVERAGE=$(echo "scale=2; 100 * $COVERED / $TOTAL" | bc)
-            printf "%-12s %-9s %-9s %-9s %6.2f%%\n" "$TYPE" "$COVERED" "$MISSED" "$TOTAL" "$COVERAGE"
-          done | sort | uniq
+          cat target/site/jacoco/jacoco.xml
