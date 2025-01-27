@@ -49,50 +49,14 @@ jobs:
         run: |
           echo "=== Coverage Summary ==="
 
-          # Instalar xmllint se necessário
-          sudo apt-get install -y libxml2-utils > /dev/null 2>&1
-
-          echo "Coverage by Package:"
-          echo "----------------------------------------"
-          echo "Package                     Coverage Line"
-          echo "----------------------------------------"
-
-          # Extrair e mostrar informação de cada package
-          xmllint --xpath "//package" target/site/jacoco/jacoco.xml | while read -r line; do
-            if [[ $line =~ name=\"([^\"]+)\" ]]; then
-              package="${BASH_REMATCH[1]}"
-              covered=$(xmllint --xpath "//package[@name='$package']//counter[@type='LINE']/@covered" target/site/jacoco/jacoco.xml | grep -o '[0-9]*')
-              missed=$(xmllint --xpath "//package[@name='$package']//counter[@type='LINE']/@missed" target/site/jacoco/jacoco.xml | grep -o '[0-9]*')
-
-              if [ -n "$covered" ] && [ -n "$missed" ]; then
-                total=$((covered + missed))
-                if [ $total -ne 0 ]; then
-                  coverage=$(echo "scale=2; ($covered / $total) * 100" | bc)
-                  printf "%-25s %8.2f%% (%d/%d)\n" "$package" $coverage $covered $total
-                fi
-              fi
-            fi
-          done
-
-          echo -e "\nTotal Project Coverage:"
-          echo "----------------------------------------"
-
           # Extrair cobertura total do projeto
-          for type in LINE INSTRUCTION BRANCH METHOD CLASS; do
-            covered=$(xmllint --xpath "//counter[@type='$type']/@covered" target/site/jacoco/jacoco.xml | grep -o '[0-9]*' | head -1)
-            missed=$(xmllint --xpath "//counter[@type='$type']/@missed" target/site/jacoco/jacoco.xml | grep -o '[0-9]*' | head -1)
+          total_covered=$(grep -oP '(?<=<counter type="LINE" covered=")\d+' target/site/jacoco/jacoco.xml | tail -1)
+          total_missed=$(grep -oP '(?<=<counter type="LINE" missed=")\d+' target/site/jacoco/jacoco.xml | tail -1)
 
-            if [ -n "$covered" ] && [ -n "$missed" ]; then
-              total=$((covered + missed))
-              if [ $total -ne 0 ]; then
-                coverage=$(echo "scale=2; ($covered / $total) * 100" | bc)
-                case $type in
-                  "LINE") echo "Line Coverage: ${coverage}% (${covered}/${total})";;
-                  "INSTRUCTION") echo "Instruction Coverage: ${coverage}% (${covered}/${total})";;
-                  "BRANCH") echo "Branch Coverage: ${coverage}% (${covered}/${total})";;
-                  "METHOD") echo "Method Coverage: ${coverage}% (${covered}/${total})";;
-                  "CLASS") echo "Class Coverage: ${coverage}% (${covered}/${total})";;
-                esac
-              fi
-            fi
-          done
+          if [ -n "$total_covered" ] && [ -n "$total_missed" ]; then
+            total=$((total_covered + total_missed))
+            coverage=$(echo "scale=2; ($total_covered / $total) * 100" | bc)
+            echo "Total Line Coverage: ${coverage}% (${total_covered}/${total} lines)"
+          else
+            echo "Could not calculate coverage"
+          fi
