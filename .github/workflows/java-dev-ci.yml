@@ -31,11 +31,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Install dependencies
-        run: mvn install --no-transfer-progress --quiet
-
-      - name: Run tests and generate report
-        run: mvn clean test --fail-at-end --no-transfer-progress
+      - name: Run tests and generate coverage report
+        run: |
+          mvn clean test org.jacoco:jacoco-maven-plugin:prepare-agent org.jacoco:jacoco-maven-plugin:report --fail-at-end --batch-mode --quiet
         env:
           MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
 
@@ -45,8 +43,6 @@ jobs:
 
       - name: Verify test coverage
         run: |
-          mvn org.jacoco:jacoco-maven-plugin:prepare-agent test
-          mvn org.jacoco:jacoco-maven-plugin:report
           COVERAGE=$(grep -oP '(?<=<counter type="INSTRUCTION" missed=")\d+(?=.*>)' target/site/jacoco/jacoco.xml | awk '{total+=1; covered+=$0} END {print (covered/total)*100}')
           if (( $(echo "$COVERAGE < 80" | bc -l) )); then
             echo "Test coverage ($COVERAGE%) is below the threshold of 80%."
