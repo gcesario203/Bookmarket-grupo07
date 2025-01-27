@@ -33,7 +33,11 @@ jobs:
 
       - name: Run tests and generate coverage report
         run: |
-          mvn clean test org.jacoco:jacoco-maven-plugin:prepare-agent org.jacoco:jacoco-maven-plugin:report --fail-at-end --batch-mode --quiet
+          mvn clean test org.jacoco:jacoco-maven-plugin:prepare-agent org.jacoco:jacoco-maven-plugin:report \
+            --fail-at-end --batch-mode \
+            -Dorg.slf4j.simpleLogger.defaultLogLevel=error \
+            -Djava.util.logging.ConsoleHandler.level=SEVERE \
+            -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.NoOpLog
         env:
           MAVEN_OPTS: "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
 
@@ -43,10 +47,16 @@ jobs:
 
       - name: Verify test coverage
         run: |
-          COVERAGE=$(grep -oP '(?<=<counter type="INSTRUCTION" missed=")\d+(?=.*>)' target/site/jacoco/jacoco.xml | awk '{total+=1; covered+=$0} END {print (covered/total)*100}')
-          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
-            echo "Test coverage ($COVERAGE%) is below the threshold of 80%."
-            exit 1
+          if [ -f target/site/jacoco/jacoco.xml ]; then
+            COVERAGE=$(grep -oP '(?<=<counter type="INSTRUCTION" missed=")\d+(?=.*>)' target/site/jacoco/jacoco.xml | awk '{total+=1; covered+=$0} END {print (covered/total)*100}')
+            echo "Test coverage: $COVERAGE%"
+            if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+              echo "Test coverage ($COVERAGE%) is below the threshold of 80%."
+              exit 1
+            else
+              echo "Test coverage ($COVERAGE%) meets the threshold of 80%."
+            fi
           else
-            echo "Test coverage ($COVERAGE%) meets the threshold of 80%."
+            echo "Coverage report not found. Failing the build."
+            exit 1
           fi
