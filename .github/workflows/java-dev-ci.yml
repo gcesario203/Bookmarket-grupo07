@@ -33,14 +33,38 @@ jobs:
             exit 1
           fi
 
-      # Step 4: Calculate total coverage
-      - name: Calculate and display total coverage
+      - name: Display test results summary
         run: |
-          COVERAGE=$(grep -oP '(?<=<counter type="INSTRUCTION" missed=")\d+(?=.*>)' target/site/jacoco/jacoco.xml \
-          | awk '{total+=1; covered+=$0} END {if (total > 0) print (covered/total)*100; else print 0}')
-          echo "Total Coverage: $COVERAGE%"
-          echo "Coverage calculation completed."
+          echo "=== Test Results Summary ==="
+          TESTS_RUN=$(grep -oP 'tests="[0-9]*"' target/surefire-reports/TEST-*.xml | head -1 | grep -oP '[0-9]+')
+          FAILURES=$(grep -oP 'failures="[0-9]*"' target/surefire-reports/TEST-*.xml | head -1 | grep -oP '[0-9]+')
+          ERRORS=$(grep -oP 'errors="[0-9]*"' target/surefire-reports/TEST-*.xml | head -1 | grep -oP '[0-9]+')
+          SKIPPED=$(grep -oP 'skipped="[0-9]*"' target/surefire-reports/TEST-*.xml | head -1 | grep -oP '[0-9]+')
+          echo "Tests Run: $TESTS_RUN"
+          echo "Failures: $FAILURES"
+          echo "Errors: $ERRORS"
+          echo "Skipped: $SKIPPED"
 
-      # Step 5: Display detailed coverage report
-      - name: Display coverage report
-        run: cat target/site/jacoco/jacoco.xml || echo "No test report found."
+      - name: Calculate and display coverage
+        run: |
+          echo "=== Coverage Summary ==="
+          MISSED=$(grep -oP '(?<=<counter type="INSTRUCTION" missed=")\d+' target/site/jacoco/jacoco.xml | head -1)
+          COVERED=$(grep -oP '(?<=<counter type="INSTRUCTION" covered=")\d+' target/site/jacoco/jacoco.xml | head -1)
+          TOTAL=$((MISSED + COVERED))
+          COVERAGE=$(awk "BEGIN { printf \"%.2f\", ($COVERED / $TOTAL) * 100 }")
+          echo "Instructions Covered: $COVERED"
+          echo "Instructions Missed: $MISSED"
+          echo "Total Instructions: $TOTAL"
+          echo "Coverage: $COVERAGE%"
+
+          # Opcionalmente, adicione cobertura por tipo
+          echo -e "\nDetailed Coverage:"
+          echo "Type         Missed Covered Coverage"
+          echo "--------------------------------"
+          for TYPE in INSTRUCTION BRANCH LINE COMPLEXITY METHOD CLASS; do
+            MISSED=$(grep -oP "(?<=<counter type=\"$TYPE\" missed=\")\\d+" target/site/jacoco/jacoco.xml | head -1)
+            COVERED=$(grep -oP "(?<=<counter type=\"$TYPE\" covered=\")\\d+" target/site/jacoco/jacoco.xml | head -1)
+            TOTAL=$((MISSED + COVERED))
+            COVERAGE=$(awk "BEGIN { printf \"%.2f\", ($COVERED / $TOTAL) * 100 }")
+            printf "%-12s %6d %7d %8.2f%%\n" "$TYPE" "$MISSED" "$COVERED" "$COVERAGE"
+          done
