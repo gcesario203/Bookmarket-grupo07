@@ -6,7 +6,7 @@ import java.util.Random;
 
 import org.junit.BeforeClass;
 
-import servico.Bookstore;
+import servico.bookstore.Bookstore;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;

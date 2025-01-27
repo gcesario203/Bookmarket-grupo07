@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 import dominio.Book;
 import dominio.Customer;
-import servico.Bookstore;
+import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.ExpecificBookstoreAction;
 
 public class CreateReviewAction extends ExpecificBookstoreAction {

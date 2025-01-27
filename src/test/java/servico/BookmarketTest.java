@@ -17,6 +17,7 @@ import dominio.Book;
 import dominio.Cart;
 import dominio.Customer;
 import dominio.Order;
+import servico.bookstore.Bookstore;
 import dominio.Review;
 import dominio.Stock;
 import servico.bookmarket.Bookmarket;

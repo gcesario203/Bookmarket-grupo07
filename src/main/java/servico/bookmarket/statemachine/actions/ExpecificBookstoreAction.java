@@ -2,7 +2,7 @@ package servico.bookmarket.statemachine.actions;
 
 import java.util.stream.Stream;
 
-import servico.Bookstore;
+import servico.bookstore.Bookstore;
 
 public abstract class ExpecificBookstoreAction extends BookstoreAction{
 	

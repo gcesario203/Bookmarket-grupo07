@@ -14,6 +14,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.junit.After;
+import servico.bookstore.Bookstore;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;

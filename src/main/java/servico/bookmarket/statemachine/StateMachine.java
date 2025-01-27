@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import servico.Bookstore;
+import servico.bookstore.Bookstore;
 import servico.bookmarket.exceptions.UmbrellaException;
 import servico.bookmarket.interfaces.Action;
 
