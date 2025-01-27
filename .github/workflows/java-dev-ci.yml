@@ -38,10 +38,14 @@ jobs:
           echo "=== Coverage Report ==="
           echo "Type         Covered   Missed   Total    Coverage"
           echo "------------------------------------------------"
+
+          xml_content=$(cat target/site/jacoco/jacoco.xml)
+
           for TYPE in INSTRUCTION LINE BRANCH METHOD CLASS; do
-            COVERED=$(cat target/site/jacoco/jacoco.xml | grep "<counter type=\"$TYPE\"" | head -1 | grep -o "covered=\"[0-9]*\"" | grep -o "[0-9]*")
-            MISSED=$(cat target/site/jacoco/jacoco.xml | grep "<counter type=\"$TYPE\"" | head -1 | grep -o "missed=\"[0-9]*\"" | grep -o "[0-9]*")
-            if [ ! -z "$COVERED" ] && [ ! -z "$MISSED" ]; then
+            line=$(echo "$xml_content" | grep "<counter type=\"$TYPE\"" | head -1)
+            if [ ! -z "$line" ]; then
+              COVERED=$(echo "$line" | grep -o 'covered="[0-9]*"' | grep -o '[0-9]*')
+              MISSED=$(echo "$line" | grep -o 'missed="[0-9]*"' | grep -o '[0-9]*')
               TOTAL=$((COVERED + MISSED))
               COVERAGE=$(echo "scale=2; 100 * $COVERED / $TOTAL" | bc)
               printf "%-12s %-9s %-9s %-9s %6.2f%%\n" "$TYPE" "$COVERED" "$MISSED" "$TOTAL" "$COVERAGE"
