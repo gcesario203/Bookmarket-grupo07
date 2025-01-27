@@ -48,34 +48,65 @@ jobs:
       - name: Calculate and display coverage
         run: |
           echo "=== Coverage Summary ==="
-          MISSED=$(grep -oP '(?<=<counter type="INSTRUCTION" missed=")\d+' target/site/jacoco/jacoco.xml | head -1)
-          COVERED=$(grep -oP '(?<=<counter type="INSTRUCTION" covered=")\d+' target/site/jacoco/jacoco.xml | head -1)
-          if [ -n "$MISSED" ] && [ -n "$COVERED" ]; then
-            TOTAL=$((MISSED + COVERED))
-            if [ $TOTAL -ne 0 ]; then
-              COVERAGE=$(awk "BEGIN { printf \"%.2f\", ($COVERED / $TOTAL) * 100 }")
-              echo "Instructions Covered: $COVERED"
-              echo "Instructions Missed: $MISSED"
-              echo "Total Instructions: $TOTAL"
-              echo "Coverage: $COVERAGE%"
-          
-              echo -e "\nDetailed Coverage:"
-              echo "Type         Missed Covered Coverage"
-              echo "--------------------------------"
-              for TYPE in INSTRUCTION BRANCH LINE COMPLEXITY METHOD CLASS; do
-                MISSED=$(grep -oP "(?<=<counter type=\"$TYPE\" missed=\")\\d+" target/site/jacoco/jacoco.xml | head -1)
-                COVERED=$(grep -oP "(?<=<counter type=\"$TYPE\" covered=\")\\d+" target/site/jacoco/jacoco.xml | head -1)
-                if [ -n "$MISSED" ] && [ -n "$COVERED" ]; then
-                  TOTAL=$((MISSED + COVERED))
-                  if [ $TOTAL -ne 0 ]; then
-                    COVERAGE=$(awk "BEGIN { printf \"%.2f\", ($COVERED / $TOTAL) * 100 }")
-                    printf "%-12s %6d %7d %8.2f%%\n" "$TYPE" "$MISSED" "$COVERED" "$COVERAGE"
-                  fi
-                fi
-              done
+
+          # Função para calcular porcentagem
+          calculate_percentage() {
+            local covered=$1
+            local missed=$2
+            local total=$((covered + missed))
+            if [ $total -ne 0 ]; then
+              echo "scale=2; ($covered / $total) * 100" | bc
             else
-              echo "No coverage data found"
+              echo "0.00"
             fi
+          }
+
+          # Extrair packages e suas coberturas
+          echo "Coverage by Package:"
+          echo "----------------------------------------"
+          echo "Package                     Coverage Line"
+          echo "----------------------------------------"
+
+          while IFS= read -r line; do
+            if [[ $line =~ package\ name=\"([^\"]+)\" ]]; then
+              package="${BASH_REMATCH[1]}"
+
+              # Obter contadores do package
+              covered=$(grep -A5 "package name=\"$package\"" target/site/jacoco/jacoco.xml | grep -oP '(?<=<counter type="LINE" covered=")\d+' | head -1)
+              missed=$(grep -A5 "package name=\"$package\"" target/site/jacoco/jacoco.xml | grep -oP '(?<=<counter type="LINE" missed=")\d+' | head -1)
+
+              # Calcular cobertura
+              if [ -n "$covered" ] && [ -n "$missed" ]; then
+                coverage=$(calculate_percentage $covered $missed)
+                printf "%-25s %8.2f%% (%d/%d)\n" "$package" $coverage $covered $((covered + missed))
+              fi
+            fi
+          done < target/site/jacoco/jacoco.xml
+
+          # Calcular cobertura total
+          echo -e "\nTotal Coverage:"
+          echo "----------------------------------------"
+          total_covered=$(grep -oP '(?<=<counter type="LINE" covered=")\d+' target/site/jacoco/jacoco.xml | head -1)
+          total_missed=$(grep -oP '(?<=<counter type="LINE" missed=")\d+' target/site/jacoco/jacoco.xml | head -1)
+
+          if [ -n "$total_covered" ] && [ -n "$total_missed" ]; then
+            total_coverage=$(calculate_percentage $total_covered $total_missed)
+            echo "Line Coverage: ${total_coverage}% (${total_covered}/$((total_covered + total_missed)) lines)"
+
+            # Adicionar outros tipos de cobertura
+            for TYPE in INSTRUCTION BRANCH METHOD CLASS; do
+              covered=$(grep -oP "(?<=<counter type=\"$TYPE\" covered=\")\\d+" target/site/jacoco/jacoco.xml | head -1)
+              missed=$(grep -oP "(?<=<counter type=\"$TYPE\" missed=\")\\d+" target/site/jacoco/jacoco.xml | head -1)
+              if [ -n "$covered" ] && [ -n "$missed" ]; then
+                coverage=$(calculate_percentage $covered $missed)
+                case $TYPE in
+                  "INSTRUCTION") echo "Instruction Coverage: ${coverage}% (${covered}/$((covered + missed)) instructions)";;
+                  "BRANCH") echo "Branch Coverage: ${coverage}% (${covered}/$((covered + missed)) branches)";;
+                  "METHOD") echo "Method Coverage: ${coverage}% (${covered}/$((covered + missed)) methods)";;
+                  "CLASS") echo "Class Coverage: ${coverage}% (${covered}/$((covered + missed)) classes)";;
+                esac
+              fi
+            done
           else
-            echo "Could not parse coverage data"
+            echo "Could not calculate total coverage"
           fi
