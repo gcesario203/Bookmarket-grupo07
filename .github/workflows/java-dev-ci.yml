@@ -46,10 +46,10 @@ jobs:
           echo "Branch Coverage = ${branches}%"
 
       - name: Upload JaCoCo badge
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jacoco-badge
-          path: ./jacoco.svg
+          path: .github/badges/jacoco.svg
 
       - name: Upload JaCoCo coverage report
         uses: actions/upload-artifact@v3
