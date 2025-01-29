@@ -68,6 +68,7 @@ jobs:
           
           git switch gh-pages || git checkout -b gh-pages
           mv public/* .
+          git pull
           git add -A
           git commit -m "Update coverage badge [skip ci]" || echo "No changes to commit"
           
