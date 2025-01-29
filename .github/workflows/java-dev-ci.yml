@@ -64,14 +64,16 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           
-          git fetch
+          git stash -u
           
-          git switch gh-pages || git checkout -b gh-pages
+          git fetch origin
+          
+          git checkout -B gh-pages --track origin/gh-pages || git checkout -b gh-pages
+          
           mv public/* .
-          git pull
-          git add -A
+          git add coverage-badge.svg
           git commit -m "Update coverage badge [skip ci]" || echo "No changes to commit"
           
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/gcesario203/Bookmarket-grupo07 gh-pages
+          git push -f https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/gcesario203/Bookmarket-grupo07 gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
