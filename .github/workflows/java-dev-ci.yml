@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - dev
-      - DdCaCf8g-ImproveCiCd
 
 jobs:
   build:
@@ -57,18 +56,6 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco/
 
-      # - name: Push coverage badge to gh-pages
-      #   run: |
-      #     mkdir -p public
-      #     cp .github/badges/jacoco.svg public/coverage-badge.svg
-      #     git fetch
-      #     git switch gh-pages || git checkout --orphan gh-pages
-      #     mv public/* .
-      #     git add -A
-      #     git commit -m "Update coverage badge [skip ci]" || echo "No changes to commit"
-      #     git push origin gh-pages
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       - name: Push coverage badge to gh-pages
         run: |
           mkdir -p public
