@@ -68,4 +68,4 @@ jobs:
           git commit -m "Update coverage badge [skip ci]" || echo "No changes to commit"
           git push origin gh-pages
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
