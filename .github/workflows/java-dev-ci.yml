@@ -60,7 +60,7 @@ jobs:
       - name: Push coverage badge to gh-pages
         run: |
           mkdir -p public
-          cp path/to/generated-badge.svg public/coverage-badge.svg
+          cp .github/badges/jacoco.svg public/coverage-badge.svg
           git fetch
           git switch gh-pages || git checkout --orphan gh-pages
           mv public/* .
