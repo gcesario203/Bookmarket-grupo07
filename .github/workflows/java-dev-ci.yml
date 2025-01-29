@@ -58,22 +58,19 @@ jobs:
 
       - name: Push coverage badge to gh-pages
         run: |
-          mkdir -p public
-          cp .github/badges/jacoco.svg public/coverage-badge.svg
+          cp .github/badges/jacoco.svg /tmp/coverage-badge.svg
           
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           
           git stash -u
-          
           git fetch origin
-          
           git checkout -B gh-pages --track origin/gh-pages || git checkout -b gh-pages
           
-          mv public/* .
+          cp /tmp/coverage-badge.svg coverage-badge.svg
+          
           git add coverage-badge.svg
           git commit -m "Update coverage badge [skip ci]" || echo "No changes to commit"
-          
           git push -f https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/gcesario203/Bookmarket-grupo07 gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
