@@ -16,6 +16,8 @@ import dominio.OrderLine;
 import dominio.Review;
 import dominio.Stock;
 import servico.bookstore.utils.Counter;
+import util.BookstoreConstants.Backing;
+import util.BookstoreConstants.Subject;
 import util.TPCW_Util;
 
 import java.io.IOException;
@@ -85,7 +87,6 @@ public class Bookstore implements Serializable {
     private static final Map<String, Customer> customersByUsername;
     private static final List<Author> authorsById;
     private static final List<Book> booksById;
-    
 
     private final Map<Book, Stock> stockByBook;
     private final List<Cart> cartsById;
@@ -107,7 +108,6 @@ public class Bookstore implements Serializable {
         customersByUsername = new HashMap<>();
         authorsById = new ArrayList<>();
         booksById = new ArrayList<>();
-        
     }
 
     /**
@@ -134,8 +134,8 @@ public class Bookstore implements Serializable {
     }
 
     /**
-
      *
+     * 
      * @return
      */
     public boolean isPopulated() {
@@ -163,7 +163,7 @@ public class Bookstore implements Serializable {
      * Busca por um objeto Country baseando-se num gerador de aleatorios do tipo
      * Random que deve ser instanciado pelo desenvolvedor que quiser utilizar o
      * metodo.
-
+     * 
      * @param random Dado randômico / aleatório
      * @return countryById País do Id escolhido
      */
@@ -177,7 +177,7 @@ public class Bookstore implements Serializable {
      * ja existentes.
      *
      *
-     * @param name Nome do país
+     * @param name     Nome do país
      * @param currency Moeda corrente do país
      * @param exchange Taxa de câmbio
      * @return country país
@@ -194,13 +194,13 @@ public class Bookstore implements Serializable {
      * Busca por um objeto Address (endereco) a partir de todos os argumentos
      * fornecidos, porem utilzia id = 0 par ao objeto, se nao o encontrar, o
      * mesmo eh criado e entao retornado.
-
      *
-     * @param street1 Rua/Avenida do endereço
-     * @param street2 Rua/Avenida do endereço (complemento)
-     * @param city Cidade do endereço
-     * @param state Estado
-     * @param zip Código postal
+     * 
+     * @param street1     Rua/Avenida do endereço
+     * @param street2     Rua/Avenida do endereço (complemento)
+     * @param city        Cidade do endereço
+     * @param state       Estado
+     * @param zip         Código postal
      * @param countryName Nome do País
      * @return address Endereço
      */
@@ -233,9 +233,9 @@ public class Bookstore implements Serializable {
      *
      * @param street1 Rua/Avenida do endereço
      * @param street2 Rua/Avenida do endereço (complemento)
-     * @param city Cidade do endereço
-     * @param state Estado
-     * @param zip Código postal
+     * @param city    Cidade do endereço
+     * @param state   Estado
+     * @param zip     Código postal
      * @param country País
      * @return address Endereço
      */
@@ -277,88 +277,88 @@ public class Bookstore implements Serializable {
     private Customer getACustomerAnyCustomer(Random random) {
         return customersById.get(random.nextInt(customersById.size()));
     }
-    
+
     public Review createReview(Customer customer, Book book, double value) throws IOException {
-    	if(!customersById.contains(customer))
-    		throw new IOException("Cliente não cadastrado");
-    	
-    	if(!booksById.contains(book))
-    		throw new IOException("Livro não cadastrado");
-    	
-    	Review review = new Review(customer, book, value, this.id);
-    	
-    	reviewsByIds.add(review);
-    	
-    	return review;
-    }
-    
-    public boolean changeReviewValue(int id, double value) throws IOException {
-    	Optional<Review> review = getReviewById(id);
-    	
-    	if(!review.isPresent())
-    		return false;
-    	
-    	review.get().setRating(value);
-    	
-    	return true;
-    }
-    
-    public boolean removeReviewById(int id) {
-    	return getReviews().removeIf(r -> r.getId() == id);
-    }
-    
-    public List<Review> getReviews(){
-    	return this.reviewsByIds;
-    }
-    
-    public Optional<Review> getReviewById(int id){
-    	return getReviews().stream().filter(r -> r.getId() == id).findFirst();
-    }
-    
-    public List<Review> getReviewsByBook(Book book){
-    	return getReviews().stream()
-    					   .filter(r -> r.getBook().getId() == book.getId())
-    				 	   .collect(Collectors.toList());
-    }
-    
-    public List<Review> getReviewsByCustomer(Customer customer){
-    	return getReviews().stream()
-				   .filter(r -> r.getCustomer().getId() == customer.getId())
-			 	   .collect(Collectors.toList());
+        if (!customersById.contains(customer))
+            throw new IOException("Cliente não cadastrado");
+
+        if (!booksById.contains(book))
+            throw new IOException("Livro não cadastrado");
+
+        Review review = new Review(customer, book, value, this.id);
+
+        reviewsByIds.add(review);
+
+        return review;
     }
 
+    public boolean changeReviewValue(int id, double value) throws IOException {
+        Optional<Review> review = getReviewById(id);
+
+        if (!review.isPresent())
+            return false;
+
+        review.get().setRating(value);
+
+        return true;
+    }
+
+    public boolean removeReviewById(int id) {
+        return getReviews().removeIf(r -> r.getId() == id);
+    }
+
+    public List<Review> getReviews() {
+        return this.reviewsByIds;
+    }
+
+    public Optional<Review> getReviewById(int id) {
+        return getReviews().stream().filter(r -> r.getId() == id).findFirst();
+    }
+
+    public List<Review> getReviewsByBook(Book book) {
+        return getReviews().stream()
+                .filter(r -> r.getBook().getId() == book.getId())
+                .collect(Collectors.toList());
+    }
+
+    public List<Review> getReviewsByCustomer(Customer customer) {
+        return getReviews().stream()
+                .filter(r -> r.getCustomer().getId() == customer.getId())
+                .collect(Collectors.toList());
+    }
 
     /**
      * <pre>
      * Address address = alwaysGetAddress(street1, street2, city, state, zip,
-     * countryName);
+     *         countryName);
      * return createCustomer(fname, lname, address, phone, email,
-     * new Date(now), new Date(now), new Date(now),
-     * new Date(now + 7200000 ), discount, birthdate,
-     * data);
+     *         new Date(now), new Date(now), new Date(now),
+     *         new Date(now + 7200000), discount, birthdate,
+     *         data);
      * </pre>
      *
      * Este método irá retornar o método de criação do controle do consumidor em
      * relação a data de cadastro, último acesso, login e tempo de expiração da
      * sessão.
      *
-     * @param fname Primeiro nome do consumidor
-     * @param lname Sobrenome / Último nome do consumidor
-     * @param street1 Rua/Avenida do endereço
-     * @param street2 Rua/Avenida do endereço (complemento)
-     * @param city Cidade do endereço
-     * @param state Estado
-     * @param zip Código postal
+     * @param fname       Primeiro nome do consumidor
+     * @param lname       Sobrenome / Último nome do consumidor
+     * @param street1     Rua/Avenida do endereço
+     * @param street2     Rua/Avenida do endereço (complemento)
+     * @param city        Cidade do endereço
+     * @param state       Estado
+     * @param zip         Código postal
      * @param countryName Nome do País
-     * @param phone Telefone
-     * @param email	E-mail
-     * @param discount Desconto
-     * @param birthdate Data de Nascimento
-     * @param data Dado referente ao Consumidor
-     * @param now Hora Atual
+     * @param phone       Telefone
+     * @param email       E-mail
+     * @param discount    Desconto
+     * @param birthdate   Data de Nascimento
+     * @param data        Dado referente ao Consumidor
+     * @param now         Hora Atual
      * @return O método createCustomer com os parâmetros: fname, lname, address,
-     * phone, email, since, lastVisit, login, expiration, discount, birthdate,
-     * data)
+     *         phone, email, since, lastVisit, login, expiration, discount,
+     *         birthdate,
+     *         data)
      */
     public static Customer createCustomer(String fname, String lname, String street1,
             String street2, String city, String state, String zip,
@@ -375,29 +375,30 @@ public class Bookstore implements Serializable {
     /**
      * Create a customer and inser it on customer Id list and customer username
      * map.
+     * 
      * <pre>
-     *  int id = customersById.size();
+     * int id = customersById.size();
      * String uname = TPCW_Util.DigSyl(id, 0);
      * Customer customer = new Customer(id, uname, uname.toLowerCase(), fname,
-     * lname, phone, email, since, lastVisit, login, expiration,
-     * discount, 0, 0, birthdate, data, address);
+     *         lname, phone, email, since, lastVisit, login, expiration,
+     *         discount, 0, 0, birthdate, data, address);
      * customersById.add(customer);
      * customersByUsername.put(uname, customer);
      * return customer;
      * </pre>
      *
-     * @param fname Primeiro nome do Consumidor
-     * @param lname Sobrenome / Último nome do consumidor
-     * @param address Endereço do consumidor
-     * @param phone Telefone
-     * @param email Email
-     * @param since Data de Cadastro
-     * @param lastVisit Data do último acesso
-     * @param login Data de acesso ao login da sessão
+     * @param fname      Primeiro nome do Consumidor
+     * @param lname      Sobrenome / Último nome do consumidor
+     * @param address    Endereço do consumidor
+     * @param phone      Telefone
+     * @param email      Email
+     * @param since      Data de Cadastro
+     * @param lastVisit  Data do último acesso
+     * @param login      Data de acesso ao login da sessão
      * @param expiration Data de expiração da sessão
-     * @param discount Desconto
-     * @param birthdate Data de Nascimento
-     * @param data Dado referente ao Consumidor
+     * @param discount   Desconto
+     * @param birthdate  Data de Nascimento
+     * @param data       Dado referente ao Consumidor
      * @return customer Consumidor
      */
     private static Customer createCustomer(String fname, String lname, Address address,
@@ -416,16 +417,17 @@ public class Bookstore implements Serializable {
 
     /**
      * Updates the customer login expiring date aka refresh session.
+     * 
      * <pre>
      * Customer customer = getCustomer(cId);
      * if (customer != null) {
-     * customer.setLogin(new Date(now));
-     * customer.setExpiration(new Date(now + 7200000 ));
+     *     customer.setLogin(new Date(now));
+     *     customer.setExpiration(new Date(now + 7200000));
      * }
      * </pre>
      *
      * @param cId Id do Consumidor
-     * @param now	Tempo / hora atual
+     * @param now Tempo / hora atual
      */
     public static void refreshCustomerSession(int cId, long now) {
         Customer customer = getCustomer(cId);
@@ -450,11 +452,11 @@ public class Bookstore implements Serializable {
      * nome, nome do meio, e último nome / sobrenome), data de nascimento, e
      * biografia do autor.
      *
-     * @param fname Primeiro nome do Autor
-     * @param mname Nome do meio do Autor
-     * @param lname Sobrenome / Último nome do Autor
+     * @param fname     Primeiro nome do Autor
+     * @param mname     Nome do meio do Autor
+     * @param lname     Sobrenome / Último nome do Autor
      * @param birthdate Data de Nascimento
-     * @param bio Biografia do Autor
+     * @param bio       Biografia do Autor
      * @return author Autor
      */
     private static Author createAuthor(String fname, String mname, String lname,
@@ -508,12 +510,12 @@ public class Bookstore implements Serializable {
      * <pre>
      * ArrayList&lt;Book&gt; books = new ArrayList&lt;&gt;();
      * for (Book book : booksById) {
-     * if (subject.equals(book.getSubject())) {
-     * books.add(book);
-     * if (books.size() &gt; 50) {
-     * break;
-     * }
-     * }
+     *     if (subject.equals(book.getSubject())) {
+     *         books.add(book);
+     *         if (books.size() &gt; 50) {
+     *             break;
+     *         }
+     *     }
      * }
      * Collections.sort(books, (Book a, Book b) -&gt; a.getTitle().compareTo(b.getTitle()));
      * return books;
@@ -556,7 +558,6 @@ public class Bookstore implements Serializable {
         books.sort((a, b) -> a.getTitle().compareTo(b.getTitle()));
         return books;
     }
-
 
     /**
      * Returns a list of books that were written by an specific author.
@@ -618,13 +619,43 @@ public class Bookstore implements Serializable {
      * Com isto, é importante salientar que este método utiliza as vendas desta
      * instância para recuperar os livros vendidos.
      *
-     * @param subject Assunto que será utilizado para filtro de pesquisa por
-     * melhores vendedores
+     * @param top
      * @return Retorna uma lista dos livros mais vendidos desta
-     * {@linkplain Bookstore} com tamanho limitado em 100
+     *         {@linkplain Bookstore} com tamanho limitado em 100
      */
-    public List<Book> getBestSellers(String subject) {
-        return null;
+    public List<Book> getBestSellers(Integer top) {
+        final Integer minTopValue = 1;
+        final Integer maxTopValue = 100;
+        if (top < minTopValue || top > maxTopValue){
+            throw new RuntimeException("Invalid value for top");
+        }
+        HashMap<Book, Integer> counter = getBookOrderCounter();
+
+        // Ordena os livros pelas vendas em ordem decrescente e pega os 100 mais vendidos
+        List<Book> topBooks = counter.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
+                .limit(top) // Filtra os N primeiros
+                .map(Map.Entry::getKey) // Extrai apenas os objetos Book
+                .collect(Collectors.toList());
+        return topBooks;
+    }
+
+    public HashMap<Book, Integer> getBookOrderCounter() {
+        HashMap<Book, Integer> counter = new HashMap<Book, Integer>();
+
+        for (Order order : ordersById) {
+            for (OrderLine line : order.getLines()) {
+                Book book = line.getBook();
+                Integer qtd = line.getQty();
+                if (counter.containsKey(book)) {
+                    counter.put(book, counter.get(book) + qtd);
+                } else {
+                    counter.put(book, qtd);
+                }
+            }
+
+        }
+        return counter;
     }
 
     /**
@@ -635,13 +666,12 @@ public class Bookstore implements Serializable {
     public List<Order> getOrdersById() {
         return ordersById;
     }
-    
+
     /**
      *
      * @param subject
      * @return
      */
-    
 
     private static Book createBook(String title, Date pubDate, String publisher,
             String subject, String desc, String thumbnail,
@@ -658,10 +688,10 @@ public class Bookstore implements Serializable {
     /**
      * Updates Book image path and Thumbnail path of a Book
      *
-     * @param bId - Book Id
-     * @param image - Image path
+     * @param bId       - Book Id
+     * @param image     - Image path
      * @param thumbnail - thumbnail
-     * @param now - Publication Date.
+     * @param now       - Publication Date.
      */
     public static void updateBook(int bId, String image,
             String thumbnail, long now) {
@@ -674,7 +704,7 @@ public class Bookstore implements Serializable {
     /**
      * Upadtes the stock of a Book based on Book Id and updates its cost.
      *
-     * @param bId - Book Id
+     * @param bId  - Book Id
      * @param cost - o custo
      */
     public void updateStock(int bId, double cost) {
@@ -698,8 +728,8 @@ public class Bookstore implements Serializable {
         return stock;
     }
 
-    public List<Stock> getStocks(){
-    	return new ArrayList<>(stockByBook.values());
+    public List<Stock> getStocks() {
+        return new ArrayList<>(stockByBook.values());
     }
 
     /**
@@ -744,15 +774,15 @@ public class Bookstore implements Serializable {
                 });
             }
         }
-        Counter[] sorted = counters.values().toArray(new Counter[]{});
+        Counter[] sorted = counters.values().toArray(new Counter[] {});
         Arrays.sort(sorted, (Counter a, Counter b) -> {
             if (b.count > a.count) {
                 return 1;
             }
             return b.count < a.count ? -1 : 0;
         });
-        Book[] related = new Book[]{targetBook, targetBook, targetBook,
-            targetBook, targetBook};
+        Book[] related = new Book[] { targetBook, targetBook, targetBook,
+                targetBook, targetBook };
         for (j = 0; j < 5 && j < sorted.length; j++) {
             related[j] = sorted[j].book;
         }
@@ -789,11 +819,11 @@ public class Bookstore implements Serializable {
     /**
      * Update shopping cart for one book or many books.
      *
-     * @param cId - cart Id
-     * @param bId - book Id
-     * @param bIds - books Id
+     * @param cId        - cart Id
+     * @param bId        - book Id
+     * @param bIds       - books Id
      * @param quantities - quantities if many books.
-     * @param now - Date from now.
+     * @param now        - Date from now.
      * @return uma instância de <code>Cart</code>
      */
     public Cart cartUpdate(int cId, Integer bId, List<Integer> bIds,
@@ -803,9 +833,8 @@ public class Bookstore implements Serializable {
         if (bId != null) {
             cart.increaseLine(stockByBook.get(getBook(bId).get()), getBook(bId).get(), 1);
         }
-        
-        if((bIds != null && bIds.size() > 0) && (quantities != null && quantities.size() > 0)) 
-        {
+
+        if ((bIds != null && bIds.size() > 0) && (quantities != null && quantities.size() > 0)) {
             for (int i = 0; i < bIds.size(); i++) {
                 cart.changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
             }
@@ -824,20 +853,20 @@ public class Bookstore implements Serializable {
      * O método irá finalizar o pedido, enviar a transferência do cartão de
      * crédito e criar uma ordem para que o produto seja enviado.
      *
-     * @param customerId ID do Consumidor
-     * @param cartId ID do Carrinho de Compras
-     * @param comment Comentário
-     * @param ccType Tipo de Cartão de Crédito
-     * @param ccNumber Número do Cartão de Crédito
-     * @param ccName Name do titular do Cartão de Crédito
-     * @param ccExpiry Data de Expiração do Cartão de Crédito
-     * @param shipping Remessa do Pedido
+     * @param customerId   ID do Consumidor
+     * @param cartId       ID do Carrinho de Compras
+     * @param comment      Comentário
+     * @param ccType       Tipo de Cartão de Crédito
+     * @param ccNumber     Número do Cartão de Crédito
+     * @param ccName       Name do titular do Cartão de Crédito
+     * @param ccExpiry     Data de Expiração do Cartão de Crédito
+     * @param shipping     Remessa do Pedido
      * @param shippingDate Data de Envio
-     * @param addressId Endereço do Consumidor
-     * @param now Tempo / hora atual
+     * @param addressId    Endereço do Consumidor
+     * @param now          Tempo / hora atual
      * @return O método createOrder com os parâmetros: Consumidor, Data atual,
-     * carrinho de compras, comentários, dados para envio da ordem, e a
-     * transação do cartão.
+     *         carrinho de compras, comentários, dados para envio da ordem, e a
+     *         transação do cartão.
      */
     public Order confirmBuy(int customerId, int cartId, String comment,
             String ccType, long ccNumber, String ccName, Date ccExpiry,
@@ -877,26 +906,24 @@ public class Bookstore implements Serializable {
         return order;
     }
 
-    
-
     private static Random rand;
 
     /**
      * Randomly populates Addresses, Customers, Authors and Books lists.
      *
-     * @param seed - um valor random
-     * @param now - data e hora atual
-     * @param items - a quantidde de itens
+     * @param seed      - um valor random
+     * @param now       - data e hora atual
+     * @param items     - a quantidde de itens
      * @param customers - a quantidade de clientes
      * @param addresses - a quantidade de enderços
-     * @param authors - a quantidade de autores
+     * @param authors   - a quantidade de autores
      * @return true always
      */
     public static boolean populate(long seed, long now, int items, int customers,
             int addresses, int authors) {
-    	if(items < 0 || customers < 0 || addresses < 0 || authors < 0)
-    		throw new RuntimeException("Parametros invalidos");
-    	
+        if (items < 0 || customers < 0 || addresses < 0 || authors < 0)
+            throw new RuntimeException("Parametros invalidos");
+
         if (populated) {
             return false;
         }
@@ -919,14 +946,14 @@ public class Bookstore implements Serializable {
      * consumidor.
      */
     private static void populateCountries() {
-            System.out.print("Creating " + COUNTRIES.length + " countries...");
+        System.out.print("Creating " + COUNTRIES.length + " countries...");
 
-            for (int i = 0; i < COUNTRIES.length; i++) {
-                createCountry(COUNTRIES[i], CURRENCIES[i], EXCHANGES[i]);
-            }
-
-            System.out.println(" Done");
+        for (int i = 0; i < COUNTRIES.length; i++) {
+            createCountry(COUNTRIES[i], CURRENCIES[i], EXCHANGES[i]);
         }
+
+        System.out.println(" Done");
+    }
 
     private static void populateAddresses(int number, Random rand) {
         System.out.print("Creating " + number + " addresses...");
@@ -964,7 +991,7 @@ public class Bookstore implements Serializable {
                     address,
                     TPCW_Util.getRandomString(rand, 9, 16),
                     TPCW_Util.getRandomString(rand, 2, 9) + "@"
-                    + TPCW_Util.getRandomString(rand, 2, 9) + ".com",
+                            + TPCW_Util.getRandomString(rand, 2, 9) + ".com",
                     new Date(since),
                     new Date(lastLogin),
                     new Date(now),
@@ -1049,8 +1076,7 @@ public class Bookstore implements Serializable {
                     (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
                             + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0) + "x"
                             + (TPCW_Util.getRandomInt(rand, 1, 9999) / 100.0),
-                    author
-            );
+                    author);
         }
         setRelatedBooks(number, rand);
 
@@ -1062,22 +1088,23 @@ public class Bookstore implements Serializable {
         populateStocks(number, rand, now);
         populateReviews(number, rand);
     }
-    
+
     private void populateReviews(int number, Random rand) {
-    	if(number < 0)
-    		throw new RuntimeException("Parâmetros inválidos");
-    		
+        if (number < 0)
+            throw new RuntimeException("Parâmetros inválidos");
+
         System.out.print("Creating " + number + " reviews");
-        
-        for(int i = 0; i < number; i++) {
-        	try {
-				createReview(getACustomerAnyCustomer(rand), getABookAnyBook(rand),(int) (Math.random() * 6));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+
+        for (int i = 0; i < number; i++) {
+            try {
+                createReview(getACustomerAnyCustomer(rand), getABookAnyBook(rand), (int) (Math.random() * 6));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        
+
     }
+
     private void populateStocks(int number, Random rand, long now) {
         System.out.print("Creating " + number + " stocks...");
         for (int i = 0; i < number; i++) {
