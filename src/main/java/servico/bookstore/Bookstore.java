@@ -623,22 +623,22 @@ public class Bookstore implements Serializable {
      * @return Retorna uma lista dos livros mais vendidos desta
      *         {@linkplain Bookstore} com tamanho limitado em 100
      */
-    public List<Book> getBestSellers(Integer top) {
-        final Integer minTopValue = 1;
-        final Integer maxTopValue = 100;
-        if (top < minTopValue || top > maxTopValue){
-            throw new RuntimeException("Invalid value for top");
-        }
-        HashMap<Book, Integer> counter = getBookOrderCounter();
+    // public List<Book> getBestSellers(Integer top) {
+    //     final Integer minTopValue = 1;
+    //     final Integer maxTopValue = 100;
+    //     if (top < minTopValue || top > maxTopValue){
+    //         throw new RuntimeException("Invalid value for top");
+    //     }
+    //     HashMap<Book, Integer> counter = getBookOrderCounter();
 
-        // Ordena os livros pelas vendas em ordem decrescente e pega os 100 mais vendidos
-        List<Book> topBooks = counter.entrySet().stream()
-                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
-                .limit(top) // Filtra os N primeiros
-                .map(Map.Entry::getKey) // Extrai apenas os objetos Book
-                .collect(Collectors.toList());
-        return topBooks;
-    }
+    //     // Ordena os livros pelas vendas em ordem decrescente e pega os 100 mais vendidos
+    //     List<Book> topBooks = counter.entrySet().stream()
+    //             .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
+    //             .limit(top) // Filtra os N primeiros
+    //             .map(Map.Entry::getKey) // Extrai apenas os objetos Book
+    //             .collect(Collectors.toList());
+    //     return topBooks;
+    // }
 
     public HashMap<Book, Integer> getBookOrderCounter() {
         HashMap<Book, Integer> counter = new HashMap<Book, Integer>();

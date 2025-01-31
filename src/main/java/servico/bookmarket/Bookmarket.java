@@ -336,7 +336,7 @@ public class Bookmarket {
     public static List<Book> getBestSellers(Integer top) {
         final Integer minTopValue = 1;
         final Integer maxTopValue = 100;
-        if (top < minTopValue || top > maxTopValue){
+        if (top < minTopValue || top > maxTopValue) {
             throw new RuntimeException("Invalid value for top");
         }
         // Combina as vendas de todas as lojas em um único mapa
@@ -347,15 +347,28 @@ public class Bookmarket {
                     map2.forEach((book, qty) -> map1.put(book, map1.getOrDefault(book, 0) + qty));
                     return map1;
                 });
-    
-        // Ordena os livros pelas vendas em ordem decrescente e pega os 100 mais vendidos
+
+        // Ordena os livros pelas vendas em ordem decrescente e pega os 100 mais
+        // vendidos
         List<Book> topBooks = totalSales.entrySet().stream()
                 .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
                 .limit(top) // Filtra os N primeiros
                 .map(Map.Entry::getKey) // Extrai apenas os objetos Book
                 .collect(Collectors.toList());
-    
+
         return topBooks;
+    }
+
+    public static HashMap<Book, Integer> getBookOrderCounter() {
+        HashMap<Book, Integer> totalSales = stateMachine.getStateStream()
+                .map(Bookstore::getBookOrderCounter)
+                .reduce(new HashMap<>(), (map1, map2) -> {
+                    // Combina dois mapas
+                    map2.forEach((book, qty) -> map1.put(book, map1.getOrDefault(book, 0) + qty));
+                    return map1;
+                });
+
+        return totalSales;
     }
 
     /**
