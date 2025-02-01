@@ -1,10 +1,5 @@
 package servico;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +19,8 @@ import dominio.Stock;
 import servico.bookmarket.Bookmarket;
 import servico.bookmarket.exceptions.UmbrellaException;
 import util.TPCW_Util;
+
+import static org.junit.Assert.*;
 
 public class BookmarketTest {
 
@@ -653,15 +650,85 @@ public class BookmarketTest {
     }
 
     @Test
-    public void testBestSellers() {
-        HashMap<Book, Integer> totalSales = Bookmarket.getBookOrderCounter();
-        List<Book> bestSellers = Bookmarket.getBestSellers(100);
-        
-        Book book_a = bestSellers.get(0);
-        bestSellers.remove(book_a);
-        for (Book book_b : bestSellers){
-            assertTrue(totalSales.get(book_a) >= totalSales.get(book_b));
-            book_a = book_b;
+    public void shouldGetConsolidatedBookSales() {
+        Bookstore bookStore = new Bookstore(3);
+        bookStore.publicPopulateBooks(10);  // Criando 10 livros
+        bookStore.publicpopulateOrders(20); // Criando 20 pedidos
+
+        HashMap<Book, Integer> salesByBook = bookStore.getConsolidatedBookSales();
+
+        assertNotNull(salesByBook);
+        assertTrue(salesByBook.size() > 0);
+
+        for (Integer quantity : salesByBook.values()) {
+            assertTrue(quantity > 0);
+        }
+
+        for (Book book : salesByBook.keySet()) {
+            assertNotNull( book);
+            assertNotNull( book.getTitle());
+        }
+
+        int totalQuantity = salesByBook.values().stream()
+                .mapToInt(Integer::intValue)
+                .sum();
+        assertTrue(totalQuantity >= 20);
+
+    }
+
+    @Test
+    public void shouldGetConsolidatedBookSalesWithNoOrders() {
+        Bookstore bookStore = new Bookstore(3);
+        bookStore.publicPopulateBooks(10);
+
+        HashMap<Book, Integer> salesByBook = bookStore.getConsolidatedBookSales();
+
+        assertTrue(salesByBook.isEmpty());
+    }
+
+    @Test
+    public void shouldSortBooksBySalesDescending() {
+        Bookstore bookStore = new Bookstore(3);
+        bookStore.publicPopulateBooks(10);
+        bookStore.publicpopulateOrders(20);
+        HashMap<Book, Integer> totalSales = bookStore.getConsolidatedBookSales();
+        List<Book> result = Bookmarket.sortBooksBySalesDescending(totalSales, 10);
+
+        assertEquals(10, result.size());
+        for (int i = 0; i < result.size() - 1; i++) {
+            assertTrue(totalSales.get(result.get(i)) >= totalSales.get(result.get(i + 1)));
+        }
+
+    }
+
+    @Test
+    public void shouldGetBestSellers() {
+        Bookstore livraria = new Bookstore(3);
+
+        Bookstore sebo = new Bookstore(4);
+
+        Bookmarket bookmarketTest = new Bookmarket();
+
+        bookmarketTest.init(livraria, sebo);
+
+        bookmarketTest.populate(1000, 500, 100, 1000, 200);
+
+        HashMap<Book, Integer> totalSales = Bookmarket.getConsolidatedBookSales();
+
+        List<Book> tenBestSellers = bookmarketTest.getBestSellers(10);
+        List<Book> twentyBestSellers = bookmarketTest.getBestSellers(20);
+        assertTrue(tenBestSellers.size() == 10);
+        assertTrue(twentyBestSellers.size() == 20);
+        List<Book> tenBestBooksIntwentyBestSellers = twentyBestSellers.subList(0, 10);
+        List<Book> tenWorstBooksIntwentyBestSellers = twentyBestSellers.subList(10, 20);
+        assertEquals(tenBestSellers, tenBestBooksIntwentyBestSellers);
+
+        for (Book worstBook : tenWorstBooksIntwentyBestSellers) {
+            for (Book bestBook : tenBestSellers) {
+                assertTrue(totalSales.get(worstBook) < totalSales.get(bestBook));
+            }
         }
     }
+
+
 }
