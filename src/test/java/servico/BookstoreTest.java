@@ -525,4 +525,25 @@ public class BookstoreTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
+    
+    @Test
+    public void shouldUpdateRelatedBooks() {
+    	Book randomBook = instance.getABookAnyBook(new Random(0));
+    	
+    	Book oldRelated1 = randomBook.getRelated1();
+    	Book oldRelated2 = randomBook.getRelated2();
+    	Book oldRelated3 = randomBook.getRelated3();
+    	Book oldRelated4 = randomBook.getRelated4();
+    	Book oldRelated5 = randomBook.getRelated5();
+    	
+    	instance.updateRelatedBooks(randomBook);
+    	
+    	Book updatedBook = instance.getBook(randomBook.getId()).get();
+    	
+    	assertFalse(oldRelated1.getId() == updatedBook.getRelated1().getId());
+    	assertFalse(oldRelated2.getId() == updatedBook.getRelated2().getId());
+    	assertFalse(oldRelated3.getId() == updatedBook.getRelated3().getId());
+    	assertFalse(oldRelated4.getId() == updatedBook.getRelated4().getId());
+    	assertFalse(oldRelated5.getId() == updatedBook.getRelated5().getId());
+    }
 }

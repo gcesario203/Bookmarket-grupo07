@@ -15,6 +15,7 @@ import dominio.Order;
 import dominio.OrderLine;
 import dominio.Review;
 import dominio.Stock;
+import servico.bookstore.utils.BookstoreBookCounter;
 import servico.bookstore.utils.Counter;
 import util.BookstoreConstants.Backing;
 import util.BookstoreConstants.Subject;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -703,66 +705,78 @@ public class Bookstore implements Serializable {
     public List<Stock> getStocks() {
         return new ArrayList<>(stockByBook.values());
     }
+    
+    public void updateRelatedBooks(Book targetBook) {
+        // Identificar os clientes que compraram o livro alvo nas últimas 10.000 ordens
+        Set<Integer> clientIds = getClientIdsWhoBoughtTargetBook(targetBook);
 
-    /**
-     * For all the clients that bought this book in the last 10000 orders, what
-     * are the five most sold books except this one.
-     *
-     * @param targetBook - O livro que terá os relacionados atualizados
-     *
-     */
-    private void updateRelatedBooks(Book targetBook) {
-        HashSet<Integer> clientIds = new HashSet<>();
-        int j = 0;
-        Iterator<Order> i = ordersByCreation.iterator();
-        while (i.hasNext() && j <= 10000) {
-            Order order = i.next();
-            for (OrderLine line : order.getLines()) {
-                Book book = line.getBook();
-                if (targetBook.getId() == book.getId()) {
-                    clientIds.add(order.getCustomer().getId());
-                    break;
-                }
-            }
-            j++;
+        // Contar os livros mais vendidos por esses clientes
+        Map<Integer, BookstoreBookCounter> bookCounters = countBooksBoughtByClients(clientIds, targetBook);
+
+        // Obter os cinco livros mais vendidos, exceto o alvo
+        Book[] relatedBooks = getTopFiveRelatedBooks(bookCounters, targetBook);
+
+        // Atualizar os livros relacionados no livro alvo
+        setRelatedBooks(targetBook, relatedBooks);
+    }
+
+    private Set<Integer> getClientIdsWhoBoughtTargetBook(Book targetBook) {
+        Set<Integer> clientIds = new HashSet<>();
+        Iterator<Order> orderIterator = ordersByCreation.iterator();
+
+        // Itera sobre as últimas 10.000 ordens e encontra os clientes que compraram o livro alvo
+        for (int i = 0; orderIterator.hasNext() && i < 10000; i++) {
+            Order order = orderIterator.next();
+            order.getLines().stream()
+                .filter(line -> line.getBook().getId() == targetBook.getId())
+                .findFirst()
+                .ifPresent(line -> clientIds.add(order.getCustomer().getId()));
         }
-        HashMap<Integer, Counter> counters = new HashMap<>();
-        i = ordersByCreation.iterator();
-        while (i.hasNext()) {
-            Order order = i.next();
-            if (clientIds.contains(order.getCustomer().getId())) {
-                order.getLines().forEach((line) -> {
+
+        return clientIds;
+    }
+
+    private Map<Integer, BookstoreBookCounter> countBooksBoughtByClients(Set<Integer> clientIds, Book targetBook) {
+        Map<Integer, BookstoreBookCounter> counters = new HashMap<>();
+
+        // Para cada ordem, se o cliente comprou o livro alvo, conta os outros livros comprados
+        ordersByCreation.stream()
+            .filter(order -> clientIds.contains(order.getCustomer().getId()))
+            .forEach(order -> {
+                order.getLines().forEach(line -> {
                     Book book = line.getBook();
-                    if (targetBook.getId() != book.getId()) {
-                        Counter counter = counters.get(book.getId());
-                        if (counter == null) {
-                            counter = new Counter();
-                            counter.book = book;
-                            counter.count = 0;
-                            counters.put(book.getId(), counter);
-                        }
-                        counter.count += line.getQty();
+                    if (book.getId() != targetBook.getId()) {
+                        counters.computeIfAbsent(book.getId(), id -> new BookstoreBookCounter(book))
+                                .addQuantity(line.getQty());
                     }
                 });
-            }
+            });
+
+        return counters;
+    }
+
+    private Book[] getTopFiveRelatedBooks(Map<Integer, BookstoreBookCounter> bookCounters, Book targetBook) {
+        // Ordena os livros mais vendidos e pega os cinco primeiros
+        List<BookstoreBookCounter> sortedCounters = bookCounters.values().stream()
+            .sorted(Comparator.comparingInt(BookstoreBookCounter::getCount).reversed())
+            .collect(Collectors.toList());
+
+        // Preenche com o livro alvo, caso existam menos de 5 livros relacionados
+        Book[] relatedBooks = new Book[5];
+        for (int i = 0; i < Math.min(5, sortedCounters.size()); i++) {
+            relatedBooks[i] = sortedCounters.get(i).getBook();
         }
-        Counter[] sorted = counters.values().toArray(new Counter[] {});
-        Arrays.sort(sorted, (Counter a, Counter b) -> {
-            if (b.count > a.count) {
-                return 1;
-            }
-            return b.count < a.count ? -1 : 0;
-        });
-        Book[] related = new Book[] { targetBook, targetBook, targetBook,
-                targetBook, targetBook };
-        for (j = 0; j < 5 && j < sorted.length; j++) {
-            related[j] = sorted[j].book;
-        }
-        targetBook.setRelated1(related[0]);
-        targetBook.setRelated2(related[1]);
-        targetBook.setRelated3(related[2]);
-        targetBook.setRelated4(related[3]);
-        targetBook.setRelated5(related[4]);
+        Arrays.fill(relatedBooks, relatedBooks.length, 5, targetBook);
+
+        return relatedBooks;
+    }
+
+    private void setRelatedBooks(Book targetBook, Book[] relatedBooks) {
+        targetBook.setRelated1(relatedBooks[0]);
+        targetBook.setRelated2(relatedBooks[1]);
+        targetBook.setRelated3(relatedBooks[2]);
+        targetBook.setRelated4(relatedBooks[3]);
+        targetBook.setRelated5(relatedBooks[4]);
     }
 
     /**
