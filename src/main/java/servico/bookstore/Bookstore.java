@@ -927,7 +927,6 @@ public class Bookstore implements Serializable {
         if (populated) {
             return false;
         }
-        System.out.println("Beginning TPCW population.");
         rand = new Random(seed);
         populateCountries();
         populateAddresses(addresses, rand);
@@ -936,7 +935,6 @@ public class Bookstore implements Serializable {
         populateBooks(items, rand);
         populateEvaluation(rand);
         populated = true;
-        System.out.println("Finished TPCW population.");
         return true;
     }
 
@@ -946,13 +944,11 @@ public class Bookstore implements Serializable {
      * consumidor.
      */
     private static void populateCountries() {
-        System.out.print("Creating " + COUNTRIES.length + " countries...");
 
         for (int i = 0; i < COUNTRIES.length; i++) {
             createCountry(COUNTRIES[i], CURRENCIES[i], EXCHANGES[i]);
         }
 
-        System.out.println(" Done");
     }
 
     private static void populateAddresses(int number, Random rand) {
@@ -972,7 +968,6 @@ public class Bookstore implements Serializable {
                     country);
         }
 
-        System.out.println(" Done");
     }
 
     private static void populateCustomers(int number, Random rand, long now) {
@@ -1001,7 +996,6 @@ public class Bookstore implements Serializable {
                     TPCW_Util.getRandomString(rand, 100, 500));
         }
 
-        System.out.println(" Done");
     }
 
     private static void populateAuthorTable(int number, Random rand) {
@@ -1019,7 +1013,6 @@ public class Bookstore implements Serializable {
                     TPCW_Util.getRandomString(rand, 125, 500));
         }
 
-        System.out.println(" Done");
     }
 
     private static void setRelatedBooks(int number, Random rand) {
@@ -1080,7 +1073,6 @@ public class Bookstore implements Serializable {
         }
         setRelatedBooks(number, rand);
 
-        System.out.println(" Done");
     }
 
     public void populateInstanceBookstore(int number, Random rand, long now) {
@@ -1121,7 +1113,6 @@ public class Bookstore implements Serializable {
                 }
             }
         }
-        System.out.println(" Done");
     }
 
     private void populateOrders(int number, Random rand, long now) {
@@ -1176,7 +1167,6 @@ public class Bookstore implements Serializable {
                     ccTransact);
         }
 
-        System.out.println(" Done");
     }
 
     private static void populateEvaluation(Random rand) {

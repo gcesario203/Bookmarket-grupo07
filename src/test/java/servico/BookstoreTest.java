@@ -97,7 +97,6 @@ public class BookstoreTest {
      */
     @Test
     public void testIsPopulated() {
-        System.out.println("isPopulated");
         boolean expResult = true;
         boolean result = instance.isPopulated();
         assertEquals(expResult, result);
@@ -108,7 +107,6 @@ public class BookstoreTest {
      */
     @Test
     public void testAlwaysGetAddress() {
-        System.out.println("alwaysGetAddress");
         String street1 = "";
         String street2 = "";
         String city = "";
@@ -126,7 +124,6 @@ public class BookstoreTest {
      */
     @Test
     public void testGetCustomer_int() {
-        System.out.println("getCustomer");
         int cId = 0;
         Customer result = instance.getCustomer(cId);
         assertEquals(cId, result.getId());
@@ -137,7 +134,6 @@ public class BookstoreTest {
      */
     @Test
     public void testGetCustomer_String() {
-        System.out.println("getCustomer");
         String username = instance.getCustomer(10).getUname();
         Customer result = instance.getCustomer(username).get();
         assertEquals(username, result.getUname());
@@ -149,7 +145,6 @@ public class BookstoreTest {
      */
     @Test
     public void testCreateCustomer() {
-        System.out.println("createCustomer");
         String fname = "";
         String lname = "";
         String street1 = "";
@@ -185,7 +180,6 @@ public class BookstoreTest {
      */
     @Test
     public void testRefreshCustomerSession() {
-        System.out.println("refreshCustomerSession");
         int cId = 0;
         long now = 0L;
         instance.refreshCustomerSession(cId, now);
@@ -196,7 +190,6 @@ public class BookstoreTest {
      */
     @Test
     public void testGetBook() {
-        System.out.println("getBook");
         int bId = 0;
         Book result = instance.getBook(bId).get();
         assertEquals(bId, result.getId());
@@ -208,7 +201,6 @@ public class BookstoreTest {
      */
     @Test
     public void testGetBooksBySubject() {
-        System.out.println("getBooksBySubject");
         String subject = "ARTS";
         List<Book> result = instance.getBooksBySubject(subject);
         assertEquals(result.size(), result.stream().filter(book -> book.getSubject().equals(subject)).count());
@@ -220,7 +212,6 @@ public class BookstoreTest {
      */
     @Test
     public void testGetBooksByTitle() {
-        System.out.println("getBooksByTitle");
         String title = instance.getBook(0).get().getTitle().substring(0, 4);
         List<Book> result = instance.getBooksByTitle(title);
         assertEquals(result.size(), result.stream().filter(book -> book.getTitle().startsWith(title)).count());
@@ -231,7 +222,6 @@ public class BookstoreTest {
      */
     @Test
     public void testGetBooksByAuthor() {
-        System.out.println("getBooksByAuthor");
         Author author = instance.getBook(0).get().getAuthor();
         List<Book> result = instance.getBooksByAuthor(author.getLname());
         assertEquals(result.size(), result.stream().filter(book -> book.getAuthor().getLname().equals(author.getLname())).count());
@@ -243,7 +233,6 @@ public class BookstoreTest {
      */
     @Test
     public void testGetNewBooks() {
-        System.out.println("getNewBooks");
         String subject = instance.getBook(0).get().getSubject();
         List<Book> result = instance.getNewBooks(subject);
         assertEquals(result.size(),
@@ -256,7 +245,6 @@ public class BookstoreTest {
      */
     @Test
     public void testUpdateBook() {
-        System.out.println("updateBook");
         int bId = 0;
         double cost = 0.0;
         String image = "";
@@ -275,7 +263,6 @@ public class BookstoreTest {
      */
 //    @Test
     public void testGetCart() {
-        System.out.println("getCart");
         int id = 0;
 
         Cart expResult = null;
@@ -288,7 +275,6 @@ public class BookstoreTest {
      * Test of createCart method, of class Bookstore.
      */
     private void testCreateCart() {
-        System.out.println("createCart");
         long now = 0L;
 
         Cart expResult = null;
@@ -302,7 +288,6 @@ public class BookstoreTest {
      */
 //    @Test
     public void testCartUpdate() {
-        System.out.println("cartUpdate");
         testCreateCart();
         int cId = 0;
         Integer bId = 1;
@@ -321,7 +306,6 @@ public class BookstoreTest {
      */
 //    @Test
     public void testConfirmBuy() {
-        System.out.println("confirmBuy");
         int customerId = 0;
         int cartId = 0;
         String comment = "";
@@ -521,7 +505,6 @@ public class BookstoreTest {
      */
     //@Test
     public void testGetRecommendationByItens() {
-        System.out.println("getRecommendationByItens");
         int c_id = 0;
         List<Book> expResult = null;
         List<Book> result = Bookstore.getRecommendationByItens(c_id);
@@ -535,7 +518,6 @@ public class BookstoreTest {
      */
     //@Test
     public void testGetRecommendationByUsers() {
-        System.out.println("getRecommendationByUsers");
         int c_id = 0;
         List<Book> expResult = null;
         List<Book> result = Bookstore.getRecommendationByUsers(c_id);
