@@ -333,42 +333,64 @@ public class Bookmarket {
                 .collect(Collectors.toList());
     }
 
-    public static List<Book> getBestSellers(Integer top) {
-        final Integer minTopValue = 1;
-        final Integer maxTopValue = 100;
-        if (top < minTopValue || top > maxTopValue) {
-            throw new RuntimeException("Invalid value for top");
-        }
-        // Combina as vendas de todas as lojas em um único mapa
-        HashMap<Book, Integer> totalSales = stateMachine.getStateStream()
-                .map(Bookstore::getBookOrderCounter) // Obtém o mapa de cada loja
-                .reduce(new HashMap<>(), (map1, map2) -> {
-                    // Combina dois mapas
-                    map2.forEach((book, qty) -> map1.put(book, map1.getOrDefault(book, 0) + qty));
-                    return map1;
-                });
-
-        // Ordena os livros pelas vendas em ordem decrescente e pega os 100 mais
-        // vendidos
-        List<Book> topBooks = totalSales.entrySet().stream()
+    /**
+     * Retorna uma lista ordenada dos livros mais vendidos a partir de um mapa de vendas totais.
+     * A ordenação é feita em ordem decrescente de quantidade vendida.
+     *
+     * @param salesByBook Mapa contendo a quantidade total de vendas para cada livro
+     * @param limit Quantidade de livros a serem retornados
+     * @return Lista dos livros mais vendidos, limitada pelo parâmetro limit
+     */
+    public static List<Book>  sortBooksBySalesDescending(HashMap<Book, Integer> salesByBook, int limit) {
+        List<Book> topBooks = salesByBook.entrySet().stream()
                 .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
-                .limit(top) // Filtra os N primeiros
+                .limit(limit) // Filtra os N primeiros
                 .map(Map.Entry::getKey) // Extrai apenas os objetos Book
                 .collect(Collectors.toList());
-
         return topBooks;
     }
 
-    public static HashMap<Book, Integer> getBookOrderCounter() {
-        HashMap<Book, Integer> totalSales = stateMachine.getStateStream()
-                .map(Bookstore::getBookOrderCounter)
+    /**
+     * Identifica os livros mais vendidos considerando todas as livrarias no sistema.
+     *
+     * @param numberOfBooks Quantidade de livros a serem retornados (entre 1 e 100)
+     * @return Lista dos livros mais vendidos, ordenada por quantidade de vendas decrescente
+     * @throws RuntimeException se numberOfBooks estiver fora do intervalo válido (1-100)
+     */
+    public static List<Book> getBestSellers(Integer numberOfBooks) {
+        final Integer MINIMUM_BOOKS = 1;
+        final Integer MAXIMUM_BOOKS = 100;
+
+        if (numberOfBooks < MINIMUM_BOOKS || numberOfBooks > MAXIMUM_BOOKS) {
+            throw new RuntimeException("Número de livros solicitado deve estar entre 1 e 100");
+        }
+        // Combina as vendas de todas as lojas em um único mapa
+        HashMap<Book, Integer> consolidatedBookSales = stateMachine.getStateStream()
+                .map(Bookstore::getConsolidatedBookSales)
                 .reduce(new HashMap<>(), (map1, map2) -> {
-                    // Combina dois mapas
                     map2.forEach((book, qty) -> map1.put(book, map1.getOrDefault(book, 0) + qty));
                     return map1;
                 });
+        List<Book> sortBooksBySalesDescending = sortBooksBySalesDescending(consolidatedBookSales, numberOfBooks);
 
-        return totalSales;
+        return sortBooksBySalesDescending;
+    }
+
+    /**
+     * Consolida o total de vendas de todos os livros em todas as livrarias do sistema.
+     * Combina os contadores de vendas de cada livraria em um único mapa agregado.
+     *
+     * @return Mapa onde a chave é o livro e o valor é a quantidade total vendida
+     *         considerando todas as livrarias
+     */
+    public static HashMap<Book, Integer> getConsolidatedBookSales() {
+        return stateMachine.getStateStream()
+                .map(Bookstore::getConsolidatedBookSales)
+                .reduce(new HashMap<>(), (accumulatedSales, currentStoreSales) -> {
+                    currentStoreSales.forEach((book, quantity) ->
+                            accumulatedSales.put(book, accumulatedSales.getOrDefault(book, 0) + quantity));
+                    return accumulatedSales;
+                });
     }
 
     /**
