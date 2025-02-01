@@ -606,56 +606,28 @@ public class Bookstore implements Serializable {
     }
 
     /**
-     * Para realizar a busca por bestSellers o sistema aproveita do
-     * relacionamento de {@linkplain OrderLine} com {@linkplain Book}. É
-     * assumido que cada OrderLine possui apenas 01 {@linkplain Book}, neste
-     * caso a quantidade de vendas é identificada por esta relação. Sempre que
-     * acontece a criação de uma orderLine, é assumido que uma compra foi feita.
+     * Calcula o total de vendas de cada livro nesta livraria.
+     * Processa todos os pedidos e suas linhas para contabilizar a quantidade
+     * total vendida de cada livro.
      *
-     * É utilizado um limite de 100 livros para o resultado da pesquisa para
-     * evitar desperdício de memória no retorno do método. Este limite é
-     * estipulado por
-     *
-     * Com isto, é importante salientar que este método utiliza as vendas desta
-     * instância para recuperar os livros vendidos.
-     *
-     * @param top
-     * @return Retorna uma lista dos livros mais vendidos desta
-     *         {@linkplain Bookstore} com tamanho limitado em 100
+     * @return Mapa onde a chave é o livro e o valor é a quantidade total vendida nesta livraria
      */
-    // public List<Book> getBestSellers(Integer top) {
-    //     final Integer minTopValue = 1;
-    //     final Integer maxTopValue = 100;
-    //     if (top < minTopValue || top > maxTopValue){
-    //         throw new RuntimeException("Invalid value for top");
-    //     }
-    //     HashMap<Book, Integer> counter = getBookOrderCounter();
-
-    //     // Ordena os livros pelas vendas em ordem decrescente e pega os 100 mais vendidos
-    //     List<Book> topBooks = counter.entrySet().stream()
-    //             .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
-    //             .limit(top) // Filtra os N primeiros
-    //             .map(Map.Entry::getKey) // Extrai apenas os objetos Book
-    //             .collect(Collectors.toList());
-    //     return topBooks;
-    // }
-
-    public HashMap<Book, Integer> getBookOrderCounter() {
-        HashMap<Book, Integer> counter = new HashMap<Book, Integer>();
+    public HashMap<Book, Integer> getConsolidatedBookSales() {
+        HashMap<Book, Integer> salesByBook = new HashMap<Book, Integer>();
 
         for (Order order : ordersById) {
             for (OrderLine line : order.getLines()) {
                 Book book = line.getBook();
                 Integer qtd = line.getQty();
-                if (counter.containsKey(book)) {
-                    counter.put(book, counter.get(book) + qtd);
+                if (salesByBook.containsKey(book)) {
+                    salesByBook.put(book, salesByBook.get(book) + qtd);
                 } else {
-                    counter.put(book, qtd);
+                    salesByBook.put(book, qtd);
                 }
             }
 
         }
-        return counter;
+        return salesByBook;
     }
 
     /**
@@ -932,7 +904,7 @@ public class Bookstore implements Serializable {
         populateAddresses(addresses, rand);
         populateCustomers(customers, rand, now);
         populateAuthorTable(authors, rand);
-        populateBooks(items, rand);
+        populateBooks(items,rand);
         populateEvaluation(rand);
         populated = true;
         return true;
@@ -1034,11 +1006,15 @@ public class Bookstore implements Serializable {
         }
     }
 
+    public void publicPopulateBooks(int numberOfBooks) {
+        populateBooks(numberOfBooks, new Random());
+    }
+
     /**
      * Este método irá popular quais assuntos são possíveis de serem buscados
      * pelo consumidor.
      */
-    private static void populateBooks(int number, Random rand) {
+    private static void populateBooks(int number,Random rand) {
         System.out.print("Creating " + number + " books...");
 
         for (int i = 0; i < number; i++) {
@@ -1114,6 +1090,11 @@ public class Bookstore implements Serializable {
             }
         }
     }
+
+    public void publicpopulateOrders(int numberOforders) {
+        Date now = new Date();
+        populateOrders(numberOforders, new Random(), now.getTime());
+}
 
     private void populateOrders(int number, Random rand, long now) {
         System.out.print("Creating " + number + " orders...");
