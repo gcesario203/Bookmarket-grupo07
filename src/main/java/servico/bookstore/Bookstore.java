@@ -904,7 +904,7 @@ public class Bookstore implements Serializable {
         populateAddresses(addresses, rand);
         populateCustomers(customers, rand, now);
         populateAuthorTable(authors, rand);
-        populateBooks(items);
+        populateBooks(items,rand);
         populateEvaluation(rand);
         populated = true;
         return true;
@@ -1007,14 +1007,14 @@ public class Bookstore implements Serializable {
     }
 
     public void publicPopulateBooks(int numberOfBooks) {
-        populateBooks(numberOfBooks);
+        populateBooks(numberOfBooks, new Random());
     }
 
     /**
      * Este método irá popular quais assuntos são possíveis de serem buscados
      * pelo consumidor.
      */
-    private static void populateBooks(int number) {
+    private static void populateBooks(int number,Random rand) {
         System.out.print("Creating " + number + " books...");
 
         for (int i = 0; i < number; i++) {
