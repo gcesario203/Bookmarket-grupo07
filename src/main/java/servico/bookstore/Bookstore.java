@@ -769,10 +769,10 @@ public class Bookstore implements Serializable {
             .sorted(Comparator.comparingInt(BookstoreBookCounter::getCount).reversed())
             .collect(Collectors.toList()); // Ordena os livros mais vendidos e pega os cinco primeiro
 
-        // Preenche com o livro alvo, caso existam menos de 5 livros relacionados
-        Book[] relatedBooks = new Book[5];
-        for (int i = 0; i < Math.min(5, sortedCounters.size()); i++) {
-            relatedBooks[i] = sortedCounters.get(i).getBook();
+       int top = 5;
+        Book[] relatedBooks = new Book[top];
+        for (int i = 0; i < Math.min(top, sortedFrequencies.size()); i++) {
+            relatedBooks[i] = sortedFrequencies.get(i).getBook();
         }
         Arrays.fill(relatedBooks, relatedBooks.length, 5, targetBook);
 
