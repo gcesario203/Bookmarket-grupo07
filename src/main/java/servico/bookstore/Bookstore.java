@@ -363,13 +363,13 @@ public class Bookstore implements Serializable {
     public static Customer createCustomer(String fname, String lname, String street1,
             String street2, String city, String state, String zip,
             String countryName, String phone, String email, double discount,
-            Date birthdate, String data, long now) {
+            Date birthdate, String data, long now, dominio.customer.enums.Type type) {
         Address address = alwaysGetAddress(street1, street2, city, state, zip,
                 countryName);
         return createCustomer(fname, lname, address, phone, email,
                 new Date(now), new Date(now), new Date(now),
                 new Date(now + 7200000 /* 2 hours */), discount, birthdate,
-                data);
+                data, type);
     }
 
     /**
@@ -404,12 +404,12 @@ public class Bookstore implements Serializable {
     private static Customer createCustomer(String fname, String lname, Address address,
             String phone, String email, Date since, Date lastVisit,
             Date login, Date expiration, double discount, Date birthdate,
-            String data) {
+            String data, dominio.customer.enums.Type type) {
         int id = customersById.size();
         String uname = TPCW_Util.DigSyl(id, 0);
         Customer customer = new Customer(id, uname, uname.toLowerCase(), fname,
                 lname, phone, email, since, lastVisit, login, expiration,
-                discount, 0, 0, birthdate, data, address);
+                discount, 0, 0, birthdate, data, address, type);
         customersById.add(customer);
         customersByUsername.put(uname, customer);
         return customer;
@@ -944,7 +944,8 @@ public class Bookstore implements Serializable {
 
     private static void populateCustomers(int number, Random rand, long now) {
         System.out.print("Creating " + number + " customers...");
-
+        
+        dominio.customer.enums.Type[] typeValues = dominio.customer.enums.Type.values();
         for (int i = 0; i < number; i++) {
             if (i % 10000 == 0) {
                 System.out.print(".");
@@ -965,7 +966,8 @@ public class Bookstore implements Serializable {
                     new Date(now + 7200000 /* 2 hours */),
                     rand.nextInt(51),
                     TPCW_Util.getRandomBirthdate(rand),
-                    TPCW_Util.getRandomString(rand, 100, 500));
+                    TPCW_Util.getRandomString(rand, 100, 500),
+                    typeValues[new Random().nextInt(typeValues.length)]);
         }
 
     }

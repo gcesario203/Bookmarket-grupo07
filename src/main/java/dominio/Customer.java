@@ -131,7 +131,7 @@ public class Customer implements Serializable {
         this.address = address;
         mostRecentOrder = null;
         
-        if(type == null) {
+        if(type != null) {
            	this.type = type;
            	
            	return;

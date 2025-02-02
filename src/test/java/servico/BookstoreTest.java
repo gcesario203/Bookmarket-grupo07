@@ -1,6 +1,7 @@
 package servico;
 
 import dominio.*;
+import dominio.customer.enums.Type;
 import util.TPCW_Util;
 
 import java.io.IOException;
@@ -160,7 +161,7 @@ public class BookstoreTest {
         String data = "";
         long now = 0L;
 
-        Customer result = instance.createCustomer(fname, lname, street1, street2, city, state, zip, countryName, phone, email, discount, birthdate, data, now);
+        Customer result = instance.createCustomer(fname, lname, street1, street2, city, state, zip, countryName, phone, email, discount, birthdate, data, now, Type.DEFAULT);
         int id = result.getId();
         String uname = result.getUname();
         Date since = result.getSince();
@@ -170,8 +171,8 @@ public class BookstoreTest {
         Address address = result.getAddress();
         Customer expResult = new Customer(id, uname, uname.toLowerCase(), fname,
                 lname, phone, email, since, lastVisit, login, expiration,
-                discount, 0, 0, birthdate, data, address);
-        assertEquals(expResult, result);
+                discount, 0, 0, birthdate, data, address, null);
+        assertTrue(expResult.equals(result));
 
     }
 
@@ -404,7 +405,7 @@ public class BookstoreTest {
     public void cannotCreateAReviewWithoutAExistingCustomer() throws IOException {
     	Book book = instance.getBook(1).get();
     	
-    	instance.createReview(new Customer(-2, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, null, null, null), book, 2);
+    	instance.createReview(new Customer(-2, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, null, null, null, null), book, 2);
     }
     
     @Test(expected = IOException.class)
