@@ -724,8 +724,8 @@ public class Bookstore implements Serializable {
         Set<Integer> clientIds = new HashSet<>();
         Iterator<Order> orderIterator = ordersByCreation.iterator();
 
-        // Itera sobre as últimas 10.000 ordens e encontra os clientes que compraram o livro alvo
-        for (int i = 0; orderIterator.hasNext() && i < 10000; i++) {
+        int orderOldLimit = 10000;
+        for (int orderCount = 0; orderIterator.hasNext() && orderCount < orderOldLimit; orderCount++) {
             Order order = orderIterator.next();
             order.getLines().stream()
                 .filter(line -> line.getBook().getId() == targetBook.getId())
