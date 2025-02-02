@@ -16,7 +16,6 @@ import dominio.OrderLine;
 import dominio.Review;
 import dominio.Stock;
 import servico.bookstore.utils.BookstoreBookCounter;
-import servico.bookstore.utils.Counter;
 import util.BookstoreConstants.Backing;
 import util.BookstoreConstants.Subject;
 import util.TPCW_Util;
