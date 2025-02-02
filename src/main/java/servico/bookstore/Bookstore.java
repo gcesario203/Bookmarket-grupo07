@@ -765,9 +765,9 @@ public class Bookstore implements Serializable {
      */
     private Book[] getTopFiveRelatedBooks(Map<Integer, BookstoreBookCounter> purchaseFrequency, Book targetBook) {
         // Ordena os livros mais vendidos e pega os cinco primeiros
-        List<BookstoreBookCounter> sortedCounters = bookCounters.values().stream()
+        List<BookstoreBookCounter> sortedFrequencies = purchaseFrequency.values().stream()
             .sorted(Comparator.comparingInt(BookstoreBookCounter::getCount).reversed())
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()); // Ordena os livros mais vendidos e pega os cinco primeiro
 
         // Preenche com o livro alvo, caso existam menos de 5 livros relacionados
         Book[] relatedBooks = new Book[5];
