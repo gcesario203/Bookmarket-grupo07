@@ -379,6 +379,7 @@ public class Customer implements Serializable {
         hash = 29 * hash + Objects.hashCode(this.data);
         hash = 29 * hash + Objects.hashCode(this.address);
         hash = 29 * hash + Objects.hashCode(this.mostRecentOrder);
+        hash = 29 * hash + Objects.hashCode(this.type);
         return hash;
     }
 
@@ -453,6 +454,11 @@ public class Customer implements Serializable {
         if (!Objects.equals(this.mostRecentOrder, other.mostRecentOrder)) {
             return false;
         }
+        
+        if (!Objects.equals(this.type, other.type)) {
+            return false;
+        }
+        
         return true;
     }
 
