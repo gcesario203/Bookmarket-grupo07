@@ -355,10 +355,11 @@ public class Bookstore implements Serializable {
      * @param birthdate   Data de Nascimento
      * @param data        Dado referente ao Consumidor
      * @param now         Hora Atual
+     * @param type		 Tipo do consumidor
      * @return O método createCustomer com os parâmetros: fname, lname, address,
      *         phone, email, since, lastVisit, login, expiration, discount,
      *         birthdate,
-     *         data)
+     *         data, type)
      */
     public static Customer createCustomer(String fname, String lname, String street1,
             String street2, String city, String state, String zip,
@@ -399,6 +400,7 @@ public class Bookstore implements Serializable {
      * @param discount   Desconto
      * @param birthdate  Data de Nascimento
      * @param data       Dado referente ao Consumidor
+     * @param type		 Tipo do consumidor
      * @return customer Consumidor
      */
     private static Customer createCustomer(String fname, String lname, Address address,
@@ -862,6 +864,17 @@ public class Bookstore implements Serializable {
         return createOrder(customer, new Date(now), cart, comment, shipping,
                 shippingDate, "Pending", customer.getAddress(),
                 shippingAddress, ccTransact);
+    }
+    
+    public Optional<Customer> updateCustomerType(int customerId, dominio.customer.enums.Type type) {
+    	Customer customerToChange = getCustomer(customerId);
+    	
+    	if(customerToChange == null)
+    		return Optional.empty();
+    	
+    	customerToChange.setType(type);
+    	
+    	return Optional.of(customerToChange);
     }
 
     private Order createOrder(Customer customer, Date date, Cart cart,

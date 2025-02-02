@@ -131,14 +131,7 @@ public class Customer implements Serializable {
         this.address = address;
         mostRecentOrder = null;
         
-        if(type != null) {
-           	this.type = type;
-           	
-           	return;
-        }
-        
-        
-        this.type = Type.DEFAULT;
+        setType(type);
     }
 
     /**
@@ -351,6 +344,12 @@ public class Customer implements Serializable {
     }
     
     public void setType(dominio.customer.enums.Type type) {
+    	if(type == null) {
+    		this.type = Type.DEFAULT;
+    		
+    		return;
+    	}
+    	
     	this.type = type;
     }
 

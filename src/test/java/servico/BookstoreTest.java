@@ -146,20 +146,20 @@ public class BookstoreTest {
      */
     @Test
     public void testCreateCustomer() {
-        String fname = "";
-        String lname = "";
-        String street1 = "";
-        String street2 = "";
-        String city = "";
-        String state = "";
-        String zip = "";
-        String countryName = "";
-        String phone = "";
-        String email = "";
-        double discount = 0.0;
-        Date birthdate = null;
-        String data = "";
-        long now = 0L;
+    	String fname = "João";
+        String lname = "Silva";
+        String street1 = "Rua das Flores, 123";
+        String street2 = "Apto 45B";
+        String city = "São Paulo";
+        String state = "SP";
+        String zip = "01000-000";
+        String countryName = "Brasil";
+        String phone = "+55 11 98765-4321";
+        String email = "joao.silva@email.com";
+        double discount = 10.5;
+        Date birthdate = new Date(90, 4, 15); // 15 de maio de 1990 (ano baseado em 1900)
+        String data = "2025-02-02";
+        long now = System.currentTimeMillis();
 
         Customer result = instance.createCustomer(fname, lname, street1, street2, city, state, zip, countryName, phone, email, discount, birthdate, data, now, Type.DEFAULT);
         int id = result.getId();
@@ -307,17 +307,18 @@ public class BookstoreTest {
      */
 //    @Test
     public void testConfirmBuy() {
-        int customerId = 0;
-        int cartId = 0;
-        String comment = "";
-        String ccType = "";
-        long ccNumber = 0L;
-        String ccName = "";
-        Date ccExpiry = null;
-        String shipping = "";
-        Date shippingDate = null;
-        int addressId = 0;
-        long now = 0L;
+    	int customerId = 1;
+        int cartId = 67890;
+        String comment = "Cliente frequente, gosta de livros de ficção.";
+        String ccType = "Visa";
+        long ccNumber = 4111111111111111L; // Número fictício para exemplo
+        String ccName = "João Silva";
+        Date ccExpiry = new Date(126, 11, 31); // 31 de dezembro de 2026 (anos baseados em 1900)
+        String shipping = "Expresso";
+        Date shippingDate = new Date(); // Data atual
+        int addressId = 54321;
+        long now = System.currentTimeMillis();
+        
         Order expResult = null;
         Order result = instance.confirmBuy(customerId, cartId, comment, ccType, ccNumber, ccName, ccExpiry, shipping, shippingDate, addressId, now);
         assertEquals(expResult, result);
@@ -499,7 +500,37 @@ public class BookstoreTest {
         instance.updateStock(book.getId(), newCost);
         assertEquals(newCost, instance.getStock(book.getId()).getCost(), 0.0);
     }
-
+    
+    @Test
+    public void shouldUpdateACustomerType() {
+    	Customer customer = instance.getCustomer(1);
+    	
+    	Customer updatedCustomer = instance.updateCustomerType(customer.getId(), Type.SUBSCRIBER).get();
+    	
+    	assertTrue(customer.getId() == updatedCustomer.getId() && updatedCustomer.getType() == Type.SUBSCRIBER);
+    }
+    
+    @Test
+    public void shouldCreateACustomerWithDefaultTypeWhenTypeParamIsEmpty() {
+    	String fname = "João";
+        String lname = "Silva";
+        String street1 = "Rua das Flores, 123";
+        String street2 = "Apto 45B";
+        String city = "São Paulo";
+        String state = "SP";
+        String zip = "01000-000";
+        String countryName = "Brasil";
+        String phone = "+55 11 98765-4321";
+        String email = "joao.silva@email.com";
+        double discount = 10.5;
+        Date birthdate = new Date(90, 4, 15); // 15 de maio de 1990 (ano baseado em 1900)
+        String data = "2025-02-02";
+        long now = System.currentTimeMillis();
+        
+        Customer newCustomer = instance.createCustomer(fname, lname, street1, street2, city, state, zip, countryName, phone, email, discount, birthdate, data, now, null);
+        
+        assertTrue(newCustomer.getType() == Type.DEFAULT);
+    }
 
     /**
      * Test of getRecommendationByItens method, of class Bookstore.
