@@ -932,14 +932,14 @@ public class Bookstore implements Serializable {
     }
     
     public Optional<Customer> updateCustomerType(int customerId, dominio.customer.enums.Type type) {
-    	Customer customerToChange = getCustomer(customerId);
+    	Optional<Customer> customerToChange = getCustomer(customerId);
     	
-    	if(customerToChange == null)
+    	if(customerToChange.isEmpty())
     		return Optional.empty();
     	
-    	customerToChange.setType(type);
+    	customerToChange.get().setType(type);
     	
-    	return Optional.of(customerToChange);
+    	return customerToChange;
     }
 
     private Order createOrder(Customer customer, Date date, Cart cart,

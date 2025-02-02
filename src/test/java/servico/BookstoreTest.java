@@ -533,7 +533,7 @@ public class BookstoreTest {
     
     @Test
     public void shouldUpdateACustomerType() {
-    	Customer customer = instance.getCustomer(1);
+    	Customer customer = instance.getCustomer(1).get();
     	
     	Customer updatedCustomer = instance.updateCustomerType(customer.getId(), Type.SUBSCRIBER).get();
     	
