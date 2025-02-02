@@ -710,14 +710,9 @@ public class Bookstore implements Serializable {
         // Identificar os clientes que compraram o livro alvo nas últimas 10.000 ordens
         Set<Integer> clientIds = getClientIdsWhoBoughtTargetBook(targetBook);
 
-        // Contar os livros mais vendidos por esses clientes
-        Map<Integer, BookstoreBookCounter> bookCounters = countBooksBoughtByClients(clientIds, targetBook);
-
-        // Obter os cinco livros mais vendidos, exceto o alvo
-        Book[] relatedBooks = getTopFiveRelatedBooks(bookCounters, targetBook);
-
-        // Atualizar os livros relacionados no livro alvo
-        setRelatedBooks(targetBook, relatedBooks);
+        Map<Integer, BookstoreBookCounter> purchaseFrequency = countBooksBoughtByClients(clientIds, targetBook);
+        Book[] topRelatedBooks = getTopFiveRelatedBooks(purchaseFrequency, targetBook);
+        setRelatedBooks(targetBook, topRelatedBooks);
     }
 
      /**
