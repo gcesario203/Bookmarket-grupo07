@@ -250,11 +250,11 @@ public class Cart implements Serializable {
     }
     
     public Customer getCustomer() {
-    	return this.getCustomer();
+    	return this.customer;
     }
     
     public int getBookstoreId() {
-    	return this.getBookstoreId();
+    	return this.bookstoreId;
     }
 
 }

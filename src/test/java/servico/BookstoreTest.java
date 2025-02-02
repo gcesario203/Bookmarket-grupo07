@@ -125,7 +125,7 @@ public class BookstoreTest {
     @Test
     public void testGetCustomer_int() {
         int cId = 0;
-        Customer result = instance.getCustomer(cId);
+        Customer result = instance.getCustomer(cId).get();
         assertEquals(cId, result.getId());
     }
 
@@ -134,7 +134,7 @@ public class BookstoreTest {
      */
     @Test
     public void testGetCustomer_String() {
-        String username = instance.getCustomer(10).getUname();
+        String username = instance.getCustomer(10).get().getUname();
         Customer result = instance.getCustomer(username).get();
         assertEquals(username, result.getUname());
 
@@ -257,48 +257,77 @@ public class BookstoreTest {
         assertEquals(image, book.getImage());
         assertEquals(thumbnail, book.getThumbnail());
     }
-
-    /**
-     * Test of getCart method, of class Bookstore.
-     */
-//    @Test
-    public void testGetCart() {
-        int id = 0;
-
-        Cart expResult = null;
-        Cart result = instance.getCart(id);
-        assertEquals(expResult, result);
-
-    }
-
+    
     /**
      * Test of createCart method, of class Bookstore.
      */
-    private void testCreateCart() {
+    @Test
+    public void testCreateCart() {
         long now = 0L;
-
-        Cart expResult = null;
-        Cart result = instance.createCart(now);
-        assertEquals(expResult, result);
+        Customer customer = instance.getCustomer(1).get();
+        
+        Cart cart = instance.createCart(customer.getId(), now).get();
+        
+        assertTrue(cart.getId() > 0);
+        
+        assertEquals(cart.getId(), instance.getCart(cart.getId()).get().getId());
+        
+        assertEquals(cart.getBookstoreId(), instance.getId());
+        
+        assertEquals(cart.getCustomer().getId(), customer.getId());
+    }
+    
+    /**
+     * Test of getCart method, of class Bookstore.
+     */
+    @Test
+    public void testGetCart() {
+    	Cart cart = instance.getCart(1).get();
+    	
+    	assertFalse(cart == null);
 
     }
 
     /**
      * Test of cartUpdate method, of class Bookstore.
      */
-//    @Test
+    @Test
     public void testCartUpdate() {
-        testCreateCart();
-        int cId = 0;
-        Integer bId = 1;
-        List<Integer> bIds = Arrays.asList(10, 20);
-        List<Integer> quantities = Arrays.asList(10, 20);
+    	Cart cart = instance.getCart(1).get();
+    	Book book = instance.getABookAnyBook(new Random(4));
+    	
         long now = 0L;
+        
+        Cart result = instance.cartUpdate(cart.getId(), book.getId(), null, null, now);
+        
+        
+        assertTrue(result.getLines().stream().anyMatch(x -> x.getBook().getId() == book.getId()));
 
-        Cart expResult = null;
-        Cart result = instance.cartUpdate(cId, bId, bIds, quantities, now);
-        assertEquals(expResult, result);
-
+    }
+    
+    @Test
+    public void shouldNotCreateANewCartWhenACartForTheCustomerAlreadyExists() {
+    	Cart cart = instance.getCart(1).get();
+    	
+    	Customer customer = cart.getCustomer();
+    	
+    	Cart cartCreated = instance.createCart(customer.getId(), 0L).get();
+    	
+    	assertEquals(cart.getId(), cartCreated.getId());
+    	
+    	assertTrue(cart.getTime() == cartCreated.getTime());
+    }
+    
+    @Test
+    public void shouldGetAEmptyCartWhenCreatingForAInvalidCustomer() {
+    	Optional<Cart> cart = instance.createCart(-1, 0L);
+    	
+    	assertEquals(cart.isEmpty(), true);
+    }
+    
+    @Test
+    public void shouldGetAEmptyCartWhenFindingAInexistentCart() {
+    	assertTrue(instance.getCart(-1).isEmpty());
     }
 
     /**
@@ -329,7 +358,7 @@ public class BookstoreTest {
     
     @Test(expected = IOException.class)
     public void cannotCreateReviewWithInvalidValue() throws IOException {
-    	Customer customer = instance.getCustomer(1);
+    	Customer customer = instance.getCustomer(1).get();
     	
     	Optional<Book> book = instance.getBook(1);
     	
@@ -409,7 +438,7 @@ public class BookstoreTest {
     
     @Test(expected = IOException.class)
     public void cannotCreateAReviewWithoutAExistingBook() throws IOException {
-    	Customer customer = instance.getCustomer(1);
+    	Customer customer = instance.getCustomer(1).get();
     	
     	instance.createReview(customer, new Book(-2, null, null, null, null, null, null, null, 0, null, null, 0, null, null, null), 0);
     }
