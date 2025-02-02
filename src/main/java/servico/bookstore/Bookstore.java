@@ -720,6 +720,12 @@ public class Bookstore implements Serializable {
         setRelatedBooks(targetBook, relatedBooks);
     }
 
+     /**
+     * Retrieves the IDs of customers who purchased the specified book in the last 10,000 orders.
+     *
+     * @param targetBook the book to search for in customer orders
+     * @return a set of customer IDs who purchased the target book
+     */
     private Set<Integer> getClientIdsWhoBoughtTargetBook(Book targetBook) {
         Set<Integer> clientIds = new HashSet<>();
         Iterator<Order> orderIterator = ordersByCreation.iterator();
