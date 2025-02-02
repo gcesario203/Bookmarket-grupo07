@@ -7,6 +7,7 @@ import dominio.Customer;
 import dominio.Order;
 import dominio.Review;
 import dominio.Stock;
+import dominio.customer.enums.Type;
 import servico.bookstore.Bookstore;
 import servico.bookmarket.exceptions.UmbrellaException;
 import servico.bookmarket.statemachine.StateMachine;
@@ -178,22 +179,38 @@ public class Bookmarket {
      * @param email       email do usuário
      * @param birthdate   Data de nascimento do usuário
      * @param data        Dados do usuário
+     * @param type 		  Tipo de cliente
      * @return Customer Novo Customer cadastrado na plataforma
      */
-    public static Customer createNewCustomer(String fname, String lname,
+    private static Customer createNewCustomer(String fname, String lname,
             String street1, String street2, String city, String state,
             String zip, String countryName, String phone, String email,
-            Date birthdate, String data) {
+            Date birthdate, String data, dominio.customer.enums.Type type) {
         double discount = (int) (Math.random() * 51);
         long now = System.currentTimeMillis();
         try {
             return (Customer) stateMachine.execute(new CreateCustomerAction(
                     fname, lname, street1, street2, city, state, zip,
-                    countryName, phone, email, discount, birthdate, data, now));
+                    countryName, phone, email, discount, birthdate, data, now, type));
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public static Customer createNewSubscriber(String fname, String lname,
+            String street1, String street2, String city, String state,
+            String zip, String countryName, String phone, String email,
+            Date birthdate, String data) {
+    	return createNewCustomer(fname, lname, street1, street2, city, state, zip, countryName, phone, email, birthdate, data, Type.SUBSCRIBER);
+    	
+    }
+    public static Customer createNewCustomer(String fname, String lname,
+            String street1, String street2, String city, String state,
+            String zip, String countryName, String phone, String email,
+            Date birthdate, String data) {
+    	return createNewCustomer(fname, lname, street1, street2, city, state, zip, countryName, phone, email, birthdate, data, Type.DEFAULT);
+    	
     }
 
     public static Review createReview(int bookstoreId, Customer customer, Book book, double value) {
