@@ -707,7 +707,6 @@ public class Bookstore implements Serializable {
     }
     
     public void updateRelatedBooks(Book targetBook) {
-        // Identificar os clientes que compraram o livro alvo nas últimas 10.000 ordens
         Set<Integer> clientIds = getClientIdsWhoBoughtTargetBook(targetBook);
 
         Map<Integer, BookstoreBookCounter> purchaseFrequency = countBooksBoughtByClients(clientIds, targetBook);
