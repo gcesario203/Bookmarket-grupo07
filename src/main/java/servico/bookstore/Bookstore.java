@@ -771,6 +771,12 @@ public class Bookstore implements Serializable {
         return relatedBooks;
     }
 
+    /**
+     * Sets the five related book references in the target book.
+     *
+     * @param targetBook the book to update with related recommendations
+     * @param relatedBooks array of five books to set as related items
+     */
     private void setRelatedBooks(Book targetBook, Book[] relatedBooks) {
         targetBook.setRelated1(relatedBooks[0]);
         targetBook.setRelated2(relatedBooks[1]);
