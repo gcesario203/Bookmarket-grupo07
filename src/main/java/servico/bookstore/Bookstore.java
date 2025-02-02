@@ -752,8 +752,8 @@ public class Bookstore implements Serializable {
                 order.getLines().forEach(line -> {
                     Book book = line.getBook();
                     if (book.getId() != targetBook.getId()) {
-                        counters.computeIfAbsent(book.getId(), id -> new BookstoreBookCounter(book))
-                                .addQuantity(line.getQty());
+                        purchaseFrequency.computeIfAbsent(book.getId(), id -> new BookstoreBookCounter(book))
+                                .addQuantity(line.getQty()); //conta os outros livros comprados
                     }
                 });
             });
