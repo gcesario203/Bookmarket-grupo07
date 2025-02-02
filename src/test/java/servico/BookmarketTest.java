@@ -770,7 +770,9 @@ public class BookmarketTest {
         bookmarketTest.populate(1000, 500, 100, 1000, 200);
 
         HashMap<Book, Integer> totalSales = Bookmarket.getConsolidatedBookSales();
-
+        
+        cleanTestObjects();
+         
         List<Book> tenBestSellers = bookmarketTest.getBestSellers(10);
         List<Book> twentyBestSellers = bookmarketTest.getBestSellers(20);
         assertTrue(tenBestSellers.size() == 10);
@@ -784,6 +786,8 @@ public class BookmarketTest {
                 assertTrue(totalSales.get(worstBook) < totalSales.get(bestBook));
             }
         }
+        
+        startUpTestObjects();
     }
 
 
