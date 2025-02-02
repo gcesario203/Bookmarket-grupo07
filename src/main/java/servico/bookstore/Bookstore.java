@@ -755,7 +755,15 @@ public class Bookstore implements Serializable {
         return counters;
     }
 
-    private Book[] getTopFiveRelatedBooks(Map<Integer, BookstoreBookCounter> bookCounters, Book targetBook) {
+/**
+     * Identifies the top five most frequently purchased books from the frequency map.
+     * If fewer than five related books are found, the remaining slots are filled with the target book.
+     *
+     * @param purchaseFrequency map of book purchase frequencies
+     * @param targetBook the original book used to fill empty slots if necessary
+     * @return an array of the top five related books
+     */
+    private Book[] getTopFiveRelatedBooks(Map<Integer, BookstoreBookCounter> purchaseFrequency, Book targetBook) {
         // Ordena os livros mais vendidos e pega os cinco primeiros
         List<BookstoreBookCounter> sortedCounters = bookCounters.values().stream()
             .sorted(Comparator.comparingInt(BookstoreBookCounter::getCount).reversed())
