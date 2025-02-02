@@ -758,7 +758,7 @@ public class Bookstore implements Serializable {
                 });
             });
 
-        return counters;
+        return purchaseFrequency;
     }
 
 /**
