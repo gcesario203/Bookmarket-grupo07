@@ -774,7 +774,7 @@ public class Bookstore implements Serializable {
         for (int i = 0; i < Math.min(top, sortedFrequencies.size()); i++) {
             relatedBooks[i] = sortedFrequencies.get(i).getBook();
         }
-        Arrays.fill(relatedBooks, relatedBooks.length, 5, targetBook);
+        Arrays.fill(relatedBooks, relatedBooks.length, top, targetBook);
 
         return relatedBooks;
     }
