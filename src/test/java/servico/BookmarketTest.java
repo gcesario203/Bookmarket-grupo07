@@ -179,6 +179,62 @@ public class BookmarketTest {
 
         assertEquals(createdCustomer.getData(), amazonCustomer.getData());
         assertEquals(createdCustomer.getData(), saraivaCustomer.getData());
+        
+        assertEquals(createdCustomer.getType(), saraivaCustomer.getType());
+        assertEquals(createdCustomer.getType(), amazonCustomer.getType());
+    }
+    
+    @Test
+    public void shouldCreateANewSubscriberToAllBookstore() {
+        String fname = "John";
+        String lname = "Doe";
+        String street1 = "123 Main St";
+        String street2 = "Apt 4B";
+        String city = "Springfield";
+        String state = "IL";
+        String zip = "62704";
+        String countryName = "USA";
+        String phone = "555-1234";
+        String email = "john.doe@example.com";
+        double discount = 10.5;
+        String birthdate = "1990-01-01";
+        Date data = new Date(); // Instância atual de Date
+        long now = System.currentTimeMillis(); // Timestamp atual
+
+        Customer createdCustomer = Bookmarket.createNewSubscriber(fname, lname, street1, street2, city, state, zip,
+                countryName, phone, email, data, birthdate);
+
+        Customer amazonCustomer = Bookstore.getCustomer(createdCustomer.getUname()).get();
+        Customer saraivaCustomer = Bookstore.getCustomer(createdCustomer.getUname()).get();
+
+        // Verifica IDs
+        assertEquals(createdCustomer.getId(), amazonCustomer.getId());
+        assertEquals(createdCustomer.getId(), saraivaCustomer.getId());
+
+        // Verifica os campos
+        assertEquals(createdCustomer.getFname(), amazonCustomer.getFname());
+        assertEquals(createdCustomer.getFname(), saraivaCustomer.getFname());
+
+        assertEquals(createdCustomer.getLname(), amazonCustomer.getLname());
+        assertEquals(createdCustomer.getLname(), saraivaCustomer.getLname());
+
+        assertEquals(createdCustomer.getPhone(), amazonCustomer.getPhone());
+        assertEquals(createdCustomer.getPhone(), saraivaCustomer.getPhone());
+
+        assertEquals(createdCustomer.getEmail(), amazonCustomer.getEmail());
+        assertEquals(createdCustomer.getEmail(), saraivaCustomer.getEmail());
+
+        assertEquals(createdCustomer.getDiscount(), amazonCustomer.getDiscount(), 0.001);
+        assertEquals(createdCustomer.getDiscount(), saraivaCustomer.getDiscount(), 0.001);
+
+        assertEquals(createdCustomer.getBirthdate(), amazonCustomer.getBirthdate());
+        assertEquals(createdCustomer.getBirthdate(), saraivaCustomer.getBirthdate());
+
+        assertEquals(createdCustomer.getData(), amazonCustomer.getData());
+        assertEquals(createdCustomer.getData(), saraivaCustomer.getData());
+        
+        assertEquals(createdCustomer.getType(), saraivaCustomer.getType());
+        assertEquals(createdCustomer.getType(), amazonCustomer.getType());
     }
 
     @Test
@@ -714,7 +770,9 @@ public class BookmarketTest {
         bookmarketTest.populate(1000, 500, 100, 1000, 200);
 
         HashMap<Book, Integer> totalSales = Bookmarket.getConsolidatedBookSales();
-
+        
+        cleanTestObjects();
+         
         List<Book> tenBestSellers = bookmarketTest.getBestSellers(10);
         List<Book> twentyBestSellers = bookmarketTest.getBestSellers(20);
         assertTrue(tenBestSellers.size() == 10);
@@ -728,6 +786,8 @@ public class BookmarketTest {
                 assertTrue(totalSales.get(worstBook) < totalSales.get(bestBook));
             }
         }
+        
+        startUpTestObjects();
     }
 
 
