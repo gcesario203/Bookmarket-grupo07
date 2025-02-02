@@ -736,10 +736,16 @@ public class Bookstore implements Serializable {
         return clientIds;
     }
 
+    **
+     * Counts the frequency of books purchased by the specified customers, excluding the target book.
+     *
+     * @param clientIds set of customer IDs to analyze purchases for
+     * @param targetBook the book to exclude from the counting
+     * @return a map of book IDs to their purchase frequency counters
+     */
     private Map<Integer, BookstoreBookCounter> countBooksBoughtByClients(Set<Integer> clientIds, Book targetBook) {
-        Map<Integer, BookstoreBookCounter> counters = new HashMap<>();
+        Map<Integer, BookstoreBookCounter> purchaseFrequency = new HashMap<>();
 
-        // Para cada ordem, se o cliente comprou o livro alvo, conta os outros livros comprados
         ordersByCreation.stream()
             .filter(order -> clientIds.contains(order.getCustomer().getId()))
             .forEach(order -> {
