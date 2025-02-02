@@ -57,6 +57,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
+import dominio.customer.enums.Type;
+
 /**
  * *<img src="./doc-files/Customer.png" alt="Customer">
  * <br><a href="./doc-files/Customer.html"> code </a>
@@ -83,6 +85,7 @@ public class Customer implements Serializable {
     private final String data;
     private final Address address;
     private Order mostRecentOrder;
+    private dominio.customer.enums.Type type;
 
     /**
      *
@@ -108,7 +111,7 @@ public class Customer implements Serializable {
             String lname, String phone, String email, Date since,
             Date lastVisit, Date login, Date expiration, double discount,
             double balance, double ytdPmt, Date birthdate, String data,
-            Address address) {
+            Address address, dominio.customer.enums.Type type) {
         this.id = id;
         this.uname = uname;
         this.passwd = passwd;
@@ -127,6 +130,15 @@ public class Customer implements Serializable {
         this.data = data;
         this.address = address;
         mostRecentOrder = null;
+        
+        if(type == null) {
+           	this.type = type;
+           	
+           	return;
+        }
+        
+        
+        this.type = Type.DEFAULT;
     }
 
     /**
@@ -332,6 +344,14 @@ public class Customer implements Serializable {
      */
     public String getData() {
         return data;
+    }
+    
+    public dominio.customer.enums.Type getType(){
+    	return this.type;
+    }
+    
+    public void setType(dominio.customer.enums.Type type) {
+    	this.type = type;
     }
 
     /**
