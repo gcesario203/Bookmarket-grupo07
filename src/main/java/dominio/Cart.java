@@ -67,6 +67,8 @@ public class Cart implements Serializable {
     private static final long serialVersionUID = -4194553499937996531L;
 
     private final int id;
+    private final Customer customer;
+    private final int bookstoreId;
     private Date time;
     private HashMap<Integer, CartLine> linesByBookId;
     private double aggregateCost;
@@ -77,9 +79,11 @@ public class Cart implements Serializable {
 	 * @param id   Identificador do carrinho de compras.
 	 * @param time Tempo do carrinho de compras.
 	 */
-    public Cart(int id, Date time) {
+    public Cart(int id, Date time, Customer customer, int bookstoreId) {
         this.id = id;
         this.time = time;
+        this.customer = customer;
+        this.bookstoreId = bookstoreId;
         clear();
     }
 
@@ -243,6 +247,14 @@ public class Cart implements Serializable {
      */
     public double total(double discount) {
         return subTotal(discount) + shipCost() + tax(discount);
+    }
+    
+    public Customer getCustomer() {
+    	return this.getCustomer();
+    }
+    
+    public int getBookstoreId() {
+    	return this.getBookstoreId();
     }
 
 }
