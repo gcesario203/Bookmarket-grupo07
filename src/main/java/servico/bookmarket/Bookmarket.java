@@ -114,7 +114,7 @@ public class Bookmarket {
      */
     public static String[] getName(int c_id) {
 
-        Customer customer = Bookstore.getCustomer(c_id);
+        Customer customer = Bookstore.getCustomer(c_id).get();
 
         String name[] = new String[3];
         name[0] = customer.getFname();
@@ -131,7 +131,7 @@ public class Bookmarket {
      * @return String Nome de usuário do Customer
      */
     public static String getUserName(int C_ID) {
-        return Bookstore.getCustomer(C_ID).getUname();
+        return Bookstore.getCustomer(C_ID).get().getUname();
     }
 
     /**
@@ -329,7 +329,7 @@ public class Bookmarket {
      * @return Lista com os preços de um determinado livro dentro do marketPlace
      */
     public static List<Double> getCosts(Book book) {
-        return getBookstoreStream().map(store -> store.getStock(book.getId())).map(stock -> stock.getCost())
+        return getBookstoreStream().map(store -> store.getStock(book.getId())).map(stock -> stock == null ? 0 : stock.getCost())
                 .collect(Collectors.toList());
     }
 
@@ -491,10 +491,10 @@ public class Bookmarket {
      * @param storeId
      * @return
      */
-    public static int createEmptyCart(int storeId) {
+    public static int createEmptyCart(int storeId, int customerId) {
         try {
-            return ((Cart) stateMachine.execute(new CreateCartAction(storeId,
-                    System.currentTimeMillis()))).getId();
+            return ((Optional<Cart>) stateMachine.execute(new CreateCartAction(storeId,
+                    System.currentTimeMillis(), customerId))).get().getId();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -511,15 +511,15 @@ public class Bookmarket {
      * @param quantities
      * @return
      */
-    public static Cart doCart(int storeId, int SHOPPING_ID, Integer I_ID, List<Integer> ids,
+    public static Optional<Cart> doCart(int storeId, int SHOPPING_ID, Integer I_ID, List<Integer> ids,
             List<Integer> quantities) {
         try {
-            Cart cart = (Cart) stateMachine.execute(new CartUpdateAction(storeId,
+        	Optional<Cart> cart = (Optional<Cart>) stateMachine.execute(new CartUpdateAction(storeId,
                     SHOPPING_ID, I_ID, ids, quantities,
                     System.currentTimeMillis()));
-            if (cart.getLines().isEmpty()) {
+            if (cart.isEmpty() && cart.get().getLines().isEmpty()) {
                 Book book = getExistingBookInAStock(storeId);
-                cart = (Cart) stateMachine.execute(new CartUpdateAction(storeId,
+                cart = (Optional<Cart>) stateMachine.execute(new CartUpdateAction(storeId,
                         SHOPPING_ID, book.getId(), new ArrayList<>(),
                         new ArrayList<>(), System.currentTimeMillis()));
             }
@@ -551,7 +551,7 @@ public class Bookmarket {
                 .findFirst()
                 .get();
         synchronized (bookstore) {
-            return bookstore.getCart(SHOPPING_ID);
+            return bookstore.getCart(SHOPPING_ID).get();
         }
     }
 

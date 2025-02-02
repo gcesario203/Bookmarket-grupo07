@@ -428,13 +428,16 @@ public class Bookstore implements Serializable {
      *
      * @param cId Id do Consumidor
      * @param now Tempo / hora atual
+     * @throws Exception 
      */
-    public static void refreshCustomerSession(int cId, long now) {
+    public static void refreshCustomerSession(int cId, long now) throws Exception {
         Optional<Customer> customer = getCustomer(cId);
-        if (customer.isPresent()) {
-            customer.get().setLogin(new Date(now));
-            customer.get().setExpiration(new Date(now + 7200000 /* 2 hours */));
-        }
+        
+        if(customer.isEmpty())
+        	throw new Exception("Customer not exists");
+        
+        customer.get().setLogin(new Date(now));
+        customer.get().setExpiration(new Date(now + 7200000 /* 2 hours */));
     }
 
     /**
@@ -817,21 +820,24 @@ public class Bookstore implements Serializable {
      * @param now        - Date from now.
      * @return uma instância de <code>Cart</code>
      */
-    public Cart cartUpdate(int cId, Integer bId, List<Integer> bIds,
+    public Optional<Cart> cartUpdate(int cId, Integer bId, List<Integer> bIds,
             List<Integer> quantities, long now) {
-        Cart cart = getCart(cId).get();
-
+        Optional<Cart> cart = getCart(cId);
+        
+        if(cart.isEmpty())
+        	return Optional.empty();
+        
         if (bId != null) {
-            cart.increaseLine(stockByBook.get(getBook(bId).get()), getBook(bId).get(), 1);
+            cart.get().increaseLine(stockByBook.get(getBook(bId).get()), getBook(bId).get(), 1);
         }
 
         if ((bIds != null && bIds.size() > 0) && (quantities != null && quantities.size() > 0)) {
             for (int i = 0; i < bIds.size(); i++) {
-                cart.changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
+                cart.get().changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
             }
         }
 
-        cart.setTime(new Date(now));
+        cart.get().setTime(new Date(now));
 
         return cart;
     }

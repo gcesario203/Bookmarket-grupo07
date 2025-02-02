@@ -177,10 +177,11 @@ public class BookstoreTest {
 
     /**
      * Test of refreshCustomerSession method, of class Bookstore.
+     * @throws Exception 
      */
     @Test
-    public void testRefreshCustomerSession() {
-        int cId = 0;
+    public void testRefreshCustomerSession() throws Exception {
+        int cId = 1;
         long now = 0L;
         instance.refreshCustomerSession(cId, now);
     }
@@ -298,7 +299,7 @@ public class BookstoreTest {
     	
         long now = 0L;
         
-        Cart result = instance.cartUpdate(cart.getId(), book.getId(), null, null, now);
+        Cart result = instance.cartUpdate(cart.getId(), book.getId(), null, null, now).get();
         
         
         assertTrue(result.getLines().stream().anyMatch(x -> x.getBook().getId() == book.getId()));
