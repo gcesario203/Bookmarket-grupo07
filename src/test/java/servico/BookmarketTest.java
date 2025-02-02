@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.junit.BeforeClass;
@@ -462,7 +463,21 @@ public class BookmarketTest {
 
         assertTrue(newCartId == amazon.getCart(newCartId).get().getId());
 
-        assertTrue(newCartId == Bookmarket.getCart(amazon.getId(), newCartId).getId());
+        assertTrue(newCartId == Bookmarket.getCart(amazon.getId(), newCartId).get().getId());
+    }
+    
+    @Test
+    public void shouldGetACartByCustomer() {
+    	Customer customer = amazon.getCustomer(2).get();
+    	
+    	Optional<Cart> cart = bookmarket.getCartByCustomer(amazon.getId(), customer.getId());
+    	
+    	assertTrue(cart.isPresent());
+    }
+    
+    @Test
+    public void shouldNotGetANonExistingCartByCustomer() {
+    	assertTrue(bookmarket.getCartByCustomer(amazon.getId(), -1).isEmpty());
     }
 
     @Test(expected = RuntimeException.class)
@@ -475,7 +490,7 @@ public class BookmarketTest {
     	Customer customer = amazon.getCustomer(2).get();
         int newCartId = Bookmarket.createEmptyCart(amazon.getId(), customer.getId());
 
-        Cart amazonCart = Bookmarket.getCart(amazon.getId(), newCartId);
+        Cart amazonCart = Bookmarket.getCart(amazon.getId(), newCartId).get();
 
         assertEquals(amazonCart.getId(), amazon.getCart(newCartId).get().getId());
     }

@@ -14,6 +14,8 @@ import servico.bookmarket.statemachine.actions.BookstoreAction;
 import servico.bookmarket.statemachine.actions.books.UpdateBookAction;
 import servico.bookmarket.statemachine.actions.carts.CartUpdateAction;
 import servico.bookmarket.statemachine.actions.carts.CreateCartAction;
+import servico.bookmarket.statemachine.actions.carts.GetCartByCustomer;
+import servico.bookmarket.statemachine.actions.carts.GetCartById;
 import servico.bookmarket.statemachine.actions.customers.CreateCustomerAction;
 import servico.bookmarket.statemachine.actions.customers.RefreshCustomerSessionAction;
 import servico.bookmarket.statemachine.actions.orders.ConfirmBuyAction;
@@ -29,6 +31,7 @@ import servico.bookmarket.statemachine.actions.shared.PopulateAction;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.classfile.ClassFile.Option;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -517,7 +520,7 @@ public class Bookmarket {
         	Optional<Cart> cart = (Optional<Cart>) stateMachine.execute(new CartUpdateAction(storeId,
                     SHOPPING_ID, I_ID, ids, quantities,
                     System.currentTimeMillis()));
-            if (cart.isEmpty() && cart.get().getLines().isEmpty()) {
+            if (cart.get().getLines().isEmpty()) {
                 Book book = getExistingBookInAStock(storeId);
                 cart = (Optional<Cart>) stateMachine.execute(new CartUpdateAction(storeId,
                         SHOPPING_ID, book.getId(), new ArrayList<>(),
@@ -545,14 +548,12 @@ public class Bookmarket {
      * @param storeId
      * @return
      */
-    public static Cart getCart(int storeId, int SHOPPING_ID) {
-        Bookstore bookstore = getBookstoreStream()
-                .filter(store -> store.getId() == storeId)
-                .findFirst()
-                .get();
-        synchronized (bookstore) {
-            return bookstore.getCart(SHOPPING_ID).get();
-        }
+    public static Optional<Cart> getCart(int storeId, int SHOPPING_ID) {
+    	return (Optional<Cart>)stateMachine.execute(new GetCartById(storeId, SHOPPING_ID));
+    }
+    
+    public static Optional<Cart> getCartByCustomer(int storeId, int customerId){
+    	return (Optional<Cart>)stateMachine.execute(new GetCartByCustomer(storeId, customerId));
     }
 
     /**
