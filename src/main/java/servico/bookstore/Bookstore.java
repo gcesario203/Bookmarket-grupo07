@@ -742,7 +742,7 @@ public class Bookstore implements Serializable {
         return clientIds;
     }
 
-    **
+     /**
      * Counts the frequency of books purchased by the specified customers, excluding the target book.
      *
      * @param clientIds set of customer IDs to analyze purchases for
@@ -767,7 +767,7 @@ public class Bookstore implements Serializable {
         return purchaseFrequency;
     }
 
-/**
+    /**
      * Identifies the top five most frequently purchased books from the frequency map.
      * If fewer than five related books are found, the remaining slots are filled with the target book.
      *
