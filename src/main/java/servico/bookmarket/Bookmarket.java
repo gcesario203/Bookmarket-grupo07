@@ -12,6 +12,7 @@ import servico.bookstore.Bookstore;
 import servico.bookmarket.exceptions.UmbrellaException;
 import servico.bookmarket.statemachine.StateMachine;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
+import servico.bookmarket.statemachine.actions.books.GetBookPriceAverageAction;
 import servico.bookmarket.statemachine.actions.books.UpdateBookAction;
 import servico.bookmarket.statemachine.actions.carts.CartUpdateAction;
 import servico.bookmarket.statemachine.actions.carts.CreateCartAction;
@@ -635,6 +636,16 @@ public class Bookmarket {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    /**
+     * Método utilizado para pegar o valor medio do livro em todas as bookstores
+     *
+     * @param bookId
+     * @return o preço medio do livro nas bookstores
+     */
+    public static double getBookPriceAverage(int bookId) {
+    	return (double) stateMachine.execute(new GetBookPriceAverageAction(bookId));
     }
 
     private static String randomComment() {

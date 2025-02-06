@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.junit.BeforeClass;
@@ -788,6 +789,21 @@ public class BookmarketTest {
         }
         
         startUpTestObjects();
+    }
+    
+    @Test
+    public void shouldGetTheAverageCostFromABook() {
+    	Book randomBook = bookmarket.getABookAnyBook();
+    	
+    	Stock amazonStock = amazon.getStock(randomBook.getId());
+    	
+    	Stock saraivaStock = saraiva.getStock(randomBook.getId());
+    	
+    	double averageValue = bookmarket.getBookPriceAverage(randomBook.getId());
+    	
+    	double averageValueFromStocks = (amazonStock.getCost() + saraivaStock.getCost()) / 2;
+    	
+    	assertTrue(averageValue == averageValueFromStocks);
     }
 
 
