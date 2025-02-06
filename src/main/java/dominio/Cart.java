@@ -78,6 +78,8 @@ public class Cart implements Serializable {
 	 *
 	 * @param id   Identificador do carrinho de compras.
 	 * @param time Tempo do carrinho de compras.
+	 * @param customer Cliente que está criando o carrinho de compras
+	 * @param bookstoreId Id da bookstore cujo qual o carrinho pertence
 	 */
     public Cart(int id, Date time, Customer customer, int bookstoreId) {
         this.id = id;
