@@ -845,6 +845,11 @@ public class Bookstore implements Serializable {
     	return createdCart;
     }
     
+    /**
+     * Metodo utilizado para buscar um carrinho de um cliente
+     *
+     * @param customerId Id do cliente
+     */
     public Optional<Cart> getCartByCustomer(int customerId){
     	
     	return cartsById.stream()

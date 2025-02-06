@@ -568,6 +568,12 @@ public class Bookmarket {
     	return (Optional<Cart>)stateMachine.execute(new GetCartById(storeId, SHOPPING_ID));
     }
     
+    /**
+     * Metodo utilizado para buscar um carrinho de um cliente
+     *
+     * @param storeId Id do bookstore cujo qual é necessario buscar o carrinho
+     * @param customerId Id do cliente
+     */
     public static Optional<Cart> getCartByCustomer(int storeId, int customerId){
     	return (Optional<Cart>)stateMachine.execute(new GetCartByCustomer(storeId, customerId));
     }
