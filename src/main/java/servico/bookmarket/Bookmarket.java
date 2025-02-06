@@ -508,6 +508,7 @@ public class Bookmarket {
      * {@linkplain Bookstore}.
      *
      * @param storeId
+     * @param customerId
      * @return
      */
     public static int createEmptyCart(int storeId, int customerId) {
