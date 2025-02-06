@@ -5,12 +5,7 @@ import dominio.customer.enums.Type;
 import util.TPCW_Util;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -577,5 +572,31 @@ public class BookstoreTest {
     	assertFalse(oldRelated3.getId() == updatedBook.getRelated3().getId());
     	assertFalse(oldRelated4.getId() == updatedBook.getRelated4().getId());
     	assertFalse(oldRelated5.getId() == updatedBook.getRelated5().getId());
+    }
+
+    @Test
+    public void shouldReturnRightHashmapOnConsolidatedBookSales() {
+        HashMap<Book, Integer> consolidatedSales = instance.getConsolidatedBookSales();
+        assertNotNull(consolidatedSales);
+        List<Order> orders = instance.getOrdersById();
+        for (Map.Entry<Book, Integer> entry : consolidatedSales.entrySet()) {
+            Book book = entry.getKey();
+            Integer sales = entry.getValue();
+            for (Order order : orders) {
+                for (OrderLine line : order.getLines()) {
+                    Book orderBook = line.getBook();
+                    if (book.getId() == orderBook.getId()) {
+                        assertTrue(sales >= line.getQty());
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void shouldReturnNullOnConsolidatedBookSales(){
+        Bookstore bookstore = new Bookstore(5);
+        HashMap<Book, Integer> consolidatedSales = bookstore.getConsolidatedBookSales();
+        assertTrue(consolidatedSales.size() == 0);
     }
 }
