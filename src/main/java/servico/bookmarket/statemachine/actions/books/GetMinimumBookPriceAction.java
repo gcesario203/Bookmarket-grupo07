@@ -22,7 +22,7 @@ public class GetMinimumBookPriceAction extends BookstoreAction{
 	@Override
 	public Object executeOnBookstore(Stream<Bookstore> bookstore) {
 		return bookstore.map(expecificBookstore -> expecificBookstore.getStock(bookId))
-				 .filter(stock -> stock != null)
+				 .filter(stock -> stock != null && stock.getQty() > 0)
 				 .min(Comparator.comparingDouble(Stock::getCost));
 	}
 
