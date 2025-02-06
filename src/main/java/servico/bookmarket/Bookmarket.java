@@ -349,7 +349,8 @@ public class Bookmarket {
      * @return Lista com os preços de um determinado livro dentro do marketPlace
      */
     public static List<Double> getCosts(Book book) {
-        return getBookstoreStream().map(store -> store.getStock(book.getId())).map(stock -> stock == null ? 0 : stock.getCost())
+                return getBookstoreStream().map(store -> store.getStock(book.getId())).map(stock -> (Double) (stock == null ? 0.0 : stock.getCost()))
+
                 .collect(Collectors.toList());
     }
 
