@@ -1,9 +1,11 @@
 package servico;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.junit.BeforeClass;
@@ -788,6 +790,22 @@ public class BookmarketTest {
         }
         
         startUpTestObjects();
+    }
+    
+    @Test
+    public void shouldGetTheMinimumBookValueCost() {
+        
+    	Optional<Stock> saraivaMinCost = saraiva.getStocks().stream().min(Comparator.comparingDouble(Stock::getCost));
+    	
+    	Stock amazonSameBookMinCost = amazon.getStock(saraivaMinCost.get().getBook().getId());
+    	
+		Optional<Stock> bookmarketMinCost = bookmarket.getMinimumBookPrice(saraivaMinCost.get().getBook().getId());
+        
+		assertTrue(bookmarketMinCost.get().getCost() == saraivaMinCost.get().getCost());
+		
+		assertTrue(bookmarketMinCost.get().getIdBookstore() == saraiva.getId());
+		
+		assertTrue(amazonSameBookMinCost.getCost() > saraivaMinCost.get().getCost());
     }
 
 
