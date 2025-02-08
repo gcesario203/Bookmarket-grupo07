@@ -7,10 +7,10 @@ import dominio.Stock;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 import servico.bookstore.Bookstore;
 
+/**
+ * Classe que implementa as ações relacionadas a busca do valor médio do livro.
+ */
 public class GetBookPriceAverageAction  extends BookstoreAction{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	int bookId;
 	
