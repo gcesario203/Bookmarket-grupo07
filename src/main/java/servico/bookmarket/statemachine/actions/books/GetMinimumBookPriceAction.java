@@ -8,10 +8,10 @@ import dominio.Stock;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 import servico.bookstore.Bookstore;
 
+/**
+ * Classe que implementa as ações relacionadas a busca do preço mínimo do livro.
+ */
 public class GetMinimumBookPriceAction extends BookstoreAction{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	int bookId;
 	
