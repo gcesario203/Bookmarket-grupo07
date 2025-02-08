@@ -1,6 +1,7 @@
 package servico.bookmarket.statemachine.actions.books;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import dominio.Stock;
@@ -21,8 +22,8 @@ public class GetBookPriceAverageAction  extends BookstoreAction{
 	@Override
 	public Object executeOnBookstore(Stream<Bookstore> bookstore) {
 		List<Stock> stocks = bookstore.map(bk -> bk.getStock(this.bookId))
-									  .filter(stock -> stock != null && stock.getQty() > 0)
-									  .toList();
+									  	.filter(stock -> stock != null && stock.getQty() > 0)
+										.collect(Collectors.toList());
 		
 		if(stocks.isEmpty())
 			return 0d;
