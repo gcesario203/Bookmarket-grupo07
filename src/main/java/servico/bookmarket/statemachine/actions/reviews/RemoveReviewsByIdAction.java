@@ -6,7 +6,7 @@ import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.ExpecificBookstoreAction;
 
 public class RemoveReviewsByIdAction extends ExpecificBookstoreAction{
-	private static final long serialVersionUID = 6439962163328790677L;
+	private static final long serialVersionUID = 1535510251114648637L;
 	
 	int id;
 	

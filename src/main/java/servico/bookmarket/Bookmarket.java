@@ -24,14 +24,14 @@ import servico.bookmarket.statemachine.actions.reviews.GetReviewByBookAction;
 import servico.bookmarket.statemachine.actions.reviews.GetReviewByCustomerAction;
 import servico.bookmarket.statemachine.actions.reviews.GetReviewByIdAction;
 import servico.bookmarket.statemachine.actions.reviews.GetReviewsAction;
+import servico.bookmarket.statemachine.actions.reviews.GetUniqueReviewsAction;
 import servico.bookmarket.statemachine.actions.reviews.GetReviewsByBookstoreAction;
 import servico.bookmarket.statemachine.actions.reviews.RemoveReviewsByIdAction;
+import servico.bookmarket.statemachine.actions.recomendations.GetRecommendationByItensAction;
+import servico.bookmarket.statemachine.actions.recomendations.GetRecommendationByUsersAction;
 import servico.bookmarket.statemachine.actions.shared.PopulateAction;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -224,6 +224,11 @@ public class Bookmarket {
     }
 
     @SuppressWarnings("unchecked")
+    public static List<Review> getUniqueReviews() {
+        return (List<Review>) stateMachine.execute(new GetUniqueReviewsAction());
+    }
+
+    @SuppressWarnings("unchecked")
     public static Optional<Review> getReviewById(int bookstoreId, int id) {
         return (Optional<Review>) stateMachine.execute(new GetReviewByIdAction(id, bookstoreId));
     }
@@ -412,25 +417,25 @@ public class Bookmarket {
 
     /**
      *
-     * @param c_id
-     * @return
-     */
-    public static List<Book> getRecommendationByItens(int c_id) {
-        return Bookstore.getRecommendationByItens(c_id);
-    }
-
-    /**
-     * A recomendação de livros para usuários do Bookmarket aproveita a
-     * implementação estática do mesmo método da Bookstore para recuperar os
-     * livros.
-     *
      * @param c_id Id do usuário que necessita de livros recomendados pelo
      *             sistema
      * @return Retorna uma lista de livros com limite de 5 itens recomendados
      *         pelo sistema.
      */
+    @SuppressWarnings("unchecked")
+    public static List<Book> getRecommendationByItens(int c_id) {
+        return (List<Book>) stateMachine.execute(new GetRecommendationByItensAction(c_id));
+    }
+
+    /**
+     * @param c_id Id do usuário que necessita de livros recomendados pelo
+     *             sistema
+     * @return Retorna uma lista de livros com limite de 5 itens recomendados
+     *         pelo sistema.
+     */
+    @SuppressWarnings("unchecked")
     public static List<Book> getRecommendationByUsers(int c_id) {
-        return Bookstore.getRecommendationByUsers(c_id);
+        return (List<Book>) stateMachine.execute(new GetRecommendationByUsersAction(c_id));
     }
 
     /**
