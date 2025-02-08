@@ -27,6 +27,7 @@ public class CreateCustomerAction extends BookstoreAction {
     Date birthdate;
     String data;
     long now;
+    dominio.customer.enums.Type type;
 
     /**
      * Método construtor da classe.
@@ -49,7 +50,7 @@ public class CreateCustomerAction extends BookstoreAction {
     public CreateCustomerAction(String fname, String lname, String street1,
             String street2, String city, String state, String zip,
             String countryName, String phone, String email,
-            double discount, Date birthdate, String data, long now) {
+            double discount, Date birthdate, String data, long now, dominio.customer.enums.Type type) {
         this.fname = fname;
         this.lname = lname;
         this.street1 = street1;
@@ -64,6 +65,7 @@ public class CreateCustomerAction extends BookstoreAction {
         this.birthdate = birthdate;
         this.data = data;
         this.now = now;
+        this.type = type;
     }
 
     /**
@@ -77,6 +79,6 @@ public class CreateCustomerAction extends BookstoreAction {
     public Object executeOnBookstore(Stream<Bookstore> bookstore) {
         return Bookstore.createCustomer(fname, lname, street1, street2,
                 city, state, zip, countryName, phone, email, discount,
-                birthdate, data, now);
+                birthdate, data, now, type);
     }
 }

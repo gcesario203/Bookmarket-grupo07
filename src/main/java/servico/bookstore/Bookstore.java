@@ -15,7 +15,7 @@ import dominio.Order;
 import dominio.OrderLine;
 import dominio.Review;
 import dominio.Stock;
-import servico.bookstore.utils.Counter;
+import servico.bookstore.utils.BookstoreBookCounter;
 import util.BookstoreConstants.Backing;
 import util.BookstoreConstants.Subject;
 import util.TPCW_Util;
@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -255,8 +256,8 @@ public class Bookstore implements Serializable {
      * @param cId ID do Consumidor
      * @return customerById ID do Consumidor
      */
-    public static Customer getCustomer(int cId) {
-        return customersById.get(cId);
+    public static Optional<Customer> getCustomer(int cId) {
+        return customersById.stream().filter(c -> c.getId() == cId).findFirst();
     }
 
     /**
@@ -355,21 +356,22 @@ public class Bookstore implements Serializable {
      * @param birthdate   Data de Nascimento
      * @param data        Dado referente ao Consumidor
      * @param now         Hora Atual
+     * @param type		 Tipo do consumidor
      * @return O método createCustomer com os parâmetros: fname, lname, address,
      *         phone, email, since, lastVisit, login, expiration, discount,
      *         birthdate,
-     *         data)
+     *         data, type)
      */
     public static Customer createCustomer(String fname, String lname, String street1,
             String street2, String city, String state, String zip,
             String countryName, String phone, String email, double discount,
-            Date birthdate, String data, long now) {
+            Date birthdate, String data, long now, dominio.customer.enums.Type type) {
         Address address = alwaysGetAddress(street1, street2, city, state, zip,
                 countryName);
         return createCustomer(fname, lname, address, phone, email,
                 new Date(now), new Date(now), new Date(now),
                 new Date(now + 7200000 /* 2 hours */), discount, birthdate,
-                data);
+                data, type);
     }
 
     /**
@@ -399,17 +401,18 @@ public class Bookstore implements Serializable {
      * @param discount   Desconto
      * @param birthdate  Data de Nascimento
      * @param data       Dado referente ao Consumidor
+     * @param type		 Tipo do consumidor
      * @return customer Consumidor
      */
     private static Customer createCustomer(String fname, String lname, Address address,
             String phone, String email, Date since, Date lastVisit,
             Date login, Date expiration, double discount, Date birthdate,
-            String data) {
+            String data, dominio.customer.enums.Type type) {
         int id = customersById.size();
         String uname = TPCW_Util.DigSyl(id, 0);
         Customer customer = new Customer(id, uname, uname.toLowerCase(), fname,
                 lname, phone, email, since, lastVisit, login, expiration,
-                discount, 0, 0, birthdate, data, address);
+                discount, 0, 0, birthdate, data, address, type);
         customersById.add(customer);
         customersByUsername.put(uname, customer);
         return customer;
@@ -428,13 +431,16 @@ public class Bookstore implements Serializable {
      *
      * @param cId Id do Consumidor
      * @param now Tempo / hora atual
+     * @throws Exception 
      */
-    public static void refreshCustomerSession(int cId, long now) {
-        Customer customer = getCustomer(cId);
-        if (customer != null) {
-            customer.setLogin(new Date(now));
-            customer.setExpiration(new Date(now + 7200000 /* 2 hours */));
-        }
+    public static void refreshCustomerSession(int cId, long now) throws Exception {
+        Optional<Customer> customer = getCustomer(cId);
+        
+        if(customer.isEmpty())
+        	throw new Exception("Customer not exists");
+        
+        customer.get().setLogin(new Date(now));
+        customer.get().setExpiration(new Date(now + 7200000 /* 2 hours */));
     }
 
     /**
@@ -606,56 +612,28 @@ public class Bookstore implements Serializable {
     }
 
     /**
-     * Para realizar a busca por bestSellers o sistema aproveita do
-     * relacionamento de {@linkplain OrderLine} com {@linkplain Book}. É
-     * assumido que cada OrderLine possui apenas 01 {@linkplain Book}, neste
-     * caso a quantidade de vendas é identificada por esta relação. Sempre que
-     * acontece a criação de uma orderLine, é assumido que uma compra foi feita.
+     * Calcula o total de vendas de cada livro nesta livraria.
+     * Processa todos os pedidos e suas linhas para contabilizar a quantidade
+     * total vendida de cada livro.
      *
-     * É utilizado um limite de 100 livros para o resultado da pesquisa para
-     * evitar desperdício de memória no retorno do método. Este limite é
-     * estipulado por
-     *
-     * Com isto, é importante salientar que este método utiliza as vendas desta
-     * instância para recuperar os livros vendidos.
-     *
-     * @param top
-     * @return Retorna uma lista dos livros mais vendidos desta
-     *         {@linkplain Bookstore} com tamanho limitado em 100
+     * @return Mapa onde a chave é o livro e o valor é a quantidade total vendida nesta livraria
      */
-    // public List<Book> getBestSellers(Integer top) {
-    //     final Integer minTopValue = 1;
-    //     final Integer maxTopValue = 100;
-    //     if (top < minTopValue || top > maxTopValue){
-    //         throw new RuntimeException("Invalid value for top");
-    //     }
-    //     HashMap<Book, Integer> counter = getBookOrderCounter();
-
-    //     // Ordena os livros pelas vendas em ordem decrescente e pega os 100 mais vendidos
-    //     List<Book> topBooks = counter.entrySet().stream()
-    //             .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
-    //             .limit(top) // Filtra os N primeiros
-    //             .map(Map.Entry::getKey) // Extrai apenas os objetos Book
-    //             .collect(Collectors.toList());
-    //     return topBooks;
-    // }
-
-    public HashMap<Book, Integer> getBookOrderCounter() {
-        HashMap<Book, Integer> counter = new HashMap<Book, Integer>();
+    public HashMap<Book, Integer> getConsolidatedBookSales() {
+        HashMap<Book, Integer> salesByBook = new HashMap<Book, Integer>();
 
         for (Order order : ordersById) {
             for (OrderLine line : order.getLines()) {
                 Book book = line.getBook();
                 Integer qtd = line.getQty();
-                if (counter.containsKey(book)) {
-                    counter.put(book, counter.get(book) + qtd);
+                if (salesByBook.containsKey(book)) {
+                    salesByBook.put(book, salesByBook.get(book) + qtd);
                 } else {
-                    counter.put(book, qtd);
+                    salesByBook.put(book, qtd);
                 }
             }
 
         }
-        return counter;
+        return salesByBook;
     }
 
     /**
@@ -731,66 +709,105 @@ public class Bookstore implements Serializable {
     public List<Stock> getStocks() {
         return new ArrayList<>(stockByBook.values());
     }
-
+    
     /**
-     * For all the clients that bought this book in the last 10000 orders, what
-     * are the five most sold books except this one.
+     * Updates the related books recommendations for a given book based on customer purchase history.
+     * The recommendations are generated by analyzing the last 10,000 orders and identifying
+     * books frequently purchased together with the target book.
      *
-     * @param targetBook - O livro que terá os relacionados atualizados
-     *
+     * @param targetBook the book for which to update related recommendations
      */
-    private void updateRelatedBooks(Book targetBook) {
-        HashSet<Integer> clientIds = new HashSet<>();
-        int j = 0;
-        Iterator<Order> i = ordersByCreation.iterator();
-        while (i.hasNext() && j <= 10000) {
-            Order order = i.next();
-            for (OrderLine line : order.getLines()) {
-                Book book = line.getBook();
-                if (targetBook.getId() == book.getId()) {
-                    clientIds.add(order.getCustomer().getId());
-                    break;
-                }
-            }
-            j++;
+    public void updateRelatedBooks(Book targetBook) {
+        Set<Integer> clientIds = getClientIdsWhoBoughtTargetBook(targetBook);
+
+        Map<Integer, BookstoreBookCounter> purchaseFrequency = getPurchaseFrequency(clientIds, targetBook);
+        Book[] topRelatedBooks = getTopFiveRelatedBooks(purchaseFrequency, targetBook);
+        setRelatedBooks(targetBook, topRelatedBooks);
+    }
+
+     /**
+     * Retrieves the IDs of customers who purchased the specified book in the last 10,000 orders.
+     *
+     * @param targetBook the book to search for in customer orders
+     * @return a set of customer IDs who purchased the target book
+     */
+    private Set<Integer> getClientIdsWhoBoughtTargetBook(Book targetBook) {
+        Set<Integer> clientIds = new HashSet<>();
+        Iterator<Order> orderIterator = ordersByCreation.iterator();
+
+        int orderOldLimit = 10000;
+        for (int orderCount = 0; orderIterator.hasNext() && orderCount < orderOldLimit; orderCount++) {
+            Order order = orderIterator.next();
+            order.getLines().stream()
+                .filter(line -> line.getBook().getId() == targetBook.getId())
+                .findFirst()
+                .ifPresent(line -> clientIds.add(order.getCustomer().getId()));
         }
-        HashMap<Integer, Counter> counters = new HashMap<>();
-        i = ordersByCreation.iterator();
-        while (i.hasNext()) {
-            Order order = i.next();
-            if (clientIds.contains(order.getCustomer().getId())) {
-                order.getLines().forEach((line) -> {
+
+        return clientIds;
+    }
+
+     /**
+     * Counts the frequency of books purchased by the specified customers, excluding the target book.
+     *
+     * @param clientIds set of customer IDs to analyze purchases for
+     * @param targetBook the book to exclude from the counting
+     * @return a map of book IDs to their purchase frequency counters
+     */
+    private Map<Integer, BookstoreBookCounter> getPurchaseFrequency(Set<Integer> clientIds, Book targetBook) {
+        Map<Integer, BookstoreBookCounter> purchaseFrequency = new HashMap<>();
+
+        ordersByCreation.stream()
+            .filter(order -> clientIds.contains(order.getCustomer().getId()))
+            .forEach(order -> {
+                order.getLines().forEach(line -> {
                     Book book = line.getBook();
-                    if (targetBook.getId() != book.getId()) {
-                        Counter counter = counters.get(book.getId());
-                        if (counter == null) {
-                            counter = new Counter();
-                            counter.book = book;
-                            counter.count = 0;
-                            counters.put(book.getId(), counter);
-                        }
-                        counter.count += line.getQty();
+                    if (book.getId() != targetBook.getId()) {
+                        purchaseFrequency.computeIfAbsent(book.getId(), id -> new BookstoreBookCounter(book))
+                                .addQuantity(line.getQty()); //conta os outros livros comprados
                     }
                 });
-            }
+            });
+
+        return purchaseFrequency;
+    }
+
+    /**
+     * Identifies the top five most frequently purchased books from the frequency map.
+     * If fewer than five related books are found, the remaining slots are filled with the target book.
+     *
+     * @param purchaseFrequency map of book purchase frequencies
+     * @param targetBook the original book used to fill empty slots if necessary
+     * @return an array of the top five related books
+     */
+    private Book[] getTopFiveRelatedBooks(Map<Integer, BookstoreBookCounter> purchaseFrequency, Book targetBook) {
+        // Ordena os livros mais vendidos e pega os cinco primeiros
+        List<BookstoreBookCounter> sortedFrequencies = purchaseFrequency.values().stream()
+            .sorted(Comparator.comparingInt(BookstoreBookCounter::getCount).reversed())
+            .collect(Collectors.toList()); // Ordena os livros mais vendidos e pega os cinco primeiro
+
+       int top = 5;
+        Book[] relatedBooks = new Book[top];
+        for (int i = 0; i < Math.min(top, sortedFrequencies.size()); i++) {
+            relatedBooks[i] = sortedFrequencies.get(i).getBook();
         }
-        Counter[] sorted = counters.values().toArray(new Counter[] {});
-        Arrays.sort(sorted, (Counter a, Counter b) -> {
-            if (b.count > a.count) {
-                return 1;
-            }
-            return b.count < a.count ? -1 : 0;
-        });
-        Book[] related = new Book[] { targetBook, targetBook, targetBook,
-                targetBook, targetBook };
-        for (j = 0; j < 5 && j < sorted.length; j++) {
-            related[j] = sorted[j].book;
-        }
-        targetBook.setRelated1(related[0]);
-        targetBook.setRelated2(related[1]);
-        targetBook.setRelated3(related[2]);
-        targetBook.setRelated4(related[3]);
-        targetBook.setRelated5(related[4]);
+        Arrays.fill(relatedBooks, relatedBooks.length, top, targetBook);
+
+        return relatedBooks;
+    }
+
+    /**
+     * Sets the five related book references in the target book.
+     *
+     * @param targetBook the book to update with related recommendations
+     * @param relatedBooks array of five books to set as related items
+     */
+    private void setRelatedBooks(Book targetBook, Book[] relatedBooks) {
+        targetBook.setRelated1(relatedBooks[0]);
+        targetBook.setRelated2(relatedBooks[1]);
+        targetBook.setRelated3(relatedBooks[2]);
+        targetBook.setRelated4(relatedBooks[3]);
+        targetBook.setRelated5(relatedBooks[4]);
     }
 
     /**
@@ -799,23 +816,47 @@ public class Bookstore implements Serializable {
      * @param id - Cart Id.
      * @return uma instância de <code>Cart</code>
      */
-    public Cart getCart(int id) {
-        return cartsById.get(id);
+    public Optional<Cart> getCart(int id) {
+        return cartsById.stream().filter(x -> x.getId() == id).findFirst();
     }
 
     /**
      * Creates a Shopping cart
      *
+     * @param customerId - customer id
      * @param now - Date from now.
      * @return uma instância de <code>Cart</code>
      */
-    public Cart createCart(long now) {
-        int idCart = cartsById.size();
-        Cart cart = new Cart(idCart, new Date(now));
-        cartsById.add(cart);
-        return cart;
+    public Optional<Cart> createCart(int customerId, long now) {
+    	Optional<Customer> customer = getCustomer(customerId);
+    	
+    	if(customer.isEmpty())
+    		return Optional.empty();
+    	
+    	Optional<Cart> createdCart = getCartByCustomer(customerId);
+    	if(createdCart.isEmpty()) {
+            int idCart = cartsById.size();
+            Cart cart = new Cart(idCart, new Date(now), customer.get(), this.getId());
+            cartsById.add(cart);
+            
+            return Optional.of(cart);	
+    	}
+    	
+    	return createdCart;
     }
-
+    
+    /**
+     * Metodo utilizado para buscar um carrinho de um cliente
+     *
+     * @param customerId Id do cliente
+     */
+    public Optional<Cart> getCartByCustomer(int customerId){
+    	
+    	return cartsById.stream()
+				.filter(cart -> cart.getCustomer().getId() == customerId)
+				.findFirst();
+    }
+   
     /**
      * Update shopping cart for one book or many books.
      *
@@ -826,21 +867,24 @@ public class Bookstore implements Serializable {
      * @param now        - Date from now.
      * @return uma instância de <code>Cart</code>
      */
-    public Cart cartUpdate(int cId, Integer bId, List<Integer> bIds,
+    public Optional<Cart> cartUpdate(int cId, Integer bId, List<Integer> bIds,
             List<Integer> quantities, long now) {
-        Cart cart = getCart(cId);
-
+        Optional<Cart> cart = getCart(cId);
+        
+        if(cart.isEmpty())
+        	return Optional.empty();
+        
         if (bId != null) {
-            cart.increaseLine(stockByBook.get(getBook(bId).get()), getBook(bId).get(), 1);
+            cart.get().increaseLine(stockByBook.get(getBook(bId).get()), getBook(bId).get(), 1);
         }
 
         if ((bIds != null && bIds.size() > 0) && (quantities != null && quantities.size() > 0)) {
             for (int i = 0; i < bIds.size(); i++) {
-                cart.changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
+                cart.get().changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
             }
         }
 
-        cart.setTime(new Date(now));
+        cart.get().setTime(new Date(now));
 
         return cart;
     }
@@ -871,8 +915,8 @@ public class Bookstore implements Serializable {
     public Order confirmBuy(int customerId, int cartId, String comment,
             String ccType, long ccNumber, String ccName, Date ccExpiry,
             String shipping, Date shippingDate, int addressId, long now) {
-        Customer customer = getCustomer(customerId);
-        Cart cart = getCart(cartId);
+        Customer customer = getCustomer(customerId).get();
+        Cart cart = getCart(cartId).get();
         Address shippingAddress = customer.getAddress();
         if (addressId != -1) {
             shippingAddress = addressById.get(addressId);
@@ -890,6 +934,17 @@ public class Bookstore implements Serializable {
         return createOrder(customer, new Date(now), cart, comment, shipping,
                 shippingDate, "Pending", customer.getAddress(),
                 shippingAddress, ccTransact);
+    }
+    
+    public Optional<Customer> updateCustomerType(int customerId, dominio.customer.enums.Type type) {
+    	Optional<Customer> customerToChange = getCustomer(customerId);
+    	
+    	if(customerToChange.isEmpty())
+    		return Optional.empty();
+    	
+    	customerToChange.get().setType(type);
+    	
+    	return customerToChange;
     }
 
     private Order createOrder(Customer customer, Date date, Cart cart,
@@ -932,7 +987,7 @@ public class Bookstore implements Serializable {
         populateAddresses(addresses, rand);
         populateCustomers(customers, rand, now);
         populateAuthorTable(authors, rand);
-        populateBooks(items, rand);
+        populateBooks(items,rand);
         populateEvaluation(rand);
         populated = true;
         return true;
@@ -972,7 +1027,8 @@ public class Bookstore implements Serializable {
 
     private static void populateCustomers(int number, Random rand, long now) {
         System.out.print("Creating " + number + " customers...");
-
+        
+        dominio.customer.enums.Type[] typeValues = dominio.customer.enums.Type.values();
         for (int i = 0; i < number; i++) {
             if (i % 10000 == 0) {
                 System.out.print(".");
@@ -993,7 +1049,8 @@ public class Bookstore implements Serializable {
                     new Date(now + 7200000 /* 2 hours */),
                     rand.nextInt(51),
                     TPCW_Util.getRandomBirthdate(rand),
-                    TPCW_Util.getRandomString(rand, 100, 500));
+                    TPCW_Util.getRandomString(rand, 100, 500),
+                    typeValues[new Random().nextInt(typeValues.length)]);
         }
 
     }
@@ -1034,11 +1091,15 @@ public class Bookstore implements Serializable {
         }
     }
 
+    public void publicPopulateBooks(int numberOfBooks) {
+        populateBooks(numberOfBooks, new Random());
+    }
+
     /**
      * Este método irá popular quais assuntos são possíveis de serem buscados
      * pelo consumidor.
      */
-    private static void populateBooks(int number, Random rand) {
+    private static void populateBooks(int number,Random rand) {
         System.out.print("Creating " + number + " books...");
 
         for (int i = 0; i < number; i++) {
@@ -1115,6 +1176,11 @@ public class Bookstore implements Serializable {
         }
     }
 
+    public void publicpopulateOrders(int numberOforders) {
+        Date now = new Date();
+        populateOrders(numberOforders, new Random(), now.getTime());
+}
+
     private void populateOrders(int number, Random rand, long now) {
         System.out.print("Creating " + number + " orders...");
 
@@ -1122,9 +1188,12 @@ public class Bookstore implements Serializable {
             if (i % 10000 == 0) {
                 System.out.print(".");
             }
-
+            
+            Customer customer = getACustomerAnyCustomer(rand);
+            
             int nBooks = TPCW_Util.getRandomInt(rand, 1, 5);
-            Cart cart = new Cart(-1, null);
+            Cart cart = createCart(customer.getId(), now).get();
+            
             String comment = TPCW_Util.getRandomString(rand, 20, 100);
 
             for (int j = 0; j < nBooks; j++) {
@@ -1139,8 +1208,6 @@ public class Bookstore implements Serializable {
 
                 cart.changeLine(stockByBook.get(book), book, quantity);
             }
-
-            Customer customer = getACustomerAnyCustomer(rand);
 
             CCTransaction ccTransact = new CCTransaction(
                     CREDIT_CARDS[rand.nextInt(CREDIT_CARDS.length)],

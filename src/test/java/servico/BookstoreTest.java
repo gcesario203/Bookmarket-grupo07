@@ -1,15 +1,11 @@
 package servico;
 
 import dominio.*;
+import dominio.customer.enums.Type;
 import util.TPCW_Util;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -125,7 +121,7 @@ public class BookstoreTest {
     @Test
     public void testGetCustomer_int() {
         int cId = 0;
-        Customer result = instance.getCustomer(cId);
+        Customer result = instance.getCustomer(cId).get();
         assertEquals(cId, result.getId());
     }
 
@@ -134,7 +130,7 @@ public class BookstoreTest {
      */
     @Test
     public void testGetCustomer_String() {
-        String username = instance.getCustomer(10).getUname();
+        String username = instance.getCustomer(10).get().getUname();
         Customer result = instance.getCustomer(username).get();
         assertEquals(username, result.getUname());
 
@@ -145,22 +141,22 @@ public class BookstoreTest {
      */
     @Test
     public void testCreateCustomer() {
-        String fname = "";
-        String lname = "";
-        String street1 = "";
-        String street2 = "";
-        String city = "";
-        String state = "";
-        String zip = "";
-        String countryName = "";
-        String phone = "";
-        String email = "";
-        double discount = 0.0;
-        Date birthdate = null;
-        String data = "";
-        long now = 0L;
+    	String fname = "João";
+        String lname = "Silva";
+        String street1 = "Rua das Flores, 123";
+        String street2 = "Apto 45B";
+        String city = "São Paulo";
+        String state = "SP";
+        String zip = "01000-000";
+        String countryName = "Brasil";
+        String phone = "+55 11 98765-4321";
+        String email = "joao.silva@email.com";
+        double discount = 10.5;
+        Date birthdate = new Date(90, 4, 15); // 15 de maio de 1990 (ano baseado em 1900)
+        String data = "2025-02-02";
+        long now = System.currentTimeMillis();
 
-        Customer result = instance.createCustomer(fname, lname, street1, street2, city, state, zip, countryName, phone, email, discount, birthdate, data, now);
+        Customer result = instance.createCustomer(fname, lname, street1, street2, city, state, zip, countryName, phone, email, discount, birthdate, data, now, Type.DEFAULT);
         int id = result.getId();
         String uname = result.getUname();
         Date since = result.getSince();
@@ -170,17 +166,18 @@ public class BookstoreTest {
         Address address = result.getAddress();
         Customer expResult = new Customer(id, uname, uname.toLowerCase(), fname,
                 lname, phone, email, since, lastVisit, login, expiration,
-                discount, 0, 0, birthdate, data, address);
-        assertEquals(expResult, result);
+                discount, 0, 0, birthdate, data, address, null);
+        assertTrue(expResult.equals(result));
 
     }
 
     /**
      * Test of refreshCustomerSession method, of class Bookstore.
+     * @throws Exception 
      */
     @Test
-    public void testRefreshCustomerSession() {
-        int cId = 0;
+    public void testRefreshCustomerSession() throws Exception {
+        int cId = 1;
         long now = 0L;
         instance.refreshCustomerSession(cId, now);
     }
@@ -257,48 +254,77 @@ public class BookstoreTest {
         assertEquals(image, book.getImage());
         assertEquals(thumbnail, book.getThumbnail());
     }
-
-    /**
-     * Test of getCart method, of class Bookstore.
-     */
-//    @Test
-    public void testGetCart() {
-        int id = 0;
-
-        Cart expResult = null;
-        Cart result = instance.getCart(id);
-        assertEquals(expResult, result);
-
-    }
-
+    
     /**
      * Test of createCart method, of class Bookstore.
      */
-    private void testCreateCart() {
+    @Test
+    public void testCreateCart() {
         long now = 0L;
-
-        Cart expResult = null;
-        Cart result = instance.createCart(now);
-        assertEquals(expResult, result);
+        Customer customer = instance.getCustomer(1).get();
+        
+        Cart cart = instance.createCart(customer.getId(), now).get();
+        
+        assertTrue(cart.getId() > 0);
+        
+        assertEquals(cart.getId(), instance.getCart(cart.getId()).get().getId());
+        
+        assertEquals(cart.getBookstoreId(), instance.getId());
+        
+        assertEquals(cart.getCustomer().getId(), customer.getId());
+    }
+    
+    /**
+     * Test of getCart method, of class Bookstore.
+     */
+    @Test
+    public void testGetCart() {
+    	Cart cart = instance.getCart(1).get();
+    	
+    	assertFalse(cart == null);
 
     }
 
     /**
      * Test of cartUpdate method, of class Bookstore.
      */
-//    @Test
+    @Test
     public void testCartUpdate() {
-        testCreateCart();
-        int cId = 0;
-        Integer bId = 1;
-        List<Integer> bIds = Arrays.asList(10, 20);
-        List<Integer> quantities = Arrays.asList(10, 20);
+    	Cart cart = instance.getCart(1).get();
+    	Book book = instance.getABookAnyBook(new Random(4));
+    	
         long now = 0L;
+        
+        Cart result = instance.cartUpdate(cart.getId(), book.getId(), null, null, now).get();
+        
+        
+        assertTrue(result.getLines().stream().anyMatch(x -> x.getBook().getId() == book.getId()));
 
-        Cart expResult = null;
-        Cart result = instance.cartUpdate(cId, bId, bIds, quantities, now);
-        assertEquals(expResult, result);
-
+    }
+    
+    @Test
+    public void shouldNotCreateANewCartWhenACartForTheCustomerAlreadyExists() {
+    	Cart cart = instance.getCart(1).get();
+    	
+    	Customer customer = cart.getCustomer();
+    	
+    	Cart cartCreated = instance.createCart(customer.getId(), 0L).get();
+    	
+    	assertEquals(cart.getId(), cartCreated.getId());
+    	
+    	assertTrue(cart.getTime() == cartCreated.getTime());
+    }
+    
+    @Test
+    public void shouldGetAEmptyCartWhenCreatingForAInvalidCustomer() {
+    	Optional<Cart> cart = instance.createCart(-1, 0L);
+    	
+    	assertEquals(cart.isEmpty(), true);
+    }
+    
+    @Test
+    public void shouldGetAEmptyCartWhenFindingAInexistentCart() {
+    	assertTrue(instance.getCart(-1).isEmpty());
     }
 
     /**
@@ -306,17 +332,18 @@ public class BookstoreTest {
      */
 //    @Test
     public void testConfirmBuy() {
-        int customerId = 0;
-        int cartId = 0;
-        String comment = "";
-        String ccType = "";
-        long ccNumber = 0L;
-        String ccName = "";
-        Date ccExpiry = null;
-        String shipping = "";
-        Date shippingDate = null;
-        int addressId = 0;
-        long now = 0L;
+    	int customerId = 1;
+        int cartId = 67890;
+        String comment = "Cliente frequente, gosta de livros de ficção.";
+        String ccType = "Visa";
+        long ccNumber = 4111111111111111L; // Número fictício para exemplo
+        String ccName = "João Silva";
+        Date ccExpiry = new Date(126, 11, 31); // 31 de dezembro de 2026 (anos baseados em 1900)
+        String shipping = "Expresso";
+        Date shippingDate = new Date(); // Data atual
+        int addressId = 54321;
+        long now = System.currentTimeMillis();
+        
         Order expResult = null;
         Order result = instance.confirmBuy(customerId, cartId, comment, ccType, ccNumber, ccName, ccExpiry, shipping, shippingDate, addressId, now);
         assertEquals(expResult, result);
@@ -329,7 +356,7 @@ public class BookstoreTest {
     
     @Test(expected = IOException.class)
     public void cannotCreateReviewWithInvalidValue() throws IOException {
-    	Customer customer = instance.getCustomer(1);
+    	Customer customer = instance.getCustomer(1).get();
     	
     	Optional<Book> book = instance.getBook(1);
     	
@@ -404,12 +431,12 @@ public class BookstoreTest {
     public void cannotCreateAReviewWithoutAExistingCustomer() throws IOException {
     	Book book = instance.getBook(1).get();
     	
-    	instance.createReview(new Customer(-2, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, null, null, null), book, 2);
+    	instance.createReview(new Customer(-2, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, null, null, null, null), book, 2);
     }
     
     @Test(expected = IOException.class)
     public void cannotCreateAReviewWithoutAExistingBook() throws IOException {
-    	Customer customer = instance.getCustomer(1);
+    	Customer customer = instance.getCustomer(1).get();
     	
     	instance.createReview(customer, new Book(-2, null, null, null, null, null, null, null, 0, null, null, 0, null, null, null), 0);
     }
@@ -498,7 +525,37 @@ public class BookstoreTest {
         instance.updateStock(book.getId(), newCost);
         assertEquals(newCost, instance.getStock(book.getId()).getCost(), 0.0);
     }
-
+    
+    @Test
+    public void shouldUpdateACustomerType() {
+    	Customer customer = instance.getCustomer(1).get();
+    	
+    	Customer updatedCustomer = instance.updateCustomerType(customer.getId(), Type.SUBSCRIBER).get();
+    	
+    	assertTrue(customer.getId() == updatedCustomer.getId() && updatedCustomer.getType() == Type.SUBSCRIBER);
+    }
+    
+    @Test
+    public void shouldCreateACustomerWithDefaultTypeWhenTypeParamIsEmpty() {
+    	String fname = "João";
+        String lname = "Silva";
+        String street1 = "Rua das Flores, 123";
+        String street2 = "Apto 45B";
+        String city = "São Paulo";
+        String state = "SP";
+        String zip = "01000-000";
+        String countryName = "Brasil";
+        String phone = "+55 11 98765-4321";
+        String email = "joao.silva@email.com";
+        double discount = 10.5;
+        Date birthdate = new Date(90, 4, 15); // 15 de maio de 1990 (ano baseado em 1900)
+        String data = "2025-02-02";
+        long now = System.currentTimeMillis();
+        
+        Customer newCustomer = instance.createCustomer(fname, lname, street1, street2, city, state, zip, countryName, phone, email, discount, birthdate, data, now, null);
+        
+        assertTrue(newCustomer.getType() == Type.DEFAULT);
+    }
 
     /**
      * Test of getRecommendationByItens method, of class Bookstore.
@@ -524,5 +581,52 @@ public class BookstoreTest {
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
+    }
+    
+    @Test
+    public void shouldUpdateRelatedBooks() {
+    	Book randomBook = instance.getABookAnyBook(new Random(0));
+    	
+    	Book oldRelated1 = randomBook.getRelated1();
+    	Book oldRelated2 = randomBook.getRelated2();
+    	Book oldRelated3 = randomBook.getRelated3();
+    	Book oldRelated4 = randomBook.getRelated4();
+    	Book oldRelated5 = randomBook.getRelated5();
+    	
+    	instance.updateRelatedBooks(randomBook);
+    	
+    	Book updatedBook = instance.getBook(randomBook.getId()).get();
+    	
+    	assertFalse(oldRelated1.getId() == updatedBook.getRelated1().getId());
+    	assertFalse(oldRelated2.getId() == updatedBook.getRelated2().getId());
+    	assertFalse(oldRelated3.getId() == updatedBook.getRelated3().getId());
+    	assertFalse(oldRelated4.getId() == updatedBook.getRelated4().getId());
+    	assertFalse(oldRelated5.getId() == updatedBook.getRelated5().getId());
+    }
+
+    @Test
+    public void shouldReturnRightHashmapOnConsolidatedBookSales() {
+        HashMap<Book, Integer> consolidatedSales = instance.getConsolidatedBookSales();
+        assertNotNull(consolidatedSales);
+        List<Order> orders = instance.getOrdersById();
+        for (Map.Entry<Book, Integer> entry : consolidatedSales.entrySet()) {
+            Book book = entry.getKey();
+            Integer sales = entry.getValue();
+            for (Order order : orders) {
+                for (OrderLine line : order.getLines()) {
+                    Book orderBook = line.getBook();
+                    if (book.getId() == orderBook.getId()) {
+                        assertTrue(sales >= line.getQty());
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void shouldReturnNullOnConsolidatedBookSales(){
+        Bookstore bookstore = new Bookstore(5);
+        HashMap<Book, Integer> consolidatedSales = bookstore.getConsolidatedBookSales();
+        assertTrue(consolidatedSales.size() == 0);
     }
 }

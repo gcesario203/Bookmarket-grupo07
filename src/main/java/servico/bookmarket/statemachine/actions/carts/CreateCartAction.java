@@ -14,6 +14,7 @@ public class CreateCartAction extends ExpecificBookstoreAction {
     private static final long serialVersionUID = 8255648428785854052L;
 
     long now;
+    int customerId;
 
     /**
      * Método construtor do carrinho de compras para um
@@ -21,9 +22,11 @@ public class CreateCartAction extends ExpecificBookstoreAction {
      *
      * @param now
      */
-    public CreateCartAction(int idBookstore, long now) {
+    public CreateCartAction(int idBookstore, long now, int customerId) {
     	super(idBookstore);
         this.now = now;
+        this.customerId = customerId;
+        
     }
 
     /**
@@ -35,6 +38,6 @@ public class CreateCartAction extends ExpecificBookstoreAction {
      */
     @Override
     public Object executeOnBookstore(Stream<Bookstore> bookstore) {
-        return getBookstoreById(bookstore).createCart(now);
+        return getBookstoreById(bookstore).createCart(customerId, now);
     }
 }
