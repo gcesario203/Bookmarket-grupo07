@@ -12,6 +12,7 @@ import servico.bookstore.Bookstore;
 import servico.bookmarket.exceptions.UmbrellaException;
 import servico.bookmarket.statemachine.StateMachine;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
+import servico.bookmarket.statemachine.actions.books.GetMinimumBookPriceAction;
 import servico.bookmarket.statemachine.actions.books.GetBookPriceAverageAction;
 import servico.bookmarket.statemachine.actions.books.UpdateBookAction;
 import servico.bookmarket.statemachine.actions.carts.CartUpdateAction;
@@ -662,6 +663,19 @@ public class Bookmarket {
 
     private static Date randomShippingDate(long now) {
         return new Date(now + 86400000 /* a day */ * (random.nextInt(7) + 1));
+    }
+    
+    /**
+     * Metodo utilizado para pegar o menor custo de um livro determinado
+     * das bookstores
+     *
+     * @param bookId
+     * @return Um Optional<Stock>, para caso não existir nenhum stock do livro em
+     * nenhuma bookstore, sendo informado no objeto Stock, em qual bookstore ele se
+     * encontra
+     */
+    public static Optional<Stock> getMinimumBookPrice(int bookId){
+    	return (Optional<Stock>) stateMachine.execute(new GetMinimumBookPriceAction(bookId));
     }
 
     /**
