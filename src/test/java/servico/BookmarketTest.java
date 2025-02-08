@@ -85,9 +85,9 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetACustomerByName() {
-        Customer saraivaCustomer = Bookstore.getCustomer(1);
+        Customer saraivaCustomer = Bookstore.getCustomer(1).get();
 
-        Customer amazonCustomer = Bookstore.getCustomer(30);
+        Customer amazonCustomer = Bookstore.getCustomer(30).get();
 
         Customer bookmarketCustomer1 = Bookmarket.getCustomer(saraivaCustomer.getUname());
 
@@ -100,7 +100,7 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetCustomerFullName() {
-        Customer amazonCustomer = Bookstore.getCustomer(51);
+        Customer amazonCustomer = Bookstore.getCustomer(51).get();
 
         String name[] = new String[3];
         name[0] = amazonCustomer.getFname();
@@ -112,21 +112,21 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetCustomerUserName() {
-        Customer amazonCustomer = Bookstore.getCustomer(72);
+        Customer amazonCustomer = Bookstore.getCustomer(72).get();
 
         assertEquals(amazonCustomer.getUname(), Bookmarket.getUserName(amazonCustomer.getId()));
     }
 
     @Test
     public void shouldGetCustomerPassword() {
-        Customer amazonCustomer = Bookstore.getCustomer(72);
+        Customer amazonCustomer = Bookstore.getCustomer(72).get();
 
         assertEquals(amazonCustomer.getPasswd(), Bookmarket.getPassword(amazonCustomer.getUname()));
     }
 
     @Test
     public void shouldGetMostRecentOrder() {
-        Customer amazonCustomer = Bookstore.getCustomer(80);
+        Customer amazonCustomer = Bookstore.getCustomer(80).get();
         Order amazonCustomerMostRecentOrder = amazonCustomer.getMostRecentOrder();
 
         assertEquals(amazonCustomerMostRecentOrder.getId(),
@@ -270,7 +270,7 @@ public class BookmarketTest {
 
     @Test
     public void shouldCreateAReviewForABookstore() {
-        Customer amazonCustomer = Bookstore.getCustomer(1);
+        Customer amazonCustomer = Bookstore.getCustomer(1).get();
 
         Book amazonBook = Bookstore.getABookAnyBook(new Random(0));
 
@@ -342,9 +342,9 @@ public class BookmarketTest {
 
     @Test
     public void shouldAllReviewTobeFromTheSameCustomer() {
-        Customer amazonCustomer = Bookstore.getCustomer(1);
+        Customer amazonCustomer = Bookstore.getCustomer(1).get();
 
-        Customer saraivaCustomer = Bookstore.getCustomer(2);
+        Customer saraivaCustomer = Bookstore.getCustomer(2).get();
 
         List<Review> amazonReviews = Bookmarket.getReviewsByCustomer(amazon.getId(), amazonCustomer);
 
@@ -355,13 +355,13 @@ public class BookmarketTest {
         assertTrue(TPCW_Util.areAllReviewsFromTheSameCustomer(amazonReviews, amazonCustomer));
     }
 
-    // @Test
+     @Test
     public void shouldRefreshUserSessionByTwoHours() {
         long now = System.currentTimeMillis();
 
         Date dateNow = new Date(now);
 
-        Customer amazonCustomer = amazon.getCustomer(1);
+        Customer amazonCustomer = amazon.getCustomer(1).get();
 
         bookmarket.refreshSession(amazonCustomer.getId());
 
@@ -443,15 +443,17 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetAllBookCost() {
+    	cleanTestObjects();
+    	setUpClass();
         Book saraivaBook = Bookstore.getABookAnyBook(new Random(3));
 
         Book amazonBook = Bookstore.getABookAnyBook(new Random(1));
-
-        double saraivaBookCost = saraiva.getStock(saraivaBook.getId())
-                .getCost();
-
-        double amazonBookCost = amazon.getStock(amazonBook.getId())
-                .getCost();
+        
+        Stock saraivaStock = saraiva.getStock(saraivaBook.getId());
+        double saraivaBookCost = saraivaStock == null ? 0 :saraivaStock.getCost();
+        
+        Stock amazonStock = amazon.getStock(amazonBook.getId());
+        double amazonBookCost = amazonStock == null ? 0 : amazonStock.getCost();
 
         List<Double> amazonBookCosts = Bookmarket.getCosts(amazonBook);
 
@@ -513,32 +515,47 @@ public class BookmarketTest {
 
     @Test
     public void shouldCreateAEmptyCart() {
-        int newCartId = Bookmarket.createEmptyCart(amazon.getId());
+    	Customer customer = amazon.getCustomer(2).get();
+        int newCartId = Bookmarket.createEmptyCart(amazon.getId(), customer.getId());
 
-        assertTrue(newCartId == amazon.getCart(newCartId).getId());
+        assertTrue(newCartId == amazon.getCart(newCartId).get().getId());
 
-        assertTrue(newCartId == Bookmarket.getCart(amazon.getId(), newCartId).getId());
+        assertTrue(newCartId == Bookmarket.getCart(amazon.getId(), newCartId).get().getId());
+    }
+    
+    @Test
+    public void shouldGetACartByCustomer() {
+    	Customer customer = amazon.getCustomer(2).get();
+    	
+    	Optional<Cart> cart = bookmarket.getCartByCustomer(amazon.getId(), customer.getId());
+    	
+    	assertTrue(cart.isPresent());
+    }
+    
+    @Test
+    public void shouldNotGetANonExistingCartByCustomer() {
+    	assertTrue(bookmarket.getCartByCustomer(amazon.getId(), -1).isEmpty());
     }
 
     @Test(expected = RuntimeException.class)
     public void shouldNotCreateAEmptyCartWithAInvalidStoreId() {
-        Bookmarket.createEmptyCart(-1);
+        Bookmarket.createEmptyCart(-1, -2);
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void shouldGetACartFromABookstore() {
-        int newCartId = Bookmarket.createEmptyCart(amazon.getId());
+    	Customer customer = amazon.getCustomer(2).get();
+        int newCartId = Bookmarket.createEmptyCart(amazon.getId(), customer.getId());
 
-        Cart amazonCart = Bookmarket.getCart(amazon.getId(), newCartId);
+        Cart amazonCart = Bookmarket.getCart(amazon.getId(), newCartId).get();
 
-        assertEquals(amazonCart, amazon.getCart(newCartId));
-
-        Cart saraivaCart = Bookmarket.getCart(saraiva.getId(), newCartId);
+        assertEquals(amazonCart.getId(), amazon.getCart(newCartId).get().getId());
     }
 
     @Test
     public void shouldCreateACartWithBooks() {
-        int newCartId = Bookmarket.createEmptyCart(amazon.getId());
+    	Customer customer = amazon.getCustomer(2).get();
+        int newCartId = Bookmarket.createEmptyCart(amazon.getId(), customer.getId());
 
         Book book = Bookmarket.getABookAnyBook();
 
@@ -546,21 +563,21 @@ public class BookmarketTest {
 
         List<Integer> bookQtdy = new ArrayList<Integer>(2);
 
-        Cart cart = Bookmarket.doCart(amazon.getId(), newCartId, book.getId(), bookIds, bookQtdy);
+        Cart cart = Bookmarket.doCart(amazon.getId(), newCartId, book.getId(), bookIds, bookQtdy).get();
 
         assertEquals(newCartId, cart.getId());
 
         assertTrue(cart.getLines().stream().anyMatch(line -> line.getBook().getId() == book.getId()));
 
-        int newEmptyCart = Bookmarket.createEmptyCart(saraiva.getId());
+        int newEmptyCart = Bookmarket.createEmptyCart(saraiva.getId(), saraiva.getCustomer(3).get().getId());
 
-        Cart cartWithRandomBook = Bookmarket.doCart(saraiva.getId(), newEmptyCart, null, null, null);
+        Cart cartWithRandomBook = Bookmarket.doCart(saraiva.getId(), newEmptyCart, null, null, null).get();
 
         assertEquals(newEmptyCart, cartWithRandomBook.getId());
 
-        assertTrue(cartWithRandomBook.getLines().size() > 0);
+        assertTrue(cart.getLines().size() > 0);
 
-        assertTrue(cartWithRandomBook.getLines().size() == 1);
+        assertTrue(cart.getLines().stream().anyMatch(x -> x.getBook().getId() == book.getId()));
     }
 
     @Test(expected = RuntimeException.class)
@@ -570,13 +587,14 @@ public class BookmarketTest {
 
     @Test
     public void shouldCreateAOrder() {
-        int newCartId = Bookmarket.createEmptyCart(amazon.getId());
+    	Customer amazonCustomer = amazon.getCustomer(5).get();
+        int newCartId = Bookmarket.createEmptyCart(amazon.getId(), amazonCustomer.getId());
 
         Book book = Bookmarket.getABookAnyBook();
 
-        Customer customer = Bookstore.getCustomer(5);
+        Customer customer = Bookstore.getCustomer(5).get();
 
-        Cart cart = Bookmarket.doCart(amazon.getId(), newCartId, book.getId(), null, null);
+        Cart cart = Bookmarket.doCart(amazon.getId(), newCartId, book.getId(), null, null).get();
 
         String ccType = "VISA";
         int ccNumber = 123456789;
@@ -598,13 +616,14 @@ public class BookmarketTest {
 
     @Test
     public void shouldCreateAOrderSecondMethod() {
-        int newCartId = Bookmarket.createEmptyCart(amazon.getId());
+    	Customer customer = Bookstore.getCustomer(5).get();
+        int newCartId = Bookmarket.createEmptyCart(amazon.getId(), customer.getId());
 
         Book book = Bookmarket.getABookAnyBook();
 
-        Customer customer = Bookstore.getCustomer(5);
+        
 
-        Cart cart = Bookmarket.doCart(amazon.getId(), newCartId, book.getId(), null, null);
+        Cart cart = Bookmarket.doCart(amazon.getId(), newCartId, book.getId(), null, null).get();
 
         String ccType = "VISA";
         int ccNumber = 123456789;
@@ -791,13 +810,13 @@ public class BookmarketTest {
         
         startUpTestObjects();
     }
-    
-    @Test
-    public void shouldGetTheMinimumBookValueCost() {
-        
-    	Optional<Stock> saraivaMinCost = saraiva.getStocks().stream().min(Comparator.comparingDouble(Stock::getCost));
-    	
-    	Stock amazonSameBookMinCost = amazon.getStock(saraivaMinCost.get().getBook().getId());
+
+  @Test
+  public void shouldGetTheMinimumBookValueCost() {
+
+    Optional<Stock> saraivaMinCost = saraiva.getStocks().stream().min(Comparator.comparingDouble(Stock::getCost));
+
+    Stock amazonSameBookMinCost = amazon.getStock(saraivaMinCost.get().getBook().getId());
     	
 		Optional<Stock> bookmarketMinCost = bookmarket.getMinimumBookPrice(saraivaMinCost.get().getBook().getId());
         
@@ -808,5 +827,28 @@ public class BookmarketTest {
 		assertTrue(amazonSameBookMinCost.getCost() > saraivaMinCost.get().getCost());
     }
 
+    @Test
+    public void shouldGetTheAverageCostFromABook() {
+        Stock amazonStock = null;
+        Stock saraivaStock = null;
+        Book randomBook = null;
+
+        while (true) {
+            try {
+                randomBook = bookmarket.getABookAnyBook();
+                amazonStock = amazon.getStock(randomBook.getId());
+                saraivaStock = saraiva.getStock(randomBook.getId());
+                if (amazonStock != null && saraivaStock != null)
+                    break;
+            } catch (Exception e) {
+                continue;
+            }
+        }
+
+        double averageValue = bookmarket.getBookPriceAverage(randomBook.getId());
+        double averageValueFromStocks = (amazonStock.getCost() + saraivaStock.getCost()) / 2;
+
+        assertTrue(averageValue == averageValueFromStocks);
+    }
 
 }

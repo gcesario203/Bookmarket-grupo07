@@ -36,7 +36,7 @@ public class ReviewTest {
     
     @Test(expected = IOException.class)
     public void ShouldThrowExceptionWhenCreateWithInvalidValueBiggerThanFive() throws IOException {
-    	Customer customer = instance.getCustomer(1);
+    	Customer customer = instance.getCustomer(1).get();
     	
     	Optional<Book> book = instance.getBook(1);
     	
@@ -46,7 +46,7 @@ public class ReviewTest {
 
     @Test(expected = IOException.class)
     public void ShouldThrowExceptionWhenCreateWithInvalidValueSmallerThanZero() throws IOException {
-    	Customer customer = instance.getCustomer(1);
+    	Customer customer = instance.getCustomer(1).get();
 
     	Optional<Book> book = instance.getBook(1);
 
@@ -56,7 +56,7 @@ public class ReviewTest {
 
     @Test
     public void ShouldCreateReviewWithValidValue() throws IOException {
-    	Customer customer = instance.getCustomer(1);
+    	Customer customer = instance.getCustomer(1).get();
 
     	Optional<Book> book = instance.getBook(1);
 
@@ -68,7 +68,7 @@ public class ReviewTest {
 
     @Test
     public void ShouldCreateReviewsWithSequentialIds() throws IOException {
-    	Customer customer = instance.getCustomer(1);
+    	Customer customer = instance.getCustomer(1).get();
 
     	Optional<Book> book = instance.getBook(1);
 

@@ -13,9 +13,12 @@ import servico.bookmarket.exceptions.UmbrellaException;
 import servico.bookmarket.statemachine.StateMachine;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 import servico.bookmarket.statemachine.actions.books.GetMinimumBookPriceAction;
+import servico.bookmarket.statemachine.actions.books.GetBookPriceAverageAction;
 import servico.bookmarket.statemachine.actions.books.UpdateBookAction;
 import servico.bookmarket.statemachine.actions.carts.CartUpdateAction;
 import servico.bookmarket.statemachine.actions.carts.CreateCartAction;
+import servico.bookmarket.statemachine.actions.carts.GetCartByCustomer;
+import servico.bookmarket.statemachine.actions.carts.GetCartById;
 import servico.bookmarket.statemachine.actions.customers.CreateCustomerAction;
 import servico.bookmarket.statemachine.actions.customers.RefreshCustomerSessionAction;
 import servico.bookmarket.statemachine.actions.orders.ConfirmBuyAction;
@@ -116,7 +119,7 @@ public class Bookmarket {
      */
     public static String[] getName(int c_id) {
 
-        Customer customer = Bookstore.getCustomer(c_id);
+        Customer customer = Bookstore.getCustomer(c_id).get();
 
         String name[] = new String[3];
         name[0] = customer.getFname();
@@ -133,7 +136,7 @@ public class Bookmarket {
      * @return String Nome de usuário do Customer
      */
     public static String getUserName(int C_ID) {
-        return Bookstore.getCustomer(C_ID).getUname();
+        return Bookstore.getCustomer(C_ID).get().getUname();
     }
 
     /**
@@ -347,7 +350,8 @@ public class Bookmarket {
      * @return Lista com os preços de um determinado livro dentro do marketPlace
      */
     public static List<Double> getCosts(Book book) {
-        return getBookstoreStream().map(store -> store.getStock(book.getId())).map(stock -> stock.getCost())
+                return getBookstoreStream().map(store -> store.getStock(book.getId())).map(stock -> (Double) (stock == null ? 0.0 : stock.getCost()))
+
                 .collect(Collectors.toList());
     }
 
@@ -507,12 +511,13 @@ public class Bookmarket {
      * {@linkplain Bookstore}.
      *
      * @param storeId
+     * @param customerId
      * @return
      */
-    public static int createEmptyCart(int storeId) {
+    public static int createEmptyCart(int storeId, int customerId) {
         try {
-            return ((Cart) stateMachine.execute(new CreateCartAction(storeId,
-                    System.currentTimeMillis()))).getId();
+            return ((Optional<Cart>) stateMachine.execute(new CreateCartAction(storeId,
+                    System.currentTimeMillis(), customerId))).get().getId();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -529,15 +534,15 @@ public class Bookmarket {
      * @param quantities
      * @return
      */
-    public static Cart doCart(int storeId, int SHOPPING_ID, Integer I_ID, List<Integer> ids,
+    public static Optional<Cart> doCart(int storeId, int SHOPPING_ID, Integer I_ID, List<Integer> ids,
             List<Integer> quantities) {
         try {
-            Cart cart = (Cart) stateMachine.execute(new CartUpdateAction(storeId,
+        	Optional<Cart> cart = (Optional<Cart>) stateMachine.execute(new CartUpdateAction(storeId,
                     SHOPPING_ID, I_ID, ids, quantities,
                     System.currentTimeMillis()));
-            if (cart.getLines().isEmpty()) {
+            if (cart.get().getLines().isEmpty()) {
                 Book book = getExistingBookInAStock(storeId);
-                cart = (Cart) stateMachine.execute(new CartUpdateAction(storeId,
+                cart = (Optional<Cart>) stateMachine.execute(new CartUpdateAction(storeId,
                         SHOPPING_ID, book.getId(), new ArrayList<>(),
                         new ArrayList<>(), System.currentTimeMillis()));
             }
@@ -563,14 +568,18 @@ public class Bookmarket {
      * @param storeId
      * @return
      */
-    public static Cart getCart(int storeId, int SHOPPING_ID) {
-        Bookstore bookstore = getBookstoreStream()
-                .filter(store -> store.getId() == storeId)
-                .findFirst()
-                .get();
-        synchronized (bookstore) {
-            return bookstore.getCart(SHOPPING_ID);
-        }
+    public static Optional<Cart> getCart(int storeId, int SHOPPING_ID) {
+    	return (Optional<Cart>)stateMachine.execute(new GetCartById(storeId, SHOPPING_ID));
+    }
+    
+    /**
+     * Metodo utilizado para buscar um carrinho de um cliente
+     *
+     * @param storeId Id do bookstore cujo qual é necessario buscar o carrinho
+     * @param customerId Id do cliente
+     */
+    public static Optional<Cart> getCartByCustomer(int storeId, int customerId){
+    	return (Optional<Cart>)stateMachine.execute(new GetCartByCustomer(storeId, customerId));
     }
 
     /**
@@ -636,6 +645,16 @@ public class Bookmarket {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    /**
+     * Método utilizado para pegar o valor medio do livro em todas as bookstores
+     *
+     * @param bookId
+     * @return o preço medio do livro nas bookstores
+     */
+    public static double getBookPriceAverage(int bookId) {
+    	return (double) stateMachine.execute(new GetBookPriceAverageAction(bookId));
     }
 
     private static String randomComment() {

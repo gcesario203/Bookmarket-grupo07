@@ -35,7 +35,11 @@ public class RefreshCustomerSessionAction extends BookstoreAction {
      */
     @Override
     public Object executeOnBookstore(Stream<Bookstore> bookstore) {
-        Bookstore.refreshCustomerSession(cId, now);
+        try {
+			Bookstore.refreshCustomerSession(cId, now);
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
         return null;
     }
 }
