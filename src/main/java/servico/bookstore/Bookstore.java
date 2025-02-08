@@ -720,7 +720,7 @@ public class Bookstore implements Serializable {
     public void updateRelatedBooks(Book targetBook) {
         Set<Integer> clientIds = getClientIdsWhoBoughtTargetBook(targetBook);
 
-        Map<Integer, BookstoreBookCounter> purchaseFrequency = countBooksBoughtByClients(clientIds, targetBook);
+        Map<Integer, BookstoreBookCounter> purchaseFrequency = getPurchaseFrequency(clientIds, targetBook);
         Book[] topRelatedBooks = getTopFiveRelatedBooks(purchaseFrequency, targetBook);
         setRelatedBooks(targetBook, topRelatedBooks);
     }
@@ -754,7 +754,7 @@ public class Bookstore implements Serializable {
      * @param targetBook the book to exclude from the counting
      * @return a map of book IDs to their purchase frequency counters
      */
-    private Map<Integer, BookstoreBookCounter> countBooksBoughtByClients(Set<Integer> clientIds, Book targetBook) {
+    private Map<Integer, BookstoreBookCounter> getPurchaseFrequency(Set<Integer> clientIds, Book targetBook) {
         Map<Integer, BookstoreBookCounter> purchaseFrequency = new HashMap<>();
 
         ordersByCreation.stream()
