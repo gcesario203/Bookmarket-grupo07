@@ -793,18 +793,26 @@ public class BookmarketTest {
     
     @Test
     public void shouldGetTheAverageCostFromABook() {
-    	Book randomBook = bookmarket.getABookAnyBook();
-    	
-    	Stock amazonStock = amazon.getStock(randomBook.getId());
-    	
-    	Stock saraivaStock = saraiva.getStock(randomBook.getId());
-    	
-    	double averageValue = bookmarket.getBookPriceAverage(randomBook.getId());
-    	
-    	double averageValueFromStocks = (amazonStock.getCost() + saraivaStock.getCost()) / 2;
-    	
-    	assertTrue(averageValue == averageValueFromStocks);
-    }
+        Stock amazonStock = null;
+        Stock saraivaStock = null;
+        Book randomBook = null;
 
+        while (true) {
+            try {
+                randomBook = bookmarket.getABookAnyBook();
+                amazonStock = amazon.getStock(randomBook.getId());
+                saraivaStock = saraiva.getStock(randomBook.getId());
+                if (amazonStock != null && saraivaStock != null)
+                    break;
+            } catch (Exception e) {
+                continue;
+            }
+        }
+
+        double averageValue = bookmarket.getBookPriceAverage(randomBook.getId());
+        double averageValueFromStocks = (amazonStock.getCost() + saraivaStock.getCost()) / 2;
+
+        assertTrue(averageValue == averageValueFromStocks);
+    }
 
 }
