@@ -256,8 +256,8 @@ public class Bookstore implements Serializable {
      * @param cId ID do Consumidor
      * @return customerById ID do Consumidor
      */
-    public static Customer getCustomer(int cId) {
-        return customersById.get(cId);
+    public static Optional<Customer> getCustomer(int cId) {
+        return customersById.stream().filter(c -> c.getId() == cId).findFirst();
     }
 
     /**
@@ -431,13 +431,16 @@ public class Bookstore implements Serializable {
      *
      * @param cId Id do Consumidor
      * @param now Tempo / hora atual
+     * @throws Exception 
      */
-    public static void refreshCustomerSession(int cId, long now) {
-        Customer customer = getCustomer(cId);
-        if (customer != null) {
-            customer.setLogin(new Date(now));
-            customer.setExpiration(new Date(now + 7200000 /* 2 hours */));
-        }
+    public static void refreshCustomerSession(int cId, long now) throws Exception {
+        Optional<Customer> customer = getCustomer(cId);
+        
+        if(customer.isEmpty())
+        	throw new Exception("Customer not exists");
+        
+        customer.get().setLogin(new Date(now));
+        customer.get().setExpiration(new Date(now + 7200000 /* 2 hours */));
     }
 
     /**
@@ -813,23 +816,47 @@ public class Bookstore implements Serializable {
      * @param id - Cart Id.
      * @return uma instância de <code>Cart</code>
      */
-    public Cart getCart(int id) {
-        return cartsById.get(id);
+    public Optional<Cart> getCart(int id) {
+        return cartsById.stream().filter(x -> x.getId() == id).findFirst();
     }
 
     /**
      * Creates a Shopping cart
      *
+     * @param customerId - customer id
      * @param now - Date from now.
      * @return uma instância de <code>Cart</code>
      */
-    public Cart createCart(long now) {
-        int idCart = cartsById.size();
-        Cart cart = new Cart(idCart, new Date(now));
-        cartsById.add(cart);
-        return cart;
+    public Optional<Cart> createCart(int customerId, long now) {
+    	Optional<Customer> customer = getCustomer(customerId);
+    	
+    	if(customer.isEmpty())
+    		return Optional.empty();
+    	
+    	Optional<Cart> createdCart = getCartByCustomer(customerId);
+    	if(createdCart.isEmpty()) {
+            int idCart = cartsById.size();
+            Cart cart = new Cart(idCart, new Date(now), customer.get(), this.getId());
+            cartsById.add(cart);
+            
+            return Optional.of(cart);	
+    	}
+    	
+    	return createdCart;
     }
-
+    
+    /**
+     * Metodo utilizado para buscar um carrinho de um cliente
+     *
+     * @param customerId Id do cliente
+     */
+    public Optional<Cart> getCartByCustomer(int customerId){
+    	
+    	return cartsById.stream()
+				.filter(cart -> cart.getCustomer().getId() == customerId)
+				.findFirst();
+    }
+   
     /**
      * Update shopping cart for one book or many books.
      *
@@ -840,21 +867,24 @@ public class Bookstore implements Serializable {
      * @param now        - Date from now.
      * @return uma instância de <code>Cart</code>
      */
-    public Cart cartUpdate(int cId, Integer bId, List<Integer> bIds,
+    public Optional<Cart> cartUpdate(int cId, Integer bId, List<Integer> bIds,
             List<Integer> quantities, long now) {
-        Cart cart = getCart(cId);
-
+        Optional<Cart> cart = getCart(cId);
+        
+        if(cart.isEmpty())
+        	return Optional.empty();
+        
         if (bId != null) {
-            cart.increaseLine(stockByBook.get(getBook(bId).get()), getBook(bId).get(), 1);
+            cart.get().increaseLine(stockByBook.get(getBook(bId).get()), getBook(bId).get(), 1);
         }
 
         if ((bIds != null && bIds.size() > 0) && (quantities != null && quantities.size() > 0)) {
             for (int i = 0; i < bIds.size(); i++) {
-                cart.changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
+                cart.get().changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
             }
         }
 
-        cart.setTime(new Date(now));
+        cart.get().setTime(new Date(now));
 
         return cart;
     }
@@ -885,8 +915,8 @@ public class Bookstore implements Serializable {
     public Order confirmBuy(int customerId, int cartId, String comment,
             String ccType, long ccNumber, String ccName, Date ccExpiry,
             String shipping, Date shippingDate, int addressId, long now) {
-        Customer customer = getCustomer(customerId);
-        Cart cart = getCart(cartId);
+        Customer customer = getCustomer(customerId).get();
+        Cart cart = getCart(cartId).get();
         Address shippingAddress = customer.getAddress();
         if (addressId != -1) {
             shippingAddress = addressById.get(addressId);
@@ -907,14 +937,14 @@ public class Bookstore implements Serializable {
     }
     
     public Optional<Customer> updateCustomerType(int customerId, dominio.customer.enums.Type type) {
-    	Customer customerToChange = getCustomer(customerId);
+    	Optional<Customer> customerToChange = getCustomer(customerId);
     	
-    	if(customerToChange == null)
+    	if(customerToChange.isEmpty())
     		return Optional.empty();
     	
-    	customerToChange.setType(type);
+    	customerToChange.get().setType(type);
     	
-    	return Optional.of(customerToChange);
+    	return customerToChange;
     }
 
     private Order createOrder(Customer customer, Date date, Cart cart,
@@ -1158,9 +1188,12 @@ public class Bookstore implements Serializable {
             if (i % 10000 == 0) {
                 System.out.print(".");
             }
-
+            
+            Customer customer = getACustomerAnyCustomer(rand);
+            
             int nBooks = TPCW_Util.getRandomInt(rand, 1, 5);
-            Cart cart = new Cart(-1, null);
+            Cart cart = createCart(customer.getId(), now).get();
+            
             String comment = TPCW_Util.getRandomString(rand, 20, 100);
 
             for (int j = 0; j < nBooks; j++) {
@@ -1175,8 +1208,6 @@ public class Bookstore implements Serializable {
 
                 cart.changeLine(stockByBook.get(book), book, quantity);
             }
-
-            Customer customer = getACustomerAnyCustomer(rand);
 
             CCTransaction ccTransact = new CCTransaction(
                     CREDIT_CARDS[rand.nextInt(CREDIT_CARDS.length)],
