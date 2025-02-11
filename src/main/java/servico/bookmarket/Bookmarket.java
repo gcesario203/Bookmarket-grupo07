@@ -404,7 +404,8 @@ public class Bookmarket {
     }
 
     /**
-     * Consolida o total de vendas de todos os livros em todas as livrarias do sistema.
+     * Consolida o total de vendas de todos os livros em todas as livrarias do
+     * sistema.
      * Combina os contadores de vendas de cada livraria em um único mapa agregado.
      *
      * @return Mapa onde a chave é o livro e o valor é a quantidade total vendida
@@ -414,33 +415,37 @@ public class Bookmarket {
         return stateMachine.getStateStream()
                 .map(Bookstore::getConsolidatedBookSales)
                 .reduce(new HashMap<>(), (accumulatedSales, currentStoreSales) -> {
-                    currentStoreSales.forEach((book, quantity) ->
-                            accumulatedSales.put(book, accumulatedSales.getOrDefault(book, 0) + quantity));
+                    currentStoreSales.forEach((book, quantity) -> accumulatedSales.put(book,
+                            accumulatedSales.getOrDefault(book, 0) + quantity));
                     return accumulatedSales;
                 });
     }
 
     /**
-     *
-     * @param c_id Id do usuário que necessita de livros recomendados pelo
-     *             sistema
-     * @return Retorna uma lista de livros com limite de 5 itens recomendados
-     *         pelo sistema.
+     * Obtém recomendações de livros com base nos itens previamente avaliados pelo
+     * usuário.
+     * 
+     * @param c_id Identificador único do usuário para o qual as recomendações serão
+     *             geradas.
+     * @return Uma lista contendo até 5 livros recomendados com base no histórico de
+     *         interação do usuário.
      */
     @SuppressWarnings("unchecked")
     public static List<Book> getRecommendationByItens(int c_id) {
-        return (List<Book>) stateMachine.execute(new GetRecommendationByItensAction(c_id));
+        return (List<Book>) stateMachine.execute(new GetRecommendationByItensAction(c_id, 5));
     }
 
     /**
-     * @param c_id Id do usuário que necessita de livros recomendados pelo
-     *             sistema
-     * @return Retorna uma lista de livros com limite de 5 itens recomendados
-     *         pelo sistema.
+     * Obtém recomendações de livros com base em usuários com perfis semelhantes.
+     * 
+     * @param c_id Identificador único do usuário para o qual as recomendações serão
+     *             geradas.
+     * @return Uma lista contendo até 5 livros recomendados com base em perfis de
+     *         usuários similares.
      */
     @SuppressWarnings("unchecked")
     public static List<Book> getRecommendationByUsers(int c_id) {
-        return (List<Book>) stateMachine.execute(new GetRecommendationByUsersAction(c_id));
+        return (List<Book>) stateMachine.execute(new GetRecommendationByUsersAction(c_id, 5));
     }
 
     /**
