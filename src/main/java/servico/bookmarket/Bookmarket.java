@@ -524,6 +524,7 @@ public class Bookmarket {
      * @param customerId
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static int createEmptyCart(int storeId, int customerId) {
         try {
             return ((Optional<Cart>) stateMachine.execute(new CreateCartAction(storeId,
@@ -544,6 +545,7 @@ public class Bookmarket {
      * @param quantities
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static Optional<Cart> doCart(int storeId, int SHOPPING_ID, Integer I_ID, List<Integer> ids,
             List<Integer> quantities) {
         try {
@@ -578,6 +580,7 @@ public class Bookmarket {
      * @param storeId
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static Optional<Cart> getCart(int storeId, int SHOPPING_ID) {
     	return (Optional<Cart>)stateMachine.execute(new GetCartById(storeId, SHOPPING_ID));
     }
@@ -588,6 +591,7 @@ public class Bookmarket {
      * @param storeId Id do bookstore cujo qual é necessario buscar o carrinho
      * @param customerId Id do cliente
      */
+    @SuppressWarnings("unchecked")
     public static Optional<Cart> getCartByCustomer(int storeId, int customerId){
     	return (Optional<Cart>)stateMachine.execute(new GetCartByCustomer(storeId, customerId));
     }
@@ -684,6 +688,7 @@ public class Bookmarket {
      * nenhuma bookstore, sendo informado no objeto Stock, em qual bookstore ele se
      * encontra
      */
+    @SuppressWarnings("unchecked")
     public static Optional<Stock> getMinimumBookPrice(int bookId){
     	return (Optional<Stock>) stateMachine.execute(new GetMinimumBookPriceAction(bookId));
     }

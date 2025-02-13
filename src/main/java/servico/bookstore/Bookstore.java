@@ -487,23 +487,85 @@ public class Bookstore implements Serializable {
     }
 
     /**
-     * Returns a list of recommeded books based on Users
+     * Retorna uma lista de livros recomendados com base na filtragem por itens,
+     * utilizando um número padrão de 5 recomendações.
      *
-     * @param c_id Customer id
-     * @return Não implementado, Null
+     * @param c_id o identificador do cliente para o qual as recomendações serão
+     *             geradas
+     * @return uma lista de livros recomendados derivados da similaridade entre
+     *         itens
      */
-    public static List<Book> getRecommendationByItens(int c_id) {
-        List<RecommendedItem> itemRecommendations = MahoutUtils.recommendItemBased(reviewsByIds, c_id, 5);
-        return null;
+    public List<Book> getRecommendationByItens(int c_id) {
+        return getRecommendationByItens(c_id, 5);
     }
 
     /**
+     * Retorna uma lista de livros recomendados com base na filtragem por itens.
+     * <p>
+     * Este método utiliza o mecanismo de recomendação baseado em itens do Mahout
+     * para calcular itens similares para o cliente especificado. Em seguida, cada
+     * item recomendado é mapeado para o seu respectivo objeto {@link Book}. Caso o
+     * item recomendado não corresponda a um livro válido, ele será ignorado.
+     * </p>
      *
-     * @param c_id
-     * @return
+     * @param c_id    o identificador do cliente para o qual as recomendações serão
+     *                geradas
+     * @param numRecs o número máximo de recomendações a serem retornadas
+     * @return uma lista de livros recomendados derivados da similaridade entre
+     *         itens
      */
-    public static List<Book> getRecommendationByUsers(int c_id) {
-        return null;
+    public List<Book> getRecommendationByItens(int c_id, int numRecs) {
+        List<RecommendedItem> itemRecommendations = MahoutUtils.recommendItemBased(reviewsByIds, c_id, numRecs);
+        List<Book> recommendedBooks = new ArrayList<>();
+        for (RecommendedItem item : itemRecommendations) {
+            Optional<Book> book = getBook((int) item.getItemID());
+            if (book.isPresent()) {
+                recommendedBooks.add(book.get());
+            }
+        }
+        return recommendedBooks;
+    }
+
+    /**
+     * Retorna uma lista de livros recomendados com base na filtragem por usuários,
+     * utilizando um número padrão de 5 recomendações.
+     *
+     * @param c_id o identificador do cliente para o qual as recomendações serão
+     *             geradas
+     * @return uma lista de livros recomendados derivados da similaridade entre
+     *         usuários
+     */
+    public List<Book> getRecommendationByUsers(int c_id) {
+        return getRecommendationByUsers(c_id, 5);
+    }
+
+    /**
+     * Retorna uma lista de livros recomendados com base na filtragem por usuários.
+     * <p>
+     * Este método utiliza o mecanismo de recomendação baseado em usuários do Mahout
+     * para identificar clientes similares ao especificado e, em seguida, recuperar
+     * itens que esses clientes avaliaram positivamente, mas que o cliente alvo
+     * ainda não avaliou.
+     * Cada item recomendado é mapeado para o seu respectivo objeto {@link Book}.
+     * Caso o item recomendado não corresponda a um livro válido, ele será ignorado.
+     * </p>
+     *
+     * @param c_id    o identificador do cliente para o qual as recomendações serão
+     *                geradas
+     * @param numRecs o número máximo de recomendações a serem retornadas
+     * @return uma lista de livros recomendados derivados da similaridade entre
+     *         usuários
+     */
+    public List<Book> getRecommendationByUsers(int c_id, int numRecs) {
+        List<RecommendedItem> userRecommendations = MahoutUtils.recommendUserBased(reviewsByIds, c_id, numRecs);
+        List<Book> recommendedBooks = new ArrayList<>();
+        for (RecommendedItem item : userRecommendations) {
+            Optional<Book> book = getBook((int) item.getItemID());
+            if (book.isPresent()) {
+                recommendedBooks.add(book.get());
+            }
+        }
+        return recommendedBooks;
     }
 
     /**

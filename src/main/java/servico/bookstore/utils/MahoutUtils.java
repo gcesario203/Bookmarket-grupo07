@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.apache.mahout.cf.taste.impl.model.*;
 import org.apache.mahout.cf.taste.impl.common.FastByIDMap;
 import org.apache.mahout.cf.taste.model.*;
-import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
+import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood;
 import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
 import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
@@ -56,7 +56,7 @@ public class MahoutUtils {
         try {
             DataModel dataModel = createDataModelFromReviews(reviews);
             UserSimilarity similarity = new PearsonCorrelationSimilarity(dataModel);
-            UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.1, similarity, dataModel);
+            UserNeighborhood neighborhood = new NearestNUserNeighborhood (2, similarity, dataModel);  
             Recommender recommender = new GenericUserBasedRecommender(dataModel, neighborhood, similarity);
             return recommender.recommend(userId, numRecs);
         } catch (Exception e) {
