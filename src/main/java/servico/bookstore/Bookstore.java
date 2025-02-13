@@ -129,6 +129,23 @@ public class Bookstore implements Serializable {
         stockByBook = new HashMap<>();
     }
 
+    public Bookstore(final int id, Map<Book, Stock> stockByBook, List<Cart> cartsById, List<Review> reviewsByIds,
+            List<Order> ordersById, LinkedList<Order> ordersByCreation) {
+        this.id = id;
+
+        this.cartsById = new ArrayList<>();
+        this.reviewsByIds = new ArrayList<>();
+        this.ordersById = new ArrayList<>();
+        this.ordersByCreation = new LinkedList<>();
+        this.stockByBook = new HashMap<>();
+
+        this.stockByBook.putAll(stockByBook);
+        this.cartsById.addAll(cartsById);
+        this.reviewsByIds.addAll(reviewsByIds);
+        this.ordersById.addAll(ordersById);
+        this.ordersByCreation.addAll(ordersByCreation);
+    }
+
     /**
      *
      * @return

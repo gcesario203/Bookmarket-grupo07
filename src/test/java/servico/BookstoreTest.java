@@ -656,19 +656,27 @@ public class BookstoreTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        
+        Bookstore bookstore = new Bookstore(
+                10,
+                new HashMap<Book, Stock>(),
+                new ArrayList<Cart>(),
+                reviews,
+                new ArrayList<Order>(),
+                new LinkedList<Order>());
 
         // O usuário 1 avaliou apenas b1 e b2; esperamos recomendações de outros itens
-        List<RecommendedItem> recommendations = MahoutUtils.recommendUserBased(reviews, c1.getId(), 3);
+        List<Book> recommendations = bookstore.getRecommendationByUsers(c1.getId(), 3);
         assertNotNull(recommendations);
         assertFalse(recommendations.isEmpty());
 
         // Validação: verificar se o livro "Fundação" (b3) foi recomendado
         boolean containsFundacao = recommendations.stream()
-                .anyMatch(rec -> rec.getItemID() == b3.getId());
+                .anyMatch(rec -> rec.getId() == b3.getId());
         assertTrue("Espera que o livro 'Fundação' seja recomendado.", containsFundacao);
 
         recommendations.forEach(rec -> System.out
-                .println("Recomendação para o usuário " + c1.getId() + ": Livro ID " + rec.getItemID()));
+                .println("Recomendação para o usuário " + c1.getId() + ": Livro ID " + rec.getId()));
     }
 
     @Test
@@ -721,20 +729,28 @@ public class BookstoreTest {
             throw new RuntimeException(e);
         }
 
+        Bookstore bookstore = new Bookstore(
+                10,
+                new HashMap<Book, Stock>(),
+                new ArrayList<Cart>(),
+                reviews,
+                new ArrayList<Order>(),
+                new LinkedList<Order>());
+
         // Usuário 1 avaliou somente b1 e b2; espera-se que itens similares a eles sejam
         // recomendados.
-        List<RecommendedItem> recommendations = MahoutUtils.recommendItemBased(reviews, c1.getId(), 3);
+        List<Book> recommendations = bookstore.getRecommendationByUsers(c1.getId(), 3);
         assertNotNull(recommendations);
         assertFalse(recommendations.isEmpty());
 
         // Validação: verifica se o livro "Fundação" (b3) está entre as recomendações
         boolean containsFundacao = recommendations.stream()
-                .anyMatch(rec -> rec.getItemID() == b3.getId());
+                .anyMatch(rec -> rec.getId() == b3.getId());
         assertTrue("Espera que o livro 'Fundação' seja recomendado.", containsFundacao);
 
         // Impressão das recomendações para depuração
         recommendations.forEach(rec -> System.out
-                .println("Item-based recommendation for user " + c1.getId() + ": Book ID " + rec.getItemID()));
+                .println("Item-based recommendation for user " + c1.getId() + ": Book ID " + rec.getId()));
     }
 
 }
