@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - dev
-      - xxKeAd7C-gitInspector
 
 jobs:
   build:
