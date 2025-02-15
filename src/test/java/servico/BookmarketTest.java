@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,7 +21,6 @@ import servico.bookstore.Bookstore;
 import dominio.Review;
 import dominio.Stock;
 import servico.bookmarket.Bookmarket;
-import servico.bookmarket.exceptions.UmbrellaException;
 import util.TPCW_Util;
 
 import static org.junit.Assert.*;
@@ -849,6 +850,25 @@ public class BookmarketTest {
         double averageValueFromStocks = (amazonStock.getCost() + saraivaStock.getCost()) / 2;
 
         assertTrue(averageValue == averageValueFromStocks);
+    }
+
+    @Test
+    public void shouldGetUniqueReviews() {
+        List<Review> uniqueReviews = Bookmarket.getUniqueReviews();
+
+        // Verifica se o resultado não é nulo
+        assertNotNull("O resultado não pode ser nulo.", uniqueReviews);
+        assertFalse(uniqueReviews.isEmpty());
+
+        // Verifica que não há duplicação: para cada par (cliente, livro) deve existir
+        // apenas uma review
+        Set<String> uniquePairs = new HashSet<>();
+        for (Review review : uniqueReviews) {
+            String key = review.getCustomer().getId() + "-" + review.getBook().getId();
+            assertFalse("Review duplicada encontrada para o par cliente-livro: " + key,
+                    uniquePairs.contains(key));
+            uniquePairs.add(key);
+        }
     }
 
 }

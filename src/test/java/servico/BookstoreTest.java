@@ -9,13 +9,17 @@ import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.junit.After;
+
+import servico.bookmarket.Bookmarket;
 import servico.bookstore.Bookstore;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import servico.bookstore.utils.MahoutUtils;
 
 /**
  *
@@ -30,7 +34,7 @@ public class BookstoreTest {
 
     @BeforeClass
     public static void setUpClass() {
-        
+
         long seed = 0;
         long now = System.currentTimeMillis();
         int items = 10000;
@@ -55,7 +59,6 @@ public class BookstoreTest {
     @After
     public void tearDown() {
     }
-
 
     /**
      * Test of populateInstanceBookstore method, of class Bookstore.
@@ -85,7 +88,7 @@ public class BookstoreTest {
         assertTrue(stock.size() > 30);
         assertTrue(stock.get(0).getQty() > 0);
         assertTrue(stock.get(0).getCost() > 0);
-        assertEquals(stock.get(0).getIdBookstore(),bookstore.getId());
+        assertEquals(stock.get(0).getIdBookstore(), bookstore.getId());
     }
 
     /**
@@ -141,7 +144,7 @@ public class BookstoreTest {
      */
     @Test
     public void testCreateCustomer() {
-    	String fname = "João";
+        String fname = "João";
         String lname = "Silva";
         String street1 = "Rua das Flores, 123";
         String street2 = "Apto 45B";
@@ -173,7 +176,8 @@ public class BookstoreTest {
 
     /**
      * Test of refreshCustomerSession method, of class Bookstore.
-     * @throws Exception 
+     * 
+     * @throws Exception
      */
     @Test
     public void testRefreshCustomerSession() throws Exception {
@@ -250,11 +254,11 @@ public class BookstoreTest {
         Book book = instance.getBook(bId).get();
         instance.updateBook(bId, image, thumbnail, now);
         assertEquals(bId, book.getId());
-        //assertEquals(cost, book.getCost(), 0.0);
+        // assertEquals(cost, book.getCost(), 0.0);
         assertEquals(image, book.getImage());
         assertEquals(thumbnail, book.getThumbnail());
     }
-    
+
     /**
      * Test of createCart method, of class Bookstore.
      */
@@ -262,26 +266,26 @@ public class BookstoreTest {
     public void testCreateCart() {
         long now = 0L;
         Customer customer = instance.getCustomer(1).get();
-        
+
         Cart cart = instance.createCart(customer.getId(), now).get();
-        
+
         assertTrue(cart.getId() > 0);
-        
+
         assertEquals(cart.getId(), instance.getCart(cart.getId()).get().getId());
-        
+
         assertEquals(cart.getBookstoreId(), instance.getId());
-        
+
         assertEquals(cart.getCustomer().getId(), customer.getId());
     }
-    
+
     /**
      * Test of getCart method, of class Bookstore.
      */
     @Test
     public void testGetCart() {
-    	Cart cart = instance.getCart(1).get();
-    	
-    	assertFalse(cart == null);
+        Cart cart = instance.getCart(1).get();
+
+        assertFalse(cart == null);
 
     }
 
@@ -290,49 +294,48 @@ public class BookstoreTest {
      */
     @Test
     public void testCartUpdate() {
-    	Cart cart = instance.getCart(1).get();
-    	Book book = instance.getABookAnyBook(new Random(4));
-    	
+        Cart cart = instance.getCart(1).get();
+        Book book = instance.getABookAnyBook(new Random(4));
+
         long now = 0L;
-        
+
         Cart result = instance.cartUpdate(cart.getId(), book.getId(), null, null, now).get();
-        
-        
+
         assertTrue(result.getLines().stream().anyMatch(x -> x.getBook().getId() == book.getId()));
 
     }
-    
+
     @Test
     public void shouldNotCreateANewCartWhenACartForTheCustomerAlreadyExists() {
-    	Cart cart = instance.getCart(1).get();
-    	
-    	Customer customer = cart.getCustomer();
-    	
-    	Cart cartCreated = instance.createCart(customer.getId(), 0L).get();
-    	
-    	assertEquals(cart.getId(), cartCreated.getId());
-    	
-    	assertTrue(cart.getTime() == cartCreated.getTime());
+        Cart cart = instance.getCart(1).get();
+
+        Customer customer = cart.getCustomer();
+
+        Cart cartCreated = instance.createCart(customer.getId(), 0L).get();
+
+        assertEquals(cart.getId(), cartCreated.getId());
+
+        assertTrue(cart.getTime() == cartCreated.getTime());
     }
-    
+
     @Test
     public void shouldGetAEmptyCartWhenCreatingForAInvalidCustomer() {
-    	Optional<Cart> cart = instance.createCart(-1, 0L);
-    	
-    	assertEquals(cart.isEmpty(), true);
+        Optional<Cart> cart = instance.createCart(-1, 0L);
+
+        assertEquals(cart.isEmpty(), true);
     }
-    
+
     @Test
     public void shouldGetAEmptyCartWhenFindingAInexistentCart() {
-    	assertTrue(instance.getCart(-1).isEmpty());
+        assertTrue(instance.getCart(-1).isEmpty());
     }
 
     /**
      * Test of confirmBuy method, of class Bookstore.
      */
-//    @Test
+    // @Test
     public void testConfirmBuy() {
-    	int customerId = 1;
+        int customerId = 1;
         int cartId = 67890;
         String comment = "Cliente frequente, gosta de livros de ficção.";
         String ccType = "Visa";
@@ -343,33 +346,33 @@ public class BookstoreTest {
         Date shippingDate = new Date(); // Data atual
         int addressId = 54321;
         long now = System.currentTimeMillis();
-        
+
         Order expResult = null;
         Order result = instance.confirmBuy(customerId, cartId, comment, ccType, ccNumber, ccName, ccExpiry, shipping, shippingDate, addressId, now);
         assertEquals(expResult, result);
     }
-    
+
     @Test
     public void shouldHasPopulatedReviews() {
-    	assertEquals(instance.getReviews().size(), 10000);
+        assertEquals(instance.getReviews().size(), 10000);
     }
-    
+
     @Test(expected = IOException.class)
     public void cannotCreateReviewWithInvalidValue() throws IOException {
-    	Customer customer = instance.getCustomer(1).get();
-    	
-    	Optional<Book> book = instance.getBook(1);
-    	
-    	instance.createReview(customer, book.get(), -1);
+        Customer customer = instance.getCustomer(1).get();
+
+        Optional<Book> book = instance.getBook(1);
+
+        instance.createReview(customer, book.get(), -1);
     }
-    
+
     @Test
     public void shouldGetTheCorrectReviewById() {
-    	Review review = instance.getReviews().get(0);
-    	
-    	assertEquals(review.getId(), instance.getReviewById(review.getId()).get().getId());
+        Review review = instance.getReviews().get(0);
+
+        assertEquals(review.getId(), instance.getReviewById(review.getId()).get().getId());
     }
-    
+
     @Test
     public void shouldGetTheCorrectReviewByCustomer() {
     	Review review = instance.getReviews().get(0);
@@ -379,7 +382,7 @@ public class BookstoreTest {
     								.allMatch(r -> r.getCustomer().getId() == review.getCustomer().getId());
     	assertTrue(condition);
     }
-    
+
     @Test
     public void shouldGetTheCorrectReviewByBook() {
     	Review review = instance.getReviews().get(0);
@@ -389,56 +392,58 @@ public class BookstoreTest {
     								.allMatch(r -> r.getBook().getId() == review.getBook().getId());
     	assertTrue(condition);
     }
-    
+
     @Test
     public void shouldChangeAReview() throws IOException {
-    	Review review = instance.getReviews().get(0);
-    	
-    	double randomValue = Math.random() * 6;
-    	
-    	double lastReview = review.getRating();
-    	
-    	while(randomValue == lastReview || randomValue > 5)
-    		randomValue = Math.random() * 6;
-    	
-    	instance.changeReviewValue(review.getId(), randomValue);
-    	
-    	Review changedReview = instance.getReviewById(review.getId()).get();
-    	
-    	assertTrue(randomValue == changedReview.getRating());
-    	
-    	assertFalse(lastReview == changedReview.getRating());
-    	
-    	assertTrue(changedReview.getId() == review.getId());
+        Review review = instance.getReviews().get(0);
+
+        double randomValue = Math.random() * 6;
+
+        double lastReview = review.getRating();
+
+        while (randomValue == lastReview || randomValue > 5)
+            randomValue = Math.random() * 6;
+
+        instance.changeReviewValue(review.getId(), randomValue);
+
+        Review changedReview = instance.getReviewById(review.getId()).get();
+
+        assertTrue(randomValue == changedReview.getRating());
+
+        assertFalse(lastReview == changedReview.getRating());
+
+        assertTrue(changedReview.getId() == review.getId());
     }
-    
+
     @Test
     public void shouldRemoveAReview() throws IOException {
-    	Review review = instance.getReviews().get(0);
-    	
-    	instance.removeReviewById(review.getId());
-    	
-    	Optional<Review> removedReview = instance.getReviewById(review.getId());
-    	
-    	assertFalse(removedReview.isPresent());
-    	
-    	assertEquals(instance.getReviews().size(), 9999);
-    	
-    	instance.createReview(review.getCustomer(), review.getBook(), 2);
+        Review review = instance.getReviews().get(0);
+
+        instance.removeReviewById(review.getId());
+
+        Optional<Review> removedReview = instance.getReviewById(review.getId());
+
+        assertFalse(removedReview.isPresent());
+
+        assertEquals(instance.getReviews().size(), 9999);
+
+        instance.createReview(review.getCustomer(), review.getBook(), 2);
     }
-    
+
     @Test(expected = IOException.class)
     public void cannotCreateAReviewWithoutAExistingCustomer() throws IOException {
-    	Book book = instance.getBook(1).get();
-    	
-    	instance.createReview(new Customer(-2, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, null, null, null, null), book, 2);
+        Book book = instance.getBook(1).get();
+
+        instance.createReview(new Customer(-2, null, null, null, null, null, null, null, null, null, null, 0, 0, 0,
+                null, null, null, null), book, 2);
     }
-    
+
     @Test(expected = IOException.class)
     public void cannotCreateAReviewWithoutAExistingBook() throws IOException {
-    	Customer customer = instance.getCustomer(1).get();
-    	
-    	instance.createReview(customer, new Book(-2, null, null, null, null, null, null, null, 0, null, null, 0, null, null, null), 0);
+        Customer customer = instance.getCustomer(1).get();
+
+        instance.createReview(customer,
+                new Book(-2, null, null, null, null, null, null, null, 0, null, null, 0, null, null, null), 0);
     }
 
     /**
@@ -475,7 +480,7 @@ public class BookstoreTest {
     @Test
     public void ShouldReturnCreatedInstanceOrdersId() {
         List<Order> result = instance.getOrdersById();
-        for(int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 10000; i++) {
             assertEquals(i, result.get(i).getId());
         }
     }
@@ -497,18 +502,17 @@ public class BookstoreTest {
         bookStore2.populateInstanceBookstore(orders, rand, now);
 
         List<Order> result1 = bookStore1.getOrdersById();
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             assertEquals(i, result1.get(i).getId());
         }
 
         List<Order> result2 = bookStore2.getOrdersById();
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             assertEquals(i, result2.get(i).getId());
         }
 
-        assertNotSame(result2,result1);
+        assertNotSame(result2, result1);
     }
-    
 
     /**
      * Test of updateStock method, of class Bookstore.
@@ -525,19 +529,19 @@ public class BookstoreTest {
         instance.updateStock(book.getId(), newCost);
         assertEquals(newCost, instance.getStock(book.getId()).getCost(), 0.0);
     }
-    
+
     @Test
     public void shouldUpdateACustomerType() {
-    	Customer customer = instance.getCustomer(1).get();
-    	
-    	Customer updatedCustomer = instance.updateCustomerType(customer.getId(), Type.SUBSCRIBER).get();
-    	
-    	assertTrue(customer.getId() == updatedCustomer.getId() && updatedCustomer.getType() == Type.SUBSCRIBER);
+        Customer customer = instance.getCustomer(1).get();
+
+        Customer updatedCustomer = instance.updateCustomerType(customer.getId(), Type.SUBSCRIBER).get();
+
+        assertTrue(customer.getId() == updatedCustomer.getId() && updatedCustomer.getType() == Type.SUBSCRIBER);
     }
-    
+
     @Test
     public void shouldCreateACustomerWithDefaultTypeWhenTypeParamIsEmpty() {
-    	String fname = "João";
+        String fname = "João";
         String lname = "Silva";
         String street1 = "Rua das Flores, 123";
         String street2 = "Apto 45B";
@@ -557,51 +561,25 @@ public class BookstoreTest {
         assertTrue(newCustomer.getType() == Type.DEFAULT);
     }
 
-    /**
-     * Test of getRecommendationByItens method, of class Bookstore.
-     */
-    //@Test
-    public void testGetRecommendationByItens() {
-        int c_id = 0;
-        List<Book> expResult = null;
-        List<Book> result = Bookstore.getRecommendationByItens(c_id);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getRecommendationByUsers method, of class Bookstore.
-     */
-    //@Test
-    public void testGetRecommendationByUsers() {
-        int c_id = 0;
-        List<Book> expResult = null;
-        List<Book> result = Bookstore.getRecommendationByUsers(c_id);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-    
     @Test
     public void shouldUpdateRelatedBooks() {
-    	Book randomBook = instance.getABookAnyBook(new Random(0));
-    	
-    	Book oldRelated1 = randomBook.getRelated1();
-    	Book oldRelated2 = randomBook.getRelated2();
-    	Book oldRelated3 = randomBook.getRelated3();
-    	Book oldRelated4 = randomBook.getRelated4();
-    	Book oldRelated5 = randomBook.getRelated5();
-    	
-    	instance.updateRelatedBooks(randomBook);
-    	
-    	Book updatedBook = instance.getBook(randomBook.getId()).get();
-    	
-    	assertFalse(oldRelated1.getId() == updatedBook.getRelated1().getId());
-    	assertFalse(oldRelated2.getId() == updatedBook.getRelated2().getId());
-    	assertFalse(oldRelated3.getId() == updatedBook.getRelated3().getId());
-    	assertFalse(oldRelated4.getId() == updatedBook.getRelated4().getId());
-    	assertFalse(oldRelated5.getId() == updatedBook.getRelated5().getId());
+        Book randomBook = instance.getABookAnyBook(new Random(0));
+
+        Book oldRelated1 = randomBook.getRelated1();
+        Book oldRelated2 = randomBook.getRelated2();
+        Book oldRelated3 = randomBook.getRelated3();
+        Book oldRelated4 = randomBook.getRelated4();
+        Book oldRelated5 = randomBook.getRelated5();
+
+        instance.updateRelatedBooks(randomBook);
+
+        Book updatedBook = instance.getBook(randomBook.getId()).get();
+
+        assertFalse(oldRelated1.getId() == updatedBook.getRelated1().getId());
+        assertFalse(oldRelated2.getId() == updatedBook.getRelated2().getId());
+        assertFalse(oldRelated3.getId() == updatedBook.getRelated3().getId());
+        assertFalse(oldRelated4.getId() == updatedBook.getRelated4().getId());
+        assertFalse(oldRelated5.getId() == updatedBook.getRelated5().getId());
     }
 
     @Test
@@ -624,9 +602,155 @@ public class BookstoreTest {
     }
 
     @Test
-    public void shouldReturnNullOnConsolidatedBookSales(){
+    public void shouldReturnNullOnConsolidatedBookSales() {
         Bookstore bookstore = new Bookstore(5);
         HashMap<Book, Integer> consolidatedSales = bookstore.getConsolidatedBookSales();
         assertTrue(consolidatedSales.size() == 0);
     }
+
+    @Test
+    public void shouldReturnValidRecommendationsFromSyntheticDataset() {
+        // Criação dos livros
+        Book b1 = Bookmarket.getBook(1); // Duna
+        Book b2 = Bookmarket.getBook(2); // Neuromancer
+        Book b3 = Bookmarket.getBook(3); // Fundação
+        Book b4 = Bookmarket.getBook(4); // O Senhor dos Anéis
+        Book b5 = Bookmarket.getBook(5); // O Hobbit
+        Book b6 = Bookmarket.getBook(6); // It - A Coisa
+
+        // Criação dos clientes
+        Customer c1 = Bookstore.getCustomer(1).orElse(null);
+        Customer c2 = Bookstore.getCustomer(2).orElse(null);
+        Customer c3 = Bookstore.getCustomer(3).orElse(null);
+        Customer c4 = Bookstore.getCustomer(4).orElse(null);
+        Customer c5 = Bookstore.getCustomer(5).orElse(null);
+
+        // Criação de reviews com variação nos ratings para evitar valores idênticos
+        List<Review> reviews = new ArrayList<>();
+        try {
+            // Usuário 1: Avalia Duna e Neuromancer
+            reviews.add(new Review(c1, b1, 5.0, 0));
+            reviews.add(new Review(c1, b2, 4.5, 0));
+
+            // Usuário 2: Avalia Duna, Neuromancer e Fundação (ratings levemente diferentes)
+            reviews.add(new Review(c2, b1, 4.8, 0));
+            reviews.add(new Review(c2, b2, 4.3, 0));
+            reviews.add(new Review(c2, b3, 4.0, 0));
+
+            // Usuário 3: Avalia Duna, Neuromancer, Fundação e O Senhor dos Anéis
+            reviews.add(new Review(c3, b1, 4.2, 0));
+            reviews.add(new Review(c3, b2, 4.0, 0));
+            reviews.add(new Review(c3, b3, 4.6, 0));
+            reviews.add(new Review(c3, b4, 5.0, 0));
+
+            // Usuário 4: Avalia Neuromancer, O Senhor dos Anéis e O Hobbit
+            reviews.add(new Review(c4, b2, 3.5, 0));
+            reviews.add(new Review(c4, b4, 4.5, 0));
+            reviews.add(new Review(c4, b5, 4.0, 0));
+
+            // Usuário 5: Avalia Fundação, O Senhor dos Anéis, O Hobbit e It - A Coisa
+            reviews.add(new Review(c5, b3, 5.0, 0));
+            reviews.add(new Review(c5, b4, 4.2, 0));
+            reviews.add(new Review(c5, b5, 3.8, 0));
+            reviews.add(new Review(c5, b6, 4.5, 0));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        
+        Bookstore bookstore = new Bookstore(
+                10,
+                new HashMap<Book, Stock>(),
+                new ArrayList<Cart>(),
+                reviews,
+                new ArrayList<Order>(),
+                new LinkedList<Order>());
+
+        // O usuário 1 avaliou apenas b1 e b2; esperamos recomendações de outros itens
+        List<Book> recommendations = bookstore.getRecommendationByUsers(c1.getId(), 3);
+        assertNotNull(recommendations);
+        assertFalse(recommendations.isEmpty());
+
+        // Validação: verificar se o livro "Fundação" (b3) foi recomendado
+        boolean containsFundacao = recommendations.stream()
+                .anyMatch(rec -> rec.getId() == b3.getId());
+        assertTrue("Espera que o livro 'Fundação' seja recomendado.", containsFundacao);
+
+        recommendations.forEach(rec -> System.out
+                .println("Recomendação para o usuário " + c1.getId() + ": Livro ID " + rec.getId()));
+    }
+
+    @Test
+    public void shouldReturnValidItemBasedRecommendationsFromSyntheticDataset() {
+        // Criação dos livros
+        Book b1 = Bookmarket.getBook(1); // Duna
+        Book b2 = Bookmarket.getBook(2); // Neuromancer
+        Book b3 = Bookmarket.getBook(3); // Fundação
+        Book b4 = Bookmarket.getBook(4); // O Senhor dos Anéis
+        Book b5 = Bookmarket.getBook(5); // O Hobbit
+        Book b6 = Bookmarket.getBook(6); // It - A Coisa
+
+        // Criação dos clientes
+        Customer c1 = Bookstore.getCustomer(1).orElse(null);
+        Customer c2 = Bookstore.getCustomer(2).orElse(null);
+        Customer c3 = Bookstore.getCustomer(3).orElse(null);
+        Customer c4 = Bookstore.getCustomer(4).orElse(null);
+        Customer c5 = Bookstore.getCustomer(5).orElse(null);
+
+        // Criação de reviews com variação nos ratings para melhorar a similaridade
+        // entre os itens
+        List<Review> reviews = new ArrayList<>();
+        try {
+            // Usuário 1: Avalia Duna e Neuromancer
+            reviews.add(new Review(c1, b1, 5.0, 0));
+            reviews.add(new Review(c1, b2, 4.5, 0));
+
+            // Usuário 2: Avalia Duna, Neuromancer e Fundação (ratings levemente diferentes)
+            reviews.add(new Review(c2, b1, 4.8, 0));
+            reviews.add(new Review(c2, b2, 4.3, 0));
+            reviews.add(new Review(c2, b3, 4.0, 0));
+
+            // Usuário 3: Avalia Duna, Neuromancer, Fundação e O Senhor dos Anéis
+            reviews.add(new Review(c3, b1, 4.2, 0));
+            reviews.add(new Review(c3, b2, 4.0, 0));
+            reviews.add(new Review(c3, b3, 4.6, 0));
+            reviews.add(new Review(c3, b4, 5.0, 0));
+
+            // Usuário 4: Avalia Neuromancer, O Senhor dos Anéis e O Hobbit
+            reviews.add(new Review(c4, b2, 3.5, 0));
+            reviews.add(new Review(c4, b4, 4.5, 0));
+            reviews.add(new Review(c4, b5, 4.0, 0));
+
+            // Usuário 5: Avalia Fundação, O Senhor dos Anéis, O Hobbit e It - A Coisa
+            reviews.add(new Review(c5, b3, 5.0, 0));
+            reviews.add(new Review(c5, b4, 4.2, 0));
+            reviews.add(new Review(c5, b5, 3.8, 0));
+            reviews.add(new Review(c5, b6, 4.5, 0));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        Bookstore bookstore = new Bookstore(
+                10,
+                new HashMap<Book, Stock>(),
+                new ArrayList<Cart>(),
+                reviews,
+                new ArrayList<Order>(),
+                new LinkedList<Order>());
+
+        // Usuário 1 avaliou somente b1 e b2; espera-se que itens similares a eles sejam
+        // recomendados.
+        List<Book> recommendations = bookstore.getRecommendationByUsers(c1.getId(), 3);
+        assertNotNull(recommendations);
+        assertFalse(recommendations.isEmpty());
+
+        // Validação: verifica se o livro "Fundação" (b3) está entre as recomendações
+        boolean containsFundacao = recommendations.stream()
+                .anyMatch(rec -> rec.getId() == b3.getId());
+        assertTrue("Espera que o livro 'Fundação' seja recomendado.", containsFundacao);
+
+        // Impressão das recomendações para depuração
+        recommendations.forEach(rec -> System.out
+                .println("Item-based recommendation for user " + c1.getId() + ": Book ID " + rec.getId()));
+    }
+
 }
