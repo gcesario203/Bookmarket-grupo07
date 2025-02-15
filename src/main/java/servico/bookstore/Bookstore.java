@@ -513,7 +513,8 @@ public class Bookstore implements Serializable {
      *         itens
      */
     public List<Book> getRecommendationByItens(int c_id) {
-        return getRecommendationByItens(c_id, 5);
+        int maxRecommendations = 5;
+        return getRecommendationByItens(c_id, maxRecommendations);
     }
 
     /**
@@ -525,14 +526,16 @@ public class Bookstore implements Serializable {
      * item recomendado não corresponda a um livro válido, ele será ignorado.
      * </p>
      *
-     * @param c_id    o identificador do cliente para o qual as recomendações serão
-     *                geradas
-     * @param numRecs o número máximo de recomendações a serem retornadas
+     * @param c_id               o identificador do cliente para o qual as
+     *                           recomendações serão
+     *                           geradas
+     * @param maxRecommendations o número máximo de recomendações a serem retornadas
      * @return uma lista de livros recomendados derivados da similaridade entre
      *         itens
      */
-    public List<Book> getRecommendationByItens(int c_id, int numRecs) {
-        List<RecommendedItem> itemRecommendations = MahoutUtils.recommendItemBased(reviewsByIds, c_id, numRecs);
+    public List<Book> getRecommendationByItens(int c_id, int maxRecommendations) {
+        List<RecommendedItem> itemRecommendations = MahoutUtils.recommendItemBased(reviewsByIds, c_id,
+                maxRecommendations);
         List<Book> recommendedBooks = new ArrayList<>();
         for (RecommendedItem item : itemRecommendations) {
             Optional<Book> book = getBook((int) item.getItemID());
@@ -553,7 +556,8 @@ public class Bookstore implements Serializable {
      *         usuários
      */
     public List<Book> getRecommendationByUsers(int c_id) {
-        return getRecommendationByUsers(c_id, 5);
+        int maxRecommendations = 5;
+        return getRecommendationByUsers(c_id, maxRecommendations);
     }
 
     /**
@@ -567,14 +571,16 @@ public class Bookstore implements Serializable {
      * Caso o item recomendado não corresponda a um livro válido, ele será ignorado.
      * </p>
      *
-     * @param c_id    o identificador do cliente para o qual as recomendações serão
-     *                geradas
-     * @param numRecs o número máximo de recomendações a serem retornadas
+     * @param c_id               o identificador do cliente para o qual as
+     *                           recomendações serão
+     *                           geradas
+     * @param maxRecommendations o número máximo de recomendações a serem retornadas
      * @return uma lista de livros recomendados derivados da similaridade entre
      *         usuários
      */
-    public List<Book> getRecommendationByUsers(int c_id, int numRecs) {
-        List<RecommendedItem> userRecommendations = MahoutUtils.recommendUserBased(reviewsByIds, c_id, numRecs);
+    public List<Book> getRecommendationByUsers(int c_id, int maxRecommendations) {
+        List<RecommendedItem> userRecommendations = MahoutUtils.recommendUserBased(reviewsByIds, c_id,
+                maxRecommendations);
         List<Book> recommendedBooks = new ArrayList<>();
         for (RecommendedItem item : userRecommendations) {
             Optional<Book> book = getBook((int) item.getItemID());

@@ -21,7 +21,6 @@ import servico.bookstore.Bookstore;
 import dominio.Review;
 import dominio.Stock;
 import servico.bookmarket.Bookmarket;
-import servico.bookmarket.exceptions.UmbrellaException;
 import util.TPCW_Util;
 
 import static org.junit.Assert.*;
