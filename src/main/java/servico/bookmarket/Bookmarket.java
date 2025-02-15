@@ -28,14 +28,14 @@ import servico.bookmarket.statemachine.actions.reviews.GetReviewByBookAction;
 import servico.bookmarket.statemachine.actions.reviews.GetReviewByCustomerAction;
 import servico.bookmarket.statemachine.actions.reviews.GetReviewByIdAction;
 import servico.bookmarket.statemachine.actions.reviews.GetReviewsAction;
+import servico.bookmarket.statemachine.actions.reviews.GetUniqueReviewsAction;
 import servico.bookmarket.statemachine.actions.reviews.GetReviewsByBookstoreAction;
 import servico.bookmarket.statemachine.actions.reviews.RemoveReviewsByIdAction;
+import servico.bookmarket.statemachine.actions.recomendations.GetRecommendationByItensAction;
+import servico.bookmarket.statemachine.actions.recomendations.GetRecommendationByUsersAction;
 import servico.bookmarket.statemachine.actions.shared.PopulateAction;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -228,6 +228,11 @@ public class Bookmarket {
     }
 
     @SuppressWarnings("unchecked")
+    public static List<Review> getUniqueReviews() {
+        return (List<Review>) stateMachine.execute(new GetUniqueReviewsAction());
+    }
+
+    @SuppressWarnings("unchecked")
     public static Optional<Review> getReviewById(int bookstoreId, int id) {
         return (Optional<Review>) stateMachine.execute(new GetReviewByIdAction(id, bookstoreId));
     }
@@ -399,7 +404,8 @@ public class Bookmarket {
     }
 
     /**
-     * Consolida o total de vendas de todos os livros em todas as livrarias do sistema.
+     * Consolida o total de vendas de todos os livros em todas as livrarias do
+     * sistema.
      * Combina os contadores de vendas de cada livraria em um único mapa agregado.
      *
      * @return Mapa onde a chave é o livro e o valor é a quantidade total vendida
@@ -409,33 +415,37 @@ public class Bookmarket {
         return stateMachine.getStateStream()
                 .map(Bookstore::getConsolidatedBookSales)
                 .reduce(new HashMap<>(), (accumulatedSales, currentStoreSales) -> {
-                    currentStoreSales.forEach((book, quantity) ->
-                            accumulatedSales.put(book, accumulatedSales.getOrDefault(book, 0) + quantity));
+                    currentStoreSales.forEach((book, quantity) -> accumulatedSales.put(book,
+                            accumulatedSales.getOrDefault(book, 0) + quantity));
                     return accumulatedSales;
                 });
     }
 
     /**
-     *
-     * @param c_id
-     * @return
+     * Obtém recomendações de livros com base nos itens previamente avaliados pelo
+     * usuário.
+     * 
+     * @param c_id Identificador único do usuário para o qual as recomendações serão
+     *             geradas.
+     * @return Uma lista contendo até 5 livros recomendados com base no histórico de
+     *         interação do usuário.
      */
+    @SuppressWarnings("unchecked")
     public static List<Book> getRecommendationByItens(int c_id) {
-        return Bookstore.getRecommendationByItens(c_id);
+        return (List<Book>) stateMachine.execute(new GetRecommendationByItensAction(c_id, 5));
     }
 
     /**
-     * A recomendação de livros para usuários do Bookmarket aproveita a
-     * implementação estática do mesmo método da Bookstore para recuperar os
-     * livros.
-     *
-     * @param c_id Id do usuário que necessita de livros recomendados pelo
-     *             sistema
-     * @return Retorna uma lista de livros com limite de 5 itens recomendados
-     *         pelo sistema.
+     * Obtém recomendações de livros com base em usuários com perfis semelhantes.
+     * 
+     * @param c_id Identificador único do usuário para o qual as recomendações serão
+     *             geradas.
+     * @return Uma lista contendo até 5 livros recomendados com base em perfis de
+     *         usuários similares.
      */
+    @SuppressWarnings("unchecked")
     public static List<Book> getRecommendationByUsers(int c_id) {
-        return Bookstore.getRecommendationByUsers(c_id);
+        return (List<Book>) stateMachine.execute(new GetRecommendationByUsersAction(c_id, 5));
     }
 
     /**
@@ -514,6 +524,7 @@ public class Bookmarket {
      * @param customerId
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static int createEmptyCart(int storeId, int customerId) {
         try {
             return ((Optional<Cart>) stateMachine.execute(new CreateCartAction(storeId,
@@ -534,6 +545,7 @@ public class Bookmarket {
      * @param quantities
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static Optional<Cart> doCart(int storeId, int SHOPPING_ID, Integer I_ID, List<Integer> ids,
             List<Integer> quantities) {
         try {
@@ -568,6 +580,7 @@ public class Bookmarket {
      * @param storeId
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static Optional<Cart> getCart(int storeId, int SHOPPING_ID) {
     	return (Optional<Cart>)stateMachine.execute(new GetCartById(storeId, SHOPPING_ID));
     }
@@ -578,6 +591,7 @@ public class Bookmarket {
      * @param storeId Id do bookstore cujo qual é necessario buscar o carrinho
      * @param customerId Id do cliente
      */
+    @SuppressWarnings("unchecked")
     public static Optional<Cart> getCartByCustomer(int storeId, int customerId){
     	return (Optional<Cart>)stateMachine.execute(new GetCartByCustomer(storeId, customerId));
     }
@@ -674,6 +688,7 @@ public class Bookmarket {
      * nenhuma bookstore, sendo informado no objeto Stock, em qual bookstore ele se
      * encontra
      */
+    @SuppressWarnings("unchecked")
     public static Optional<Stock> getMinimumBookPrice(int bookId){
     	return (Optional<Stock>) stateMachine.execute(new GetMinimumBookPriceAction(bookId));
     }
