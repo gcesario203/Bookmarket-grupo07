@@ -72,6 +72,10 @@ Este repositório contém o código-fonte e documentação do projeto BookMarket
 - [Isinkaye, Folajimi e Ojokoh (2015). "Recommendation systems: Principles, methods and evaluation". *Egyptian Informatics Journal*, 16(3):261–273.](https://doi.org/10.1016/j.eij.2015.06.005)
 - [@book{36682,title	= {Mahout in Action},author	= {Robin Anil and Sean Owen and Ted Dunning and Ellen Friedman},year	= {2010},URL	= {http://manning.com/owen/},booktitle	= {Mahout in Action},pages	= {350},address	= {Manning Publications Co. Sound View Ct. #3B Greenwich, CT 06830}}](https://research.google/pubs/mahout-in-action/)
 
+## 📈 Relatório de Contribuições (GitInspector)
+[🔍 Visualizar Relatório GitInspector](https://gcesario203.github.io/Bookmarket-grupo07/gitinspector-report.html)
+
+
 ---
 **Professor Responsável:** Luiz Eduardo Busato  
 **Disciplina:** INF329 – Prática de Engenharia de Software
