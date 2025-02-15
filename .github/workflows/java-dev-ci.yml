@@ -69,7 +69,6 @@ jobs:
           git fetch origin dev
           git checkout dev
           echo "git log ..."
-#           Apenas para debug
           git log --oneline -n 5  
           gitinspector --format=html --since=2024-01-12 --weeks --list-file-types --timeline > .github/reports/gi-report.html
 
