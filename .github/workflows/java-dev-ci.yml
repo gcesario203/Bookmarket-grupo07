@@ -60,6 +60,8 @@ jobs:
         run: |
           pip install git+https://github.com/jpwhite3/gitinspector.git
           mkdir -p .github/reports
+          git fetch origin dev
+          git checkout dev
           gitinspector --format=html --since=2024-01-12 --weeks --list-file-types --timeline > .github/reports/gi-report.html
 
       - name: Push coverage badge and gi-report to gh-pages
