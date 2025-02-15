@@ -57,6 +57,23 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco/
 
+      - name: commit coverage badge to gh-pages
+        run: |
+          mkdir -p public
+          cp .github/badges/jacoco.svg public/coverage-badge.svg
+
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
+          git fetch origin
+          git checkout -b gh-pages origin/gh-pages || git checkout -b gh-pages
+
+          mv public/* .
+          git add -f coverage-badge.svg
+          git commit -m "Update coverage badge [skip ci]" || echo "No changes to commit"
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -75,19 +92,14 @@ jobs:
       - name: Push coverage badge and gi-report to gh-pages
         run: |
           mkdir -p public
-          cp .github/badges/jacoco.svg public/coverage-badge.svg
           cp .github/reports/gi-report.html public/gitinspector-report.html
-          
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
           
           git fetch origin
           git checkout -b gh-pages origin/gh-pages || git checkout -b gh-pages
           
           mv public/* .
-          git add -f coverage-badge.svg
           git add -f gitinspector-report.html
-          git commit -m "Update coverage badge and gi-report [skip ci]" || echo "No changes to commit"
+          git commit -m "Update gitInspector-report [skip ci]" || echo "No changes to commit"
           git push -f origin gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
