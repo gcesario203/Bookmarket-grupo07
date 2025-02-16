@@ -8,6 +8,7 @@ import dominio.Order;
 import dominio.Review;
 import dominio.Stock;
 import dominio.customer.enums.Type;
+import servico.bookmarket.statemachine.actions.orders.getConsolidatedBookSalesAction;
 import servico.bookstore.Bookstore;
 import servico.bookmarket.exceptions.UmbrellaException;
 import servico.bookmarket.statemachine.StateMachine;
