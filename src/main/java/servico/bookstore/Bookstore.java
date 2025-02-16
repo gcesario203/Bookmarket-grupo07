@@ -705,25 +705,33 @@ public class Bookstore implements Serializable {
      * Processa todos os pedidos e suas linhas para contabilizar a quantidade
      * total vendida de cada livro.
      *
+     * @param subject - o assunto do livro
      * @return Mapa onde a chave é o livro e o valor é a quantidade total vendida
      *         nesta livraria
      */
-    public HashMap<Book, Integer> getConsolidatedBookSales() {
-        HashMap<Book, Integer> salesByBook = new HashMap<Book, Integer>();
-
-        for (Order order : ordersById) {
-            for (OrderLine line : order.getLines()) {
-                Book book = line.getBook();
-                Integer qtd = line.getQty();
-                if (salesByBook.containsKey(book)) {
-                    salesByBook.put(book, salesByBook.get(book) + qtd);
-                } else {
-                    salesByBook.put(book, qtd);
-                }
-            }
-
-        }
-        return salesByBook;
+    public HashMap<Book, Integer> getConsolidatedBookSales(String subject) {
+        HashMap<Book, Integer> bookSalesList = ordersById.stream()
+                .flatMap(order -> order.getLines().stream()) // Converte os pedidos em uma única stream de linhas de pedido
+                .collect(Collectors.toMap(
+                        OrderLine::getBook, // Chave: o livro
+                        OrderLine::getQty,  // Valor: a quantidade vendida
+                        Integer::sum,       // Em caso de chave repetida, soma os valores
+                        HashMap::new        // Usa um HashMap como implementação do Map
+                ));
+        
+        // Caso o tema do livro seja vazio, já retorna a lista de livros que possuem vendas
+        if(subject == null || subject.isBlank() || subject.isEmpty())
+        	return bookSalesList;
+        
+        // se não, filtra pelo livro e retorna o HashMap filtrado
+        return bookSalesList.entrySet().stream()
+        							   .filter(entry -> subject.equals(entry.getKey().getSubject()))
+        							   .collect(Collectors.toMap(
+        						                Map.Entry::getKey, 
+        						                Map.Entry::getValue, 
+        						                (entry1, entry2) -> entry1, 
+        						                HashMap::new
+        						            ));
     }
 
     /**
@@ -1056,6 +1064,59 @@ public class Bookstore implements Serializable {
         customer.logOrder(order);
         cart.clear();
         return order;
+    }
+    
+    /**
+     * Para realizar a busca por bestSellers o sistema aproveita do
+     * relacionamento de {@linkplain OrderLine} com {@linkplain Book}. É
+     * assumido que cada OrderLine possui apenas 01 {@linkplain Book}, neste
+     * caso a quantidade de vendas é identificada por esta relação. Sempre que
+     * acontece a criação de uma orderLine, é assumido que uma compra foi feita.
+     *
+     * É utilizado um limite de 100 livros para o resultado da pesquisa para
+     * evitar desperdício de memória no retorno do método. Este limite é
+     * estipulado por
+     *
+     * Com isto, é importante salientar que este método utiliza as vendas desta
+     * instância para recuperar os livros vendidos.
+     *
+     * @param subject Assunto que será utilizado para filtro de pesquisa por
+     * melhores vendedores
+     * @param Quantidade de livros
+     * @return Retorna uma lista dos livros mais vendidos desta
+     * {@linkplain Bookstore} com tamanho limitado em 100
+     */
+    public List<Book> getBestSellers(String subject, Integer numberOfBooks) {
+    	final Integer MINIMUM_BOOKS = 1;
+        final Integer MAXIMUM_BOOKS = 100;
+        
+        if (numberOfBooks < MINIMUM_BOOKS || numberOfBooks > MAXIMUM_BOOKS) {
+            throw new RuntimeException("Número de livros solicitado deve estar entre 1 e 100");
+        }
+        
+        HashMap<Book, Integer> consolidatedBookSales = getConsolidatedBookSales(subject);
+        
+        List<Book> sortBooksBySalesDescending = sortBooksBySalesDescending(consolidatedBookSales, numberOfBooks);
+
+        return sortBooksBySalesDescending.stream().filter(x -> x != null)
+        							     .collect(Collectors.toList());
+    }
+    
+    /**
+     * Retorna uma lista ordenada dos livros mais vendidos a partir de um mapa de vendas totais.
+     * A ordenação é feita em ordem decrescente de quantidade vendida.
+     *
+     * @param salesByBook Mapa contendo a quantidade total de vendas para cada livro
+     * @param limit Quantidade de livros a serem retornados
+     * @return Lista dos livros mais vendidos, limitada pelo parâmetro limit
+     */
+    public List<Book>  sortBooksBySalesDescending(HashMap<Book, Integer> salesByBook, int limit) {
+        List<Book> topBooks = salesByBook.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
+                .limit(limit) // Filtra os N primeiros
+                .map(Map.Entry::getKey) // Extrai apenas os objetos Book
+                .collect(Collectors.toList());
+        return topBooks;
     }
 
     private static Random rand;
