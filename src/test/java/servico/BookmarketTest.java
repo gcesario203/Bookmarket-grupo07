@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,7 +40,13 @@ public class BookmarketTest {
 
     @BeforeClass
     public static void setUpClass() {
+    	cleanTestObjects();
         startUpTestObjects();
+    }
+    
+    @AfterClass
+    public static void flushGlobalDatabase() {
+    	cleanTestObjects();
     }
 
     private static void startUpTestObjects() {
@@ -49,9 +57,11 @@ public class BookmarketTest {
 
         amazon = new Bookstore(0);
         saraiva = new Bookstore(1);
-
+        
+        /// PERCECORRE A SEED
         amazon.populateInstanceBookstore(10000, rand, now);
-
+        
+        /// CONTINUA DA MESMA SEED
         saraiva.populateInstanceBookstore(1000, rand, now);
 
         bookmarket = new Bookmarket();
@@ -60,6 +70,7 @@ public class BookmarketTest {
     }
 
     private static void cleanTestObjects() {
+    	Bookstore.flushGlobalDatabase();
         amazon = null;
 
         saraiva = null;
