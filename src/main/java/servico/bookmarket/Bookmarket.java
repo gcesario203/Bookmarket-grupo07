@@ -8,6 +8,7 @@ import dominio.Order;
 import dominio.Review;
 import dominio.Stock;
 import dominio.customer.enums.Type;
+import servico.bookmarket.statemachine.actions.orders.getConsolidatedBookSalesAction;
 import servico.bookstore.Bookstore;
 import servico.bookmarket.exceptions.UmbrellaException;
 import servico.bookmarket.statemachine.StateMachine;
@@ -412,9 +413,8 @@ public class Bookmarket {
      *         considerando todas as livrarias
      */
     public static HashMap<Book, Integer> getConsolidatedBookSales() {
-        return stateMachine.getStateStream()
-                .map(Bookstore::getConsolidatedBookSales)
-                .reduce(new HashMap<>(), (accumulatedSales, currentStoreSales) -> {
+        HashMap<Book, Integer> consolidatedBookSales = (HashMap<Book, Integer> ) stateMachine.execute(new getConsolidatedBookSalesAction());
+        return consolidatedBookSales.reduce(new HashMap<>(), (accumulatedSales, currentStoreSales) -> {
                     currentStoreSales.forEach((book, quantity) -> accumulatedSales.put(book,
                             accumulatedSales.getOrDefault(book, 0) + quantity));
                     return accumulatedSales;
