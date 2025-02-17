@@ -7,6 +7,10 @@ import java.util.stream.Stream;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 import servico.bookstore.Bookstore;
 
+/**
+ * Ação da maquina de estado da Bookmarket responsável por retornar uma lista dos livros
+ * mais vendidos, podendo ser filtrada por subject
+ */
 public class GetBestSellersAction extends BookstoreAction {
 
 	private static final long serialVersionUID = 34893412122L;

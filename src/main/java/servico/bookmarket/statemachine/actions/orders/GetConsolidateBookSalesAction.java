@@ -9,10 +9,6 @@ import servico.bookstore.Bookstore;
 /**
  * Ação da maquina de estado da Bookmarket responsável por pegar uma lista chave valor
  * dos livros que possuem vendas unificadas em uma unica bookstore
- * 
- * @param subject - tema do livro que serão retornados
- * @return Mapa onde a chave é o livro e o valor é a quantidade total vendida
- *         nesta livraria
  */
 public class GetConsolidateBookSalesAction extends BookstoreAction
 {

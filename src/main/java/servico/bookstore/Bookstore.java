@@ -1082,7 +1082,7 @@ public class Bookstore implements Serializable {
      *
      * @param subject Assunto que será utilizado para filtro de pesquisa por
      * melhores vendedores
-     * @param Quantidade de livros
+     * @param numberOfBooks Quantidade de livros
      * @return Retorna uma lista dos livros mais vendidos desta
      * {@linkplain Bookstore} com tamanho limitado em 100
      */
@@ -1111,12 +1111,12 @@ public class Bookstore implements Serializable {
      * @return Lista dos livros mais vendidos, limitada pelo parâmetro limit
      */
     public List<Book>  sortBooksBySalesDescending(HashMap<Book, Integer> salesByBook, int limit) {
-        List<Book> topBooks = salesByBook.entrySet().stream()
+        List<Book> topSellingBooks = salesByBook.entrySet().stream()
                 .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
                 .limit(limit) // Filtra os N primeiros
                 .map(Map.Entry::getKey) // Extrai apenas os objetos Book
                 .collect(Collectors.toList());
-        return topBooks;
+        return topSellingBooks;
     }
 
     private static Random rand;
