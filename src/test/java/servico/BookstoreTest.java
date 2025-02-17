@@ -641,7 +641,7 @@ public class BookstoreTest {
 
     @Test
     public void shouldReturnRightHashmapOnConsolidatedBookSales() {
-        HashMap<Book, Integer> consolidatedSales = instance.getConsolidatedBookSales();
+        HashMap<Book, Integer> consolidatedSales = instance.getConsolidatedBookSales(null);
         assertNotNull(consolidatedSales);
         List<Order> orders = instance.getOrdersById();
         for (Map.Entry<Book, Integer> entry : consolidatedSales.entrySet()) {
@@ -657,11 +657,26 @@ public class BookstoreTest {
             }
         }
     }
+    
+    @Test
+    public void shouldSortBooksBySalesDescending() {
+        Bookstore bookStore = new Bookstore(3);
+        bookStore.publicPopulateBooks(10);
+        bookStore.publicpopulateOrders(20);
+        HashMap<Book, Integer> totalSales = bookStore.getConsolidatedBookSales(null);
+        List<Book> result = bookStore.sortBooksBySalesDescending(totalSales, 10);
+
+        assertEquals(10, result.size());
+        for (int i = 0; i < result.size() - 1; i++) {
+            assertTrue(totalSales.get(result.get(i)) >= totalSales.get(result.get(i + 1)));
+        }
+
+    }
 
     @Test
     public void shouldReturnNullOnConsolidatedBookSales() {
         Bookstore bookstore = new Bookstore(5);
-        HashMap<Book, Integer> consolidatedSales = bookstore.getConsolidatedBookSales();
+        HashMap<Book, Integer> consolidatedSales = bookstore.getConsolidatedBookSales(null);
         assertTrue(consolidatedSales.size() == 0);
     }
 

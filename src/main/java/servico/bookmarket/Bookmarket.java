@@ -14,6 +14,7 @@ import servico.bookmarket.statemachine.StateMachine;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 import servico.bookmarket.statemachine.actions.books.GetMinimumBookPriceAction;
 import servico.bookmarket.statemachine.actions.books.GetBookPriceAverageAction;
+import servico.bookmarket.statemachine.actions.orders.GetConsolidateBookSalesAction;
 import servico.bookmarket.statemachine.actions.books.UpdateBookAction;
 import servico.bookmarket.statemachine.actions.carts.CartUpdateAction;
 import servico.bookmarket.statemachine.actions.carts.CreateCartAction;
@@ -22,6 +23,7 @@ import servico.bookmarket.statemachine.actions.carts.GetCartById;
 import servico.bookmarket.statemachine.actions.customers.CreateCustomerAction;
 import servico.bookmarket.statemachine.actions.customers.RefreshCustomerSessionAction;
 import servico.bookmarket.statemachine.actions.orders.ConfirmBuyAction;
+import servico.bookmarket.statemachine.actions.orders.GetBestSellersAction;
 import servico.bookmarket.statemachine.actions.reviews.ChangeReviewAction;
 import servico.bookmarket.statemachine.actions.reviews.CreateReviewAction;
 import servico.bookmarket.statemachine.actions.reviews.GetReviewByBookAction;
@@ -38,7 +40,6 @@ import servico.bookmarket.statemachine.actions.shared.PopulateAction;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -360,47 +361,18 @@ public class Bookmarket {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Retorna uma lista ordenada dos livros mais vendidos a partir de um mapa de vendas totais.
-     * A ordenação é feita em ordem decrescente de quantidade vendida.
-     *
-     * @param salesByBook Mapa contendo a quantidade total de vendas para cada livro
-     * @param limit Quantidade de livros a serem retornados
-     * @return Lista dos livros mais vendidos, limitada pelo parâmetro limit
-     */
-    public static List<Book>  sortBooksBySalesDescending(HashMap<Book, Integer> salesByBook, int limit) {
-        List<Book> topBooks = salesByBook.entrySet().stream()
-                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
-                .limit(limit) // Filtra os N primeiros
-                .map(Map.Entry::getKey) // Extrai apenas os objetos Book
-                .collect(Collectors.toList());
-        return topBooks;
-    }
+
 
     /**
      * Identifica os livros mais vendidos considerando todas as livrarias no sistema.
      *
      * @param numberOfBooks Quantidade de livros a serem retornados (entre 1 e 100)
+     * @param subject Tema dos livros mais vendidos
      * @return Lista dos livros mais vendidos, ordenada por quantidade de vendas decrescente
      * @throws RuntimeException se numberOfBooks estiver fora do intervalo válido (1-100)
      */
-    public static List<Book> getBestSellers(Integer numberOfBooks) {
-        final Integer MINIMUM_BOOKS = 1;
-        final Integer MAXIMUM_BOOKS = 100;
-
-        if (numberOfBooks < MINIMUM_BOOKS || numberOfBooks > MAXIMUM_BOOKS) {
-            throw new RuntimeException("Número de livros solicitado deve estar entre 1 e 100");
-        }
-        // Combina as vendas de todas as lojas em um único mapa
-        HashMap<Book, Integer> consolidatedBookSales = stateMachine.getStateStream()
-                .map(Bookstore::getConsolidatedBookSales)
-                .reduce(new HashMap<>(), (map1, map2) -> {
-                    map2.forEach((book, qty) -> map1.put(book, map1.getOrDefault(book, 0) + qty));
-                    return map1;
-                });
-        List<Book> sortBooksBySalesDescending = sortBooksBySalesDescending(consolidatedBookSales, numberOfBooks);
-
-        return sortBooksBySalesDescending;
+    public static List<Book> getBestSellers(Integer numberOfBooks, String subject) {
+    	return (List<Book>) stateMachine.execute(new GetBestSellersAction(subject, numberOfBooks));
     }
 
     /**
@@ -408,17 +380,13 @@ public class Bookmarket {
      * sistema.
      * Combina os contadores de vendas de cada livraria em um único mapa agregado.
      *
+     * @param subject - tema dos livros das livrarias
      * @return Mapa onde a chave é o livro e o valor é a quantidade total vendida
      *         considerando todas as livrarias
      */
-    public static HashMap<Book, Integer> getConsolidatedBookSales() {
-        return stateMachine.getStateStream()
-                .map(Bookstore::getConsolidatedBookSales)
-                .reduce(new HashMap<>(), (accumulatedSales, currentStoreSales) -> {
-                    currentStoreSales.forEach((book, quantity) -> accumulatedSales.put(book,
-                            accumulatedSales.getOrDefault(book, 0) + quantity));
-                    return accumulatedSales;
-                });
+    @SuppressWarnings("unchecked")
+	public static HashMap<Book, Integer> getConsolidatedBookSales(String subject) {
+    	return (HashMap<Book, Integer>) stateMachine.execute(new GetConsolidateBookSalesAction(subject)); 
     }
 
     /**
