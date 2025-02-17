@@ -2,7 +2,7 @@ package servico;
 
 import dominio.*;
 import dominio.customer.enums.Type;
-import infraestrutura.database.global.IGlobalDbContext;
+import infraestrutura.database.global.interfaces.IGlobalDbContext;
 import util.TPCW_Util;
 
 import java.io.IOException;
@@ -58,6 +58,7 @@ public class BookstoreTest {
 
     @Before
     public void setUp() {
+    	
     }
 
     @After
@@ -147,6 +148,9 @@ public class BookstoreTest {
         
         /// Verifica se TODAS as reviews da saraiva são iguais da amazon
         assertTrue(saraiva.getReviews().containsAll(amazon.getReviews()));
+        
+        /// Repopula os objetos de teste da classe
+        populateInstance();
     }
     /**
      * Test of isPopulated method, of class Bookstore.

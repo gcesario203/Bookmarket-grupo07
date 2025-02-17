@@ -1,4 +1,4 @@
-package infraestrutura.database.global;
+package infraestrutura.database.global.interfaces;
 
 import java.util.List;
 import java.util.Map;

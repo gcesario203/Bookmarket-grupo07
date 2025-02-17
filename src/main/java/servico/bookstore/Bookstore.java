@@ -17,8 +17,8 @@ import dominio.Review;
 import dominio.Stock;
 import infraestrutura.database.bookstore.InMemoryBookstoreDbContext;
 import infraestrutura.database.bookstore.interfaces.IBookstoreDbContext;
-import infraestrutura.database.global.IGlobalDbContext;
-import infraestrutura.database.global.interfaces.InMemoryGlobalDbContext;
+import infraestrutura.database.global.InMemoryGlobalDbContext;
+import infraestrutura.database.global.interfaces.IGlobalDbContext;
 import servico.bookstore.utils.BookstoreBookCounter;
 import servico.bookstore.utils.MahoutUtils;
 import util.BookstoreConstants.Backing;
@@ -692,7 +692,7 @@ public class Bookstore implements Serializable {
      *         nesta livraria
      */
     public HashMap<Book, Integer> getConsolidatedBookSales(String subject) {
-        HashMap<Book, Integer> bookSalesList = ordersById.stream()
+        HashMap<Book, Integer> bookSalesList = this.bookstoreDbContext.getOrdersById().stream()
                 .flatMap(order -> order.getLines().stream()) // Converte os pedidos em uma única stream de linhas de pedido
                 .collect(Collectors.toMap(
                         OrderLine::getBook, // Chave: o livro

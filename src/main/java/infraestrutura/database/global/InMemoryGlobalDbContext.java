@@ -1,4 +1,4 @@
-package infraestrutura.database.global.interfaces;
+package infraestrutura.database.global;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import dominio.Author;
 import dominio.Book;
 import dominio.Country;
 import dominio.Customer;
-import infraestrutura.database.global.IGlobalDbContext;
+import infraestrutura.database.global.interfaces.IGlobalDbContext;
 
 /**
  * Classe responsável por conter o contexto de banco de dados de Bookmarket e Bookstore
