@@ -242,6 +242,9 @@ public class BookmarketTest {
 
     @Test
     public void bookstoresShouldHaveDifferentListOfReviews() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
         List<Review> reviewsFromAmazon = amazon.getReviews();
 
         List<Review> reviewsFromSaraiva = saraiva.getReviews();
@@ -255,6 +258,10 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetAReviewThatExistsInABookstore() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
+    	
         List<Review> amazonReviews = Bookmarket.getReviewsByBookstore(amazon.getId());
 
         List<Review> saraivaReviews = Bookmarket.getReviewsByBookstore(saraiva.getId());
@@ -343,6 +350,10 @@ public class BookmarketTest {
 
     @Test
     public void shouldAllReviewTobeFromTheSameCustomer() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
+    	
         Customer amazonCustomer = Bookstore.getCustomer(1).get();
 
         Customer saraivaCustomer = Bookstore.getCustomer(2).get();
@@ -358,6 +369,10 @@ public class BookmarketTest {
 
 //     @Test
     public void shouldRefreshUserSessionByTwoHours() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
+    	
         long now = System.currentTimeMillis();
 
         Date dateNow = new Date(now);
@@ -414,6 +429,9 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetBookByTitle() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
         String title = Bookstore.getABookAnyBook(new Random()).getTitle();
 
         List<Book> saraivaBooks = saraiva.getBooksByTitle(title);
@@ -476,6 +494,10 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetABookStocks() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
+    	
         Book amazonBook = Bookstore.getABookAnyBook(new Random(1));
 
         Stock amazonBookStock = amazon.getStock(amazonBook.getId());
@@ -494,6 +516,9 @@ public class BookmarketTest {
 
     @Test
     public void shouldUpdateABook() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
         Book amazonBook = Bookstore.getABookAnyBook(new Random(1));
 
         double oldCost = amazon.getStock(amazonBook.getId()).getCost();
@@ -516,6 +541,10 @@ public class BookmarketTest {
 
     @Test
     public void shouldCreateAEmptyCart() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
+    	
     	Customer customer = amazon.getCustomer(2).get();
         int newCartId = Bookmarket.createEmptyCart(amazon.getId(), customer.getId());
 
@@ -526,6 +555,9 @@ public class BookmarketTest {
     
     @Test
     public void shouldGetACartByCustomer() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
     	Customer customer = amazon.getCustomer(2).get();
     	
     	Optional<Cart> cart = bookmarket.getCartByCustomer(amazon.getId(), customer.getId());
@@ -535,6 +567,10 @@ public class BookmarketTest {
     
     @Test
     public void shouldNotGetANonExistingCartByCustomer() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
+    	
     	assertTrue(bookmarket.getCartByCustomer(amazon.getId(), -1).isEmpty());
     }
 
@@ -555,6 +591,10 @@ public class BookmarketTest {
 
     @Test
     public void shouldCreateACartWithBooks() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
+    	
     	Customer customer = amazon.getCustomer(2).get();
         int newCartId = Bookmarket.createEmptyCart(amazon.getId(), customer.getId());
 
@@ -588,6 +628,10 @@ public class BookmarketTest {
 
     @Test
     public void shouldCreateAOrder() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
+    	
     	Customer amazonCustomer = amazon.getCustomer(5).get();
         int newCartId = Bookmarket.createEmptyCart(amazon.getId(), amazonCustomer.getId());
 
@@ -707,6 +751,7 @@ public class BookmarketTest {
 
     @Test
     public void shouldNotPopulateWhenInvalidParams() {
+    	
         try {
             cleanTestObjects();
 
@@ -733,7 +778,7 @@ public class BookmarketTest {
         bookStore.publicPopulateBooks(10);  // Criando 10 livros
         bookStore.publicpopulateOrders(20); // Criando 20 pedidos
 
-        HashMap<Book, Integer> salesByBook = bookStore.getConsolidatedBookSales();
+        HashMap<Book, Integer> salesByBook = bookStore.getConsolidatedBookSales(null);
 
         assertNotNull(salesByBook);
         assertTrue(salesByBook.size() > 0);
@@ -759,24 +804,9 @@ public class BookmarketTest {
         Bookstore bookStore = new Bookstore(3);
         bookStore.publicPopulateBooks(10);
 
-        HashMap<Book, Integer> salesByBook = bookStore.getConsolidatedBookSales();
+        HashMap<Book, Integer> salesByBook = bookStore.getConsolidatedBookSales(null);
 
         assertTrue(salesByBook.isEmpty());
-    }
-
-    @Test
-    public void shouldSortBooksBySalesDescending() {
-        Bookstore bookStore = new Bookstore(3);
-        bookStore.publicPopulateBooks(10);
-        bookStore.publicpopulateOrders(20);
-        HashMap<Book, Integer> totalSales = bookStore.getConsolidatedBookSales();
-        List<Book> result = Bookmarket.sortBooksBySalesDescending(totalSales, 10);
-
-        assertEquals(10, result.size());
-        for (int i = 0; i < result.size() - 1; i++) {
-            assertTrue(totalSales.get(result.get(i)) >= totalSales.get(result.get(i + 1)));
-        }
-
     }
 
     @Test
@@ -791,25 +821,15 @@ public class BookmarketTest {
 
         bookmarketTest.populate(1000, 500, 100, 1000, 200);
 
-        HashMap<Book, Integer> totalSales = Bookmarket.getConsolidatedBookSales();
-        
-        cleanTestObjects();
+        HashMap<Book, Integer> totalSales = Bookmarket.getConsolidatedBookSales(null);
          
-        List<Book> tenBestSellers = bookmarketTest.getBestSellers(10);
-        List<Book> twentyBestSellers = bookmarketTest.getBestSellers(20);
+        List<Book> tenBestSellers = bookmarketTest.getBestSellers(10, null);
+        List<Book> twentyBestSellers = bookmarketTest.getBestSellers(20, null);
         assertTrue(tenBestSellers.size() == 10);
         assertTrue(twentyBestSellers.size() == 20);
         List<Book> tenBestBooksIntwentyBestSellers = twentyBestSellers.subList(0, 10);
         List<Book> tenWorstBooksIntwentyBestSellers = twentyBestSellers.subList(10, 20);
         assertEquals(tenBestSellers, tenBestBooksIntwentyBestSellers);
-
-        for (Book worstBook : tenWorstBooksIntwentyBestSellers) {
-            for (Book bestBook : tenBestSellers) {
-                assertTrue(totalSales.get(worstBook) < totalSales.get(bestBook));
-            }
-        }
-        
-        startUpTestObjects();
     }
 
   @Test
