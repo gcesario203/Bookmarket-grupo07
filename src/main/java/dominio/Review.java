@@ -2,6 +2,8 @@ package dominio;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Objects;
+
 import servico.shared.IdGenerator;
 
 /*
@@ -64,4 +66,15 @@ public class Review implements Serializable {
 		if(value < 0 || value > 5)
 			throw new IOException("Avaliação com valor inválido");
 	}
+	
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Review review = (Review) obj;
+        return this.customer.equals(review.getCustomer()) &&
+        		this.book.equals(review.getBook()) &&
+        		this.id == review.id &&
+        		this.rating == review.rating;
+    }
 }
