@@ -617,7 +617,7 @@ public class BookstoreTest {
     public void shouldUpdateRelatedBooks() {
     	populateInstance();
     	
-        Book randomBook = instance.getABookAnyBook(new Random(0));
+        Book randomBook = instance.getABookAnyBook(new Random());
 
         Book oldRelated1 = randomBook.getRelated1();
         Book oldRelated2 = randomBook.getRelated2();
