@@ -2,7 +2,6 @@ package dominio;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Objects;
 
 import servico.shared.IdGenerator;
 
