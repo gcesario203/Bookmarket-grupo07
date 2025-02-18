@@ -138,7 +138,7 @@ public class BookstoreTest {
         saraiva.populateInstanceBookstore(10, new Random(firstSeed), now);
         
         /// Verifica se TODAS as reviews da saraiva são iguais da amazon
-        //assertTrue(saraiva.getReviews().containsAll(amazon.getReviews()));
+        assertTrue(saraiva.getReviews().containsAll(amazon.getReviews()));
         
         /// Repopula os objetos de teste da classe
         populateInstance();

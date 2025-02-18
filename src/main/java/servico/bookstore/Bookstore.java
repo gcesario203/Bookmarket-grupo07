@@ -93,11 +93,11 @@ public class Bookstore implements Serializable {
     private static final List<Author> authorsById;
     private static final List<Book> booksById;
 
-    private final Map<Book, Stock> stockByBook;
-    private final List<Cart> cartsById;
-    private final List<Order> ordersById;
-    private final List<Review> reviewsByIds;
-    private final LinkedList<Order> ordersByCreation;
+    private Map<Book, Stock> stockByBook;
+    private List<Cart> cartsById;
+    private List<Order> ordersById;
+    private List<Review> reviewsByIds;
+    private LinkedList<Order> ordersByCreation;
     private final int id;
     
     /**
@@ -124,22 +124,14 @@ public class Bookstore implements Serializable {
      */
     public Bookstore(final int id) {
         this.id = id;
-        cartsById = new ArrayList<>();
-        ordersById = new ArrayList<>();
-        ordersByCreation = new LinkedList<>();
-        stockByBook = new HashMap<>();
-        reviewsByIds = new ArrayList<>();
+        resetBookstoreData();
     }
 
     public Bookstore(final int id, Map<Book, Stock> stockByBook, List<Cart> cartsById, List<Review> reviewsByIds,
             List<Order> ordersById, LinkedList<Order> ordersByCreation) {
         this.id = id;
         
-        this.cartsById = new ArrayList<>();
-        this.reviewsByIds = new ArrayList<>();
-        this.ordersById = new ArrayList<>();
-        this.ordersByCreation = new LinkedList<>();
-        this.stockByBook = new HashMap<>();
+        resetBookstoreData();
 
         this.stockByBook.putAll(stockByBook);
         this.cartsById.addAll(cartsById);
@@ -1297,10 +1289,22 @@ public class Bookstore implements Serializable {
 
     }
     
+    /**
+     * Método responsável por limpar os dados atuais da bookstore
+     */
+    private void resetBookstoreData() {
+        cartsById = new ArrayList<>();
+        ordersById = new ArrayList<>();
+        ordersByCreation = new LinkedList<>();
+        stockByBook = new HashMap<>();
+        reviewsByIds = new ArrayList<>();
+    }
     
     public void populateInstanceBookstore(int number, Random rand, long now) {
     	// Limpa o gerador de id
     	servico.shared.IdGenerator.getInstance().reset();
+    	
+    	resetBookstoreData();
     	
         populateOrders(number, rand, now);
         populateStocks(number, rand, now);
