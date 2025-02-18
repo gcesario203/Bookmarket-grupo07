@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,7 +40,13 @@ public class BookmarketTest {
 
     @BeforeClass
     public static void setUpClass() {
+    	cleanTestObjects();
         startUpTestObjects();
+    }
+    
+    @AfterClass
+    public static void flushGlobalDatabase() {
+    	cleanTestObjects();
     }
 
     private static void startUpTestObjects() {
@@ -49,9 +57,11 @@ public class BookmarketTest {
 
         amazon = new Bookstore(0);
         saraiva = new Bookstore(1);
-
+        
+        /// PERCECORRE A SEED
         amazon.populateInstanceBookstore(10000, rand, now);
-
+        
+        /// CONTINUA DA MESMA SEED
         saraiva.populateInstanceBookstore(1000, rand, now);
 
         bookmarket = new Bookmarket();
@@ -485,6 +495,9 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetABookStock() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
         Book amazonBook = Bookstore.getABookAnyBook(new Random(1));
 
         Stock amazonBookStock = amazon.getStock(amazonBook.getId());
@@ -571,7 +584,7 @@ public class BookmarketTest {
     	
     	startUpTestObjects();
     	
-    	assertTrue(bookmarket.getCartByCustomer(amazon.getId(), -1).isEmpty());
+    	assertTrue(!bookmarket.getCartByCustomer(amazon.getId(), -1).isPresent());
     }
 
     @Test(expected = RuntimeException.class)
@@ -834,7 +847,9 @@ public class BookmarketTest {
 
   @Test
   public void shouldGetTheMinimumBookValueCost() {
-
+	  
+	  cleanTestObjects();
+	  startUpTestObjects();
     Optional<Stock> saraivaMinCost = saraiva.getStocks().stream().min(Comparator.comparingDouble(Stock::getCost));
 
     Stock amazonSameBookMinCost = amazon.getStock(saraivaMinCost.get().getBook().getId());
@@ -850,6 +865,9 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetTheAverageCostFromABook() {
+    	cleanTestObjects();
+    	startUpTestObjects();
+    	
         Stock amazonStock = null;
         Stock saraivaStock = null;
         Book randomBook = null;

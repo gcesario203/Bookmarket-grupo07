@@ -31,10 +31,8 @@ public class BookstoreTest {
     }
 
     static Bookstore instance;
-
-    @BeforeClass
-    public static void setUpClass() {
-
+    
+    private static void populateInstance() {
         long seed = 0;
         long now = System.currentTimeMillis();
         int items = 10000;
@@ -45,7 +43,11 @@ public class BookstoreTest {
         Random rand = new Random(seed);
         Bookstore.populate(seed, now, items, customers, addresses, authors);
         instance = new Bookstore(0);
-        instance.populateInstanceBookstore(orders, rand, now);
+        instance.populateInstanceBookstore(orders, new Random(seed), now);
+    }
+    @BeforeClass
+    public static void setUpClass() {
+    	populateInstance();
     }
 
     @AfterClass
@@ -54,6 +56,7 @@ public class BookstoreTest {
 
     @Before
     public void setUp() {
+    	
     }
 
     @After
@@ -90,7 +93,56 @@ public class BookstoreTest {
         assertTrue(stock.get(0).getCost() > 0);
         assertEquals(stock.get(0).getIdBookstore(), bookstore.getId());
     }
+    
+    /**
+     * Teste para verificar se a população de bookstore, está levando em conta
+     * o seed de criação do Rand para uma criação de objetos controlados
+     */
+    @Test
+    public void shouldPopulateTheWholeBookstoreBySeed() {
+        long firstSeed = 5;
+        long secondSeed = 12782;
+        long now = System.currentTimeMillis();
+        int items = 83;
+        int customers = 4;
+        int addresses = 13;
+        int authors = 1;
+        
+        Bookstore amazon = new Bookstore(1);
+        
+        Bookstore saraiva = new Bookstore(2);
+       
+        
+        /// Repopula os dados globais de acordo com a primeira seed(5)
+        Bookstore.populate(firstSeed, now, items, customers, addresses, authors);
+        
+        /// Popula os dados da amazon para que seja populado baseado na seed(5)
+        amazon.populateInstanceBookstore(10, new Random(firstSeed), now);
 
+        // Repopula os dados globais de acordo com a segunda seed(12782)
+        Bookstore.populate(secondSeed, now, items, customers, addresses, authors);
+        
+        // Popula os dados da saraiva para que seja populado baseado na seed(12782)
+        saraiva.populateInstanceBookstore(10, new Random(secondSeed), now);
+        
+        /// Verifica se TODAS as reviews da saraiva são diferentes da amazon
+        assertFalse(saraiva.getReviews().containsAll(amazon.getReviews()));
+        
+        // Vamos popular novamente os objetos globais com a primeira seed
+        Bookstore.populate(firstSeed, now, items, customers, addresses, authors);
+        
+        /// Popula os dados da amazon para que seja populado baseado na seed(5)
+        amazon.populateInstanceBookstore(10, new Random(firstSeed), now);
+        
+        /// Iremos repopular saraiva com a mesma seed(5) da amazon
+        saraiva.populateInstanceBookstore(10, new Random(firstSeed), now);
+        
+        /// Verifica se TODAS as reviews da saraiva são iguais da amazon
+        assertTrue(saraiva.getReviews().containsAll(amazon.getReviews()));
+        
+        /// Repopula os objetos de teste da classe
+        populateInstance();
+    }
     /**
      * Test of isPopulated method, of class Bookstore.
      */
@@ -322,12 +374,12 @@ public class BookstoreTest {
     public void shouldGetAEmptyCartWhenCreatingForAInvalidCustomer() {
         Optional<Cart> cart = instance.createCart(-1, 0L);
 
-        assertEquals(cart.isEmpty(), true);
+        assertEquals(!cart.isPresent(), true);
     }
 
     @Test
     public void shouldGetAEmptyCartWhenFindingAInexistentCart() {
-        assertTrue(instance.getCart(-1).isEmpty());
+        assertTrue(!instance.getCart(-1).isPresent());
     }
 
     /**
@@ -563,7 +615,9 @@ public class BookstoreTest {
 
     @Test
     public void shouldUpdateRelatedBooks() {
-        Book randomBook = instance.getABookAnyBook(new Random(0));
+    	populateInstance();
+    	
+        Book randomBook = instance.getABookAnyBook(new Random());
 
         Book oldRelated1 = randomBook.getRelated1();
         Book oldRelated2 = randomBook.getRelated2();
@@ -625,6 +679,8 @@ public class BookstoreTest {
 
     @Test
     public void shouldReturnValidRecommendationsFromSyntheticDataset() {
+    	
+    	populateInstance();
         // Criação dos livros
         Book b1 = Bookmarket.getBook(1); // Duna
         Book b2 = Bookmarket.getBook(2); // Neuromancer
