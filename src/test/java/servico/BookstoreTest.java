@@ -383,12 +383,12 @@ public class BookstoreTest {
     public void shouldGetAEmptyCartWhenCreatingForAInvalidCustomer() {
         Optional<Cart> cart = instance.createCart(-1, 0L);
 
-        assertEquals(cart.isEmpty(), true);
+        assertEquals(!cart.isPresent(), true);
     }
 
     @Test
     public void shouldGetAEmptyCartWhenFindingAInexistentCart() {
-        assertTrue(instance.getCart(-1).isEmpty());
+        assertTrue(!instance.getCart(-1).isPresent());
     }
 
     /**

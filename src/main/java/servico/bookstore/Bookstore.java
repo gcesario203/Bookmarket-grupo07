@@ -438,7 +438,7 @@ public class Bookstore implements Serializable {
     public static void refreshCustomerSession(int cId, long now) throws Exception {
         Optional<Customer> customer = getCustomer(cId);
         
-        if(customer.isEmpty())
+        if(!customer.isPresent())
         	throw new Exception("Customer not exists");
         
         customer.get().setLogin(new Date(now));
@@ -702,7 +702,7 @@ public class Bookstore implements Serializable {
                 ));
         
         // Caso o tema do livro seja vazio, já retorna a lista de livros que possuem vendas
-        if(subject == null || subject.isBlank() || subject.isEmpty())
+        if(subject == null || subject.isEmpty())
         	return bookSalesList;
         
         // se não, filtra pelo livro e retorna o HashMap filtrado
@@ -917,11 +917,11 @@ public class Bookstore implements Serializable {
     public Optional<Cart> createCart(int customerId, long now) {
     	Optional<Customer> customer = getCustomer(customerId);
     	
-    	if(customer.isEmpty())
+    	if(!customer.isPresent())
     		return Optional.empty();
     	
     	Optional<Cart> createdCart = getCartByCustomer(customerId);
-    	if(createdCart.isEmpty()) {
+    	if(!createdCart.isPresent()) {
             int idCart = this.bookstoreDbContext.getCartsById().size();
             Cart cart = new Cart(idCart, new Date(now), customer.get(), this.getId());
             this.bookstoreDbContext.getCartsById().add(cart);
@@ -958,7 +958,7 @@ public class Bookstore implements Serializable {
             List<Integer> quantities, long now) {
         Optional<Cart> cart = getCart(cId);
         
-        if(cart.isEmpty())
+        if(!cart.isPresent())
         	return Optional.empty();
         
         if (bId != null) {
@@ -1026,7 +1026,7 @@ public class Bookstore implements Serializable {
     public Optional<Customer> updateCustomerType(int customerId, dominio.customer.enums.Type type) {
     	Optional<Customer> customerToChange = getCustomer(customerId);
     	
-    	if(customerToChange.isEmpty())
+    	if(!customerToChange.isPresent())
     		return Optional.empty();
     	
     	customerToChange.get().setType(type);

@@ -582,7 +582,7 @@ public class BookmarketTest {
     	
     	startUpTestObjects();
     	
-    	assertTrue(bookmarket.getCartByCustomer(amazon.getId(), -1).isEmpty());
+    	assertTrue(!bookmarket.getCartByCustomer(amazon.getId(), -1).isPresent());
     }
 
     @Test(expected = RuntimeException.class)
