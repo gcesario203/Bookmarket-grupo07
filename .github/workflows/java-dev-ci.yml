@@ -23,12 +23,7 @@ jobs:
           distribution: temurin
 
       - name: Build with Maven
-        run: |
-          mvn -B test -Dtest=ReviewTest && \
-          mvn -B test -Dtest=IdGeneratorTest && \
-          mvn -B test -Dtest=BookmarketTest && \
-          mvn -B test -Dtest=BookstoreTest
-
+        run: mvn -B test
 
       - name: Generate JaCoCo Badge
         id: jacoco
