@@ -847,7 +847,9 @@ public class BookmarketTest {
 
   @Test
   public void shouldGetTheMinimumBookValueCost() {
-
+	  
+	  cleanTestObjects();
+	  startUpTestObjects();
     Optional<Stock> saraivaMinCost = saraiva.getStocks().stream().min(Comparator.comparingDouble(Stock::getCost));
 
     Stock amazonSameBookMinCost = amazon.getStock(saraivaMinCost.get().getBook().getId());
@@ -863,6 +865,9 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetTheAverageCostFromABook() {
+    	cleanTestObjects();
+    	startUpTestObjects();
+    	
         Stock amazonStock = null;
         Stock saraivaStock = null;
         Book randomBook = null;
