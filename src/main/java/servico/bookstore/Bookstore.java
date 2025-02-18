@@ -40,7 +40,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.hadoop.util.IdGenerator;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 
 import static util.BookstoreConstants.*;
