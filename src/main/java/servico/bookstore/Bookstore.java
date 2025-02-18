@@ -15,10 +15,6 @@ import dominio.Order;
 import dominio.OrderLine;
 import dominio.Review;
 import dominio.Stock;
-import infraestrutura.database.bookstore.InMemoryBookstoreDbContext;
-import infraestrutura.database.bookstore.interfaces.IBookstoreDbContext;
-import infraestrutura.database.global.InMemoryGlobalDbContext;
-import infraestrutura.database.global.interfaces.IGlobalDbContext;
 import servico.bookstore.utils.BookstoreBookCounter;
 import servico.bookstore.utils.MahoutUtils;
 import util.BookstoreConstants.Backing;
@@ -88,21 +84,37 @@ public class Bookstore implements Serializable {
     private static final long serialVersionUID = -3099048826035606338L;
 
     private static boolean populated;
-    
-    // Contexto global de dados das classes de dominio
-    // OBSERVAÇÃO: A arquitetura inicial do projeto contava que todas as classes
-    // de dominio globais para o bookmarket ficariam armazenadas dentro de pro
-    // priedades estaticas acessiveis pela Bookmarket. Para não quebrar
-    // e não diferenciar tanto a arquitetura original, mantive a chamada da interface
-    // como propriedade estatica, mas nada impediria que chamassemos a implementação
-    // do IGlobalDbContext::InMemoryGlobalDbCOntext de uma forma mais explícita
-    private static final IGlobalDbContext globalDbContext = new InMemoryGlobalDbContext();
-    
-    // Contexto de dados das classes de dominio que vão ser manipulados
-    // por bookstores específicas
-    private final IBookstoreDbContext bookstoreDbContext;
-    
+    private static final List<Country> countryById;
+    private static final Map<String, Country> countryByName;
+    private static final List<Address> addressById;
+    private static final Map<Address, Address> addressByAll;
+    private static final List<Customer> customersById;
+    private static final Map<String, Customer> customersByUsername;
+    private static final List<Author> authorsById;
+    private static final List<Book> booksById;
+
+    private final Map<Book, Stock> stockByBook;
+    private final List<Cart> cartsById;
+    private final List<Order> ordersById;
+    private final List<Review> reviewsByIds;
+    private final LinkedList<Order> ordersByCreation;
     private final int id;
+    
+    /**
+     * Bloco static que executa a inicialização dos atriutos estáticos da
+     * Bookstore
+     */
+    static {
+        countryById = new ArrayList<>();
+        countryByName = new HashMap<>();
+        addressById = new ArrayList<>();
+        addressByAll = new HashMap<>();
+        customersById = new ArrayList<>();
+        customersByUsername = new HashMap<>();
+        authorsById = new ArrayList<>();
+        booksById = new ArrayList<>();
+        
+    }
 
     /**
      * Construtor da classe Bookstore.Recebe como parâmetro o id da Bookstore.
@@ -112,20 +124,28 @@ public class Bookstore implements Serializable {
      */
     public Bookstore(final int id) {
         this.id = id;
-        bookstoreDbContext = new InMemoryBookstoreDbContext();
+        cartsById = new ArrayList<>();
+        ordersById = new ArrayList<>();
+        ordersByCreation = new LinkedList<>();
+        stockByBook = new HashMap<>();
+        reviewsByIds = new ArrayList<>();
     }
 
     public Bookstore(final int id, Map<Book, Stock> stockByBook, List<Cart> cartsById, List<Review> reviewsByIds,
             List<Order> ordersById, LinkedList<Order> ordersByCreation) {
         this.id = id;
         
-        bookstoreDbContext = new InMemoryBookstoreDbContext();
+        this.cartsById = new ArrayList<>();
+        this.reviewsByIds = new ArrayList<>();
+        this.ordersById = new ArrayList<>();
+        this.ordersByCreation = new LinkedList<>();
+        this.stockByBook = new HashMap<>();
 
-        this.bookstoreDbContext.getStockByBook().putAll(stockByBook);
-        this.bookstoreDbContext.getCartsById().addAll(cartsById);
-        this.bookstoreDbContext.getReviewsByIds().addAll(reviewsByIds);
-        this.bookstoreDbContext.getOrdersById().addAll(ordersById);
-        this.bookstoreDbContext.getOrdersByCreation().addAll(ordersByCreation);
+        this.stockByBook.putAll(stockByBook);
+        this.cartsById.addAll(cartsById);
+        this.reviewsByIds.addAll(reviewsByIds);
+        this.ordersById.addAll(ordersById);
+        this.ordersByCreation.addAll(ordersByCreation);
     }
 
     /**
@@ -155,7 +175,7 @@ public class Bookstore implements Serializable {
      * @return um país com o nome definido por <code>name</code>
      */
     private static Country alwaysGetCountry(String name) {
-        Country country = globalDbContext.getCountryByName().get(name);
+        Country country = countryByName.get(name);
         if (country == null) {
             country = createCountry(name, "", 0);
         }
@@ -171,7 +191,7 @@ public class Bookstore implements Serializable {
      * @return countryById País do Id escolhido
      */
     private static Country getACountryAnyCountry(Random random) {
-        return globalDbContext.getCountryById().get(random.nextInt(globalDbContext.getCountryById().size()));
+        return countryById.get(random.nextInt(countryById.size()));
     }
 
     /**
@@ -186,10 +206,10 @@ public class Bookstore implements Serializable {
      * @return country país
      */
     private static Country createCountry(String name, String currency, double exchange) {
-        int id = globalDbContext.getCountryById().size();
+        int id = countryById.size();
         Country country = new Country(id, name, currency, exchange);
-        globalDbContext.getCountryById().add(country);
-        globalDbContext.getCountryByName().put(name, country);
+        countryById.add(country);
+        countryByName.put(name, country);
         return country;
     }
 
@@ -211,7 +231,7 @@ public class Bookstore implements Serializable {
             String city, String state, String zip, String countryName) {
         Country country = alwaysGetCountry(countryName);
         Address key = new Address(0, street1, street2, city, state, zip, country);
-        Address address = globalDbContext.getAddressByAll().get(key);
+        Address address = addressByAll.get(key);
         if (address == null) {
             address = createAddress(street1, street2, city, state, zip,
                     country);
@@ -227,7 +247,7 @@ public class Bookstore implements Serializable {
      * @return addressById Endereço do Id escolhido
      */
     private static Address getAnAddressAnyAddress(Random random) {
-        return globalDbContext.getAddressById().get(random.nextInt(globalDbContext.getAddressById().size()));
+        return addressById.get(random.nextInt(addressById.size()));
     }
 
     /**
@@ -244,11 +264,11 @@ public class Bookstore implements Serializable {
      */
     private static Address createAddress(String street1, String street2,
             String city, String state, String zip, Country country) {
-        int id = globalDbContext.getAddressById().size();
+        int id = addressById.size();
         Address address = new Address(id, street1, street2, city, state, zip,
                 country);
-        globalDbContext.getAddressById().add(address);
-        globalDbContext.getAddressByAll().put(address, address);
+        addressById.add(address);
+        addressByAll.put(address, address);
         return address;
     }
 
@@ -259,7 +279,7 @@ public class Bookstore implements Serializable {
      * @return customerById ID do Consumidor
      */
     public static Optional<Customer> getCustomer(int cId) {
-        return globalDbContext.getCustomersById().stream().filter(c -> c.getId() == cId).findFirst();
+        return customersById.stream().filter(c -> c.getId() == cId).findFirst();
     }
 
     /**
@@ -268,7 +288,7 @@ public class Bookstore implements Serializable {
      * @return customersByUsername Consumidor do Nome de Usuário
      */
     public static Optional<Customer> getCustomer(String username) {
-        return Optional.ofNullable(globalDbContext.getCustomersByUsername().get(username));
+        return Optional.ofNullable(customersByUsername.get(username));
     }
 
     /**
@@ -278,19 +298,19 @@ public class Bookstore implements Serializable {
      * @return customersById Consumidor do Id escolhido
      */
     private Customer getACustomerAnyCustomer(Random random) {
-        return globalDbContext.getCustomersById().get(random.nextInt(globalDbContext.getCustomersById().size()));
+        return customersById.get(random.nextInt(customersById.size()));
     }
 
     public Review createReview(Customer customer, Book book, double value) throws IOException {
-        if (!globalDbContext.getCustomersById().contains(customer))
+        if (!customersById.contains(customer))
             throw new IOException("Cliente não cadastrado");
 
-        if (!globalDbContext.getBooksById().contains(book))
+        if (!booksById.contains(book))
             throw new IOException("Livro não cadastrado");
 
         Review review = new Review(customer, book, value, this.id);
 
-         this.bookstoreDbContext.getReviewsByIds().add(review);
+        reviewsByIds.add(review);
 
         return review;
     }
@@ -311,7 +331,7 @@ public class Bookstore implements Serializable {
     }
 
     public List<Review> getReviews() {
-        return this.bookstoreDbContext.getReviewsByIds();
+        return reviewsByIds;
     }
 
     public Optional<Review> getReviewById(int id) {
@@ -410,13 +430,13 @@ public class Bookstore implements Serializable {
             String phone, String email, Date since, Date lastVisit,
             Date login, Date expiration, double discount, Date birthdate,
             String data, dominio.customer.enums.Type type) {
-        int id = globalDbContext.getCustomersById().size();
+        int id = customersById.size();
         String uname = TPCW_Util.DigSyl(id, 0);
         Customer customer = new Customer(id, uname, uname.toLowerCase(), fname,
                 lname, phone, email, since, lastVisit, login, expiration,
                 discount, 0, 0, birthdate, data, address, type);
-        globalDbContext.getCustomersById().add(customer);
-        globalDbContext.getCustomersByUsername().put(uname, customer);
+        customersById.add(customer);
+        customersByUsername.put(uname, customer);
         return customer;
     }
 
@@ -452,7 +472,7 @@ public class Bookstore implements Serializable {
      * @return authorsById Autor do Id escolhido
      */
     private static Author getAnAuthorAnyAuthor(Random random) {
-        return globalDbContext.getAuthorsById().get(random.nextInt(globalDbContext.getAuthorsById().size()));
+        return authorsById.get(random.nextInt(authorsById.size()));
     }
 
     /**
@@ -470,7 +490,7 @@ public class Bookstore implements Serializable {
     private static Author createAuthor(String fname, String mname, String lname,
             Date birthdate, String bio) {
         Author author = new Author(fname, mname, lname, birthdate, bio);
-        globalDbContext.getAuthorsById().add(author);
+        authorsById.add(author);
         return author;
     }
 
@@ -482,7 +502,7 @@ public class Bookstore implements Serializable {
      * @return retorna optional do livro correspondente ao índice
      */
     public static Optional<Book> getBook(int bId) {
-        return Optional.ofNullable(globalDbContext.getBooksById().get(bId));
+        return Optional.ofNullable(booksById.get(bId));
     }
 
     /**
@@ -516,7 +536,7 @@ public class Bookstore implements Serializable {
      *         itens
      */
     public List<Book> getRecommendationByItens(int c_id, int maxRecommendations) {
-        List<RecommendedItem> itemRecommendations = MahoutUtils.recommendItemBased( this.bookstoreDbContext.getReviewsByIds(), c_id,
+        List<RecommendedItem> itemRecommendations = MahoutUtils.recommendItemBased(reviewsByIds, c_id,
                 maxRecommendations);
         List<Book> recommendedBooks = new ArrayList<>();
         for (RecommendedItem item : itemRecommendations) {
@@ -561,7 +581,7 @@ public class Bookstore implements Serializable {
      *         usuários
      */
     public List<Book> getRecommendationByUsers(int c_id, int maxRecommendations) {
-        List<RecommendedItem> userRecommendations = MahoutUtils.recommendUserBased( this.bookstoreDbContext.getReviewsByIds(), c_id,
+        List<RecommendedItem> userRecommendations = MahoutUtils.recommendUserBased(reviewsByIds, c_id,
                 maxRecommendations);
         List<Book> recommendedBooks = new ArrayList<>();
         for (RecommendedItem item : userRecommendations) {
@@ -580,7 +600,7 @@ public class Bookstore implements Serializable {
      * @return uma instância de <code>Book</code>
      */
     public static Book getABookAnyBook(Random random) {
-        return globalDbContext.getBooksById().get(random.nextInt(globalDbContext.getBooksById().size()));
+        return booksById.get(random.nextInt(booksById.size()));
     }
 
     /**
@@ -603,7 +623,7 @@ public class Bookstore implements Serializable {
      */
     public static List<Book> getBooksBySubject(String subject) {
         ArrayList<Book> books = new ArrayList<>();
-        for (Book book : globalDbContext.getBooksById()) {
+        for (Book book : booksById) {
             if (subject.equals(book.getSubject())) {
                 books.add(book);
                 if (books.size() > 50) {
@@ -624,7 +644,7 @@ public class Bookstore implements Serializable {
      */
     public static List<Book> getBooksByTitle(String title) {
         ArrayList<Book> books = new ArrayList<>();
-        for (Book book : globalDbContext.getBooksById()) {
+        for (Book book : booksById) {
             if (book.getTitle().startsWith(title)) {
                 books.add(book);
                 if (books.size() > 50) {
@@ -645,7 +665,7 @@ public class Bookstore implements Serializable {
     public static List<Book> getBooksByAuthor(String author) {
         Pattern regex = Pattern.compile("^" + author);
         ArrayList<Book> books = new ArrayList<>();
-        for (Book book : globalDbContext.getBooksById()) {
+        for (Book book : booksById) {
             if (regex.matcher(book.getAuthor().getLname()).matches()) {
                 books.add(book);
                 if (books.size() > 50) {
@@ -665,7 +685,7 @@ public class Bookstore implements Serializable {
      */
     public static List<Book> getNewBooks(String subject) {
         ArrayList<Book> books = new ArrayList<>();
-        for (Book book : globalDbContext.getBooksById()) {
+        for (Book book : booksById) {
             if (subject.equals(book.getSubject())) {
                 books.add(book);
             }
@@ -692,7 +712,7 @@ public class Bookstore implements Serializable {
      *         nesta livraria
      */
     public HashMap<Book, Integer> getConsolidatedBookSales(String subject) {
-        HashMap<Book, Integer> bookSalesList = this.bookstoreDbContext.getOrdersById().stream()
+        HashMap<Book, Integer> bookSalesList = ordersById.stream()
                 .flatMap(order -> order.getLines().stream()) // Converte os pedidos em uma única stream de linhas de pedido
                 .collect(Collectors.toMap(
                         OrderLine::getBook, // Chave: o livro
@@ -722,7 +742,7 @@ public class Bookstore implements Serializable {
      * @return a list of Orders
      */
     public List<Order> getOrdersById() {
-        return this.bookstoreDbContext.getOrdersById();
+        return ordersById;
     }
 
     /**
@@ -735,11 +755,11 @@ public class Bookstore implements Serializable {
             String subject, String desc, String thumbnail,
             String image, double srp, Date avail, String isbn,
             int page, String backing, String dimensions, Author author) {
-        int id = globalDbContext.getBooksById().size();
+        int id = booksById.size();
         Book book = new Book(id, title, pubDate, publisher, subject, desc,
                 thumbnail, image, srp, avail, isbn, page, backing,
                 dimensions, author);
-        globalDbContext.getBooksById().add(book);
+        booksById.add(book);
         return book;
     }
 
@@ -767,11 +787,11 @@ public class Bookstore implements Serializable {
      */
     public void updateStock(int bId, double cost) {
         Book book = getBook(bId).get();
-        if (!this.bookstoreDbContext.getStockByBook().containsKey(book)) {
+        if (!stockByBook.containsKey(book)) {
             int stock = TPCW_Util.getRandomInt(rand, 10, 30);
-            this.bookstoreDbContext.getStockByBook().put(book, new Stock(this.id, book, cost, stock));
+            stockByBook.put(book, new Stock(this.id, book, cost, stock));
         }
-        this.bookstoreDbContext.getStockByBook().get(book).setCost(cost);
+        stockByBook.get(book).setCost(cost);
     }
 
     /**
@@ -782,12 +802,12 @@ public class Bookstore implements Serializable {
      */
     public Stock getStock(int bId) {
         final Book book = getBook(bId).get();
-        final Stock stock = this.bookstoreDbContext.getStockByBook().get(book);
+        final Stock stock = stockByBook.get(book);
         return stock;
     }
 
     public List<Stock> getStocks() {
-        return new ArrayList<>(this.bookstoreDbContext.getStockByBook().values());
+        return new ArrayList<>(stockByBook.values());
     }
 
     /**
@@ -816,7 +836,7 @@ public class Bookstore implements Serializable {
      */
     private Set<Integer> getClientIdsWhoBoughtTargetBook(Book targetBook) {
         Set<Integer> clientIds = new HashSet<>();
-        Iterator<Order> orderIterator = this.bookstoreDbContext.getOrdersByCreation().iterator();
+        Iterator<Order> orderIterator = ordersByCreation.iterator();
 
         int orderOldLimit = 10000;
         for (int orderCount = 0; orderIterator.hasNext() && orderCount < orderOldLimit; orderCount++) {
@@ -841,7 +861,7 @@ public class Bookstore implements Serializable {
     private Map<Integer, BookstoreBookCounter> getPurchaseFrequency(Set<Integer> clientIds, Book targetBook) {
         Map<Integer, BookstoreBookCounter> purchaseFrequency = new HashMap<>();
 
-        this.bookstoreDbContext.getOrdersByCreation().stream()
+        ordersByCreation.stream()
                 .filter(order -> clientIds.contains(order.getCustomer().getId()))
                 .forEach(order -> {
                     order.getLines().forEach(line -> {
@@ -904,7 +924,7 @@ public class Bookstore implements Serializable {
      * @return uma instância de <code>Cart</code>
      */
     public Optional<Cart> getCart(int id) {
-        return this.bookstoreDbContext.getCartsById().stream().filter(x -> x.getId() == id).findFirst();
+        return cartsById.stream().filter(x -> x.getId() == id).findFirst();
     }
 
     /**
@@ -922,9 +942,9 @@ public class Bookstore implements Serializable {
     	
     	Optional<Cart> createdCart = getCartByCustomer(customerId);
     	if(!createdCart.isPresent()) {
-            int idCart = this.bookstoreDbContext.getCartsById().size();
+            int idCart = cartsById.size();
             Cart cart = new Cart(idCart, new Date(now), customer.get(), this.getId());
-            this.bookstoreDbContext.getCartsById().add(cart);
+            cartsById.add(cart);
             
             return Optional.of(cart);	
     	}
@@ -939,7 +959,7 @@ public class Bookstore implements Serializable {
      */
     public Optional<Cart> getCartByCustomer(int customerId){
     	
-    	return this.bookstoreDbContext.getCartsById().stream()
+    	return cartsById.stream()
 				.filter(cart -> cart.getCustomer().getId() == customerId)
 				.findFirst();
     }
@@ -962,12 +982,12 @@ public class Bookstore implements Serializable {
         	return Optional.empty();
         
         if (bId != null) {
-            cart.get().increaseLine(this.bookstoreDbContext.getStockByBook().get(getBook(bId).get()), getBook(bId).get(), 1);
+            cart.get().increaseLine(stockByBook.get(getBook(bId).get()), getBook(bId).get(), 1);
         }
 
         if ((bIds != null && bIds.size() > 0) && (quantities != null && quantities.size() > 0)) {
             for (int i = 0; i < bIds.size(); i++) {
-                cart.get().changeLine(this.bookstoreDbContext.getStockByBook().get(getBook(bId).get()), globalDbContext.getBooksById().get(bIds.get(i)), quantities.get(i));
+                cart.get().changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
             }
         }
 
@@ -1006,14 +1026,14 @@ public class Bookstore implements Serializable {
         Cart cart = getCart(cartId).get();
         Address shippingAddress = customer.getAddress();
         if (addressId != -1) {
-            shippingAddress = globalDbContext.getAddressById().get(addressId);
+            shippingAddress = addressById.get(addressId);
         }
         cart.getLines().stream().map((cartLine) -> {
             Book book = cartLine.getBook();
-            this.bookstoreDbContext.getStockByBook().get(book).addQty(-cartLine.getQty());
+            stockByBook.get(book).addQty(-cartLine.getQty());
             return book;
-        }).filter((book) -> (this.bookstoreDbContext.getStockByBook().get(book).getQty() < 10)).forEachOrdered((book) -> {
-            this.bookstoreDbContext.getStockByBook().get(book).addQty(21);
+        }).filter((book) -> (stockByBook.get(book).getQty() < 10)).forEachOrdered((book) -> {
+            stockByBook.get(book).addQty(21);
         });
         CCTransaction ccTransact = new CCTransaction(ccType, ccNumber, ccName,
                 ccExpiry, "", cart.total(customer.getDiscount()),
@@ -1038,11 +1058,11 @@ public class Bookstore implements Serializable {
             String comment, String shipType, Date shipDate,
             String status, Address billingAddress, Address shippingAddress,
             CCTransaction cc) {
-        int idOrder = this.bookstoreDbContext.getOrdersById().size();
+        int idOrder = ordersById.size();
         Order order = new Order(idOrder, customer, date, cart, comment, shipType,
                 shipDate, status, billingAddress, shippingAddress, cc);
-        this.bookstoreDbContext.getOrdersById().add(order);
-        this.bookstoreDbContext.getOrdersByCreation().addFirst(order);
+        ordersById.add(order);
+        ordersByCreation.addFirst(order);
         customer.logOrder(order);
         cart.clear();
         return order;
@@ -1133,15 +1153,6 @@ public class Bookstore implements Serializable {
         populated = true;
         return true;
     }
-    
-    /**
-     * Limpa os dados globais
-     */
-    public static void flushGlobalDatabase() {
-    	populated = false;
-    	rand = null;
-    	globalDbContext.flushDatabase();
-    }
 
     /**
      * Este método irá popular inicialmente quais países, taxas de câmbio, e
@@ -1224,7 +1235,7 @@ public class Bookstore implements Serializable {
 
     private static void setRelatedBooks(int number, Random rand) {
         for (int i = 0; i < number; i++) {
-            Book book = globalDbContext.getBooksById().get(i);
+            Book book = booksById.get(i);
             HashSet<Book> related = new HashSet<>();
             while (related.size() < 5) {
                 Book relatedBook = getABookAnyBook(rand);
@@ -1291,9 +1302,6 @@ public class Bookstore implements Serializable {
     	// Limpa o gerador de id
     	servico.shared.IdGenerator.getInstance().reset();
     	
-    	// Limpa o banco de dados referente a bookstore instanciada
-    	bookstoreDbContext.flushDatabase();
-    	
         populateOrders(number, rand, now);
         populateStocks(number, rand, now);
         populateReviews(number, rand);
@@ -1325,10 +1333,10 @@ public class Bookstore implements Serializable {
             int nBooks = TPCW_Util.getRandomInt(rand, 1, 5);
             for (int j = 0; j < nBooks; j++) {
                 Book book = getABookAnyBook(rand);
-                if (!this.bookstoreDbContext.getStockByBook().containsKey(book)) {
+                if (!stockByBook.containsKey(book)) {
                     double cost = TPCW_Util.getRandomInt(rand, 50, 100) / 100.0;
                     int quantity = TPCW_Util.getRandomInt(rand, 300, 400);
-                    this.bookstoreDbContext.getStockByBook().put(book, new Stock(this.id, book, cost, quantity));
+                    stockByBook.put(book, new Stock(this.id, book, cost, quantity));
                 }
             }
         }
@@ -1358,13 +1366,13 @@ public class Bookstore implements Serializable {
                 Book book = getABookAnyBook(rand);
                 int quantity = TPCW_Util.getRandomInt(rand, 1, 300);
 
-                if (!this.bookstoreDbContext.getStockByBook().containsKey(book)) {
+                if (!stockByBook.containsKey(book)) {
                     double cost = TPCW_Util.getRandomInt(rand, 50, 100) / 100.0;
                     int stock = TPCW_Util.getRandomInt(rand, 300, 400);
-                    this.bookstoreDbContext.getStockByBook().put(book, new Stock(this.id, book, cost, stock));
+                    stockByBook.put(book, new Stock(this.id, book, cost, stock));
                 }
 
-                cart.changeLine(this.bookstoreDbContext.getStockByBook().get(book), book, quantity);
+                cart.changeLine(stockByBook.get(book), book, quantity);
             }
 
             CCTransaction ccTransact = new CCTransaction(
@@ -1395,16 +1403,6 @@ public class Bookstore implements Serializable {
     }
 
     private static void populateEvaluation(Random rand) {
-    }
-    
-    /// Retorna o contexto de banco de dados global
-    public static IGlobalDbContext getGlobalDbContext() {
-    	return globalDbContext;
-    }
-    
-    /// Retorna o contexto de banco de dados da bookstore instanciada
-    public IBookstoreDbContext getBookstoreDbContext() {
-    	return this.bookstoreDbContext;
     }
 
 }

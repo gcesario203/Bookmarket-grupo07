@@ -70,7 +70,6 @@ public class BookmarketTest {
     }
 
     private static void cleanTestObjects() {
-    	Bookstore.flushGlobalDatabase();
         amazon = null;
 
         saraiva = null;
@@ -496,6 +495,9 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetABookStock() {
+    	cleanTestObjects();
+    	
+    	startUpTestObjects();
         Book amazonBook = Bookstore.getABookAnyBook(new Random(1));
 
         Stock amazonBookStock = amazon.getStock(amazonBook.getId());
