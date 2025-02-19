@@ -215,7 +215,7 @@ public class Bookmarket {
     	
     }
 
-    public static Review createReview(int bookstoreId, Customer customer, Book book, double value) {
+    public Review createReview(int bookstoreId, Customer customer, Book book, double value) {
         try {
             return (Review) stateMachine.execute(new CreateReviewAction(customer, book, value, bookstoreId));
         } catch (Exception e) {
@@ -224,35 +224,35 @@ public class Bookmarket {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Review> getReviews() {
+    public List<Review> getReviews() {
         return (List<Review>) stateMachine.execute(new GetReviewsAction());
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Review> getUniqueReviews() {
+    public List<Review> getUniqueReviews() {
         return (List<Review>) stateMachine.execute(new GetUniqueReviewsAction());
     }
 
     @SuppressWarnings("unchecked")
-    public static Optional<Review> getReviewById(int bookstoreId, int id) {
+    public Optional<Review> getReviewById(int bookstoreId, int id) {
         return (Optional<Review>) stateMachine.execute(new GetReviewByIdAction(id, bookstoreId));
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Review> getReviewsByBook(int bookstoreId, Book book) {
+    public List<Review> getReviewsByBook(int bookstoreId, Book book) {
         return (List<Review>) stateMachine.execute(new GetReviewByBookAction(book, bookstoreId));
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Review> getReviewsByCustomer(int bookstoreId, Customer customer) {
+    public List<Review> getReviewsByCustomer(int bookstoreId, Customer customer) {
         return (List<Review>) stateMachine.execute(new GetReviewByCustomerAction(customer, bookstoreId));
     }
 
-    public static boolean removeReviewById(int bookstoreId, int id) {
+    public boolean removeReviewById(int bookstoreId, int id) {
         return (boolean) stateMachine.execute(new RemoveReviewsByIdAction(id, bookstoreId));
     }
 
-    public static boolean changeReviewValue(int bookstoreId, int id, double value) {
+    public boolean changeReviewValue(int bookstoreId, int id, double value) {
         return (boolean) stateMachine.execute(new ChangeReviewAction(id, value, bookstoreId));
     }
 

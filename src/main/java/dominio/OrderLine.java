@@ -70,7 +70,7 @@ public class OrderLine implements Serializable {
     private static final long serialVersionUID = -5063511252485472431L;
 
     private final Book book;
-    private final int qty;
+    private int qty;
     private final double discount;
     private final String comments;
 
@@ -124,4 +124,7 @@ public class OrderLine implements Serializable {
         return comments;
     }
 
+    public void updateQty(int qty) {
+        this.qty = qty;
+    }
 }

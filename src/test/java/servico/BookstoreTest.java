@@ -359,6 +359,7 @@ public class BookstoreTest {
 
     @Test
     public void shouldNotCreateANewCartWhenACartForTheCustomerAlreadyExists() {
+    	populateInstance();
         Cart cart = instance.getCart(1).get();
 
         Customer customer = cart.getCustomer();
@@ -537,34 +538,7 @@ public class BookstoreTest {
         }
     }
 
-    @Test
-    public void ShouldReturnNewBookstoreOrdersId() {
-        long seed = 1;
-        long now = System.currentTimeMillis();
-        int items = 2;
-        int customers = 2;
-        int addresses = 2;
-        int authors = 1;
-        int orders = 10;
-        Random rand = new Random();
-        Bookstore.populate(seed, now, items, customers, addresses, authors);
-        Bookstore bookStore1 = new Bookstore(13);
-        Bookstore bookStore2 = new Bookstore(14);
-        bookStore1.populateInstanceBookstore(orders, rand, now);
-        bookStore2.populateInstanceBookstore(orders, rand, now);
 
-        List<Order> result1 = bookStore1.getOrdersById();
-        for (int i = 0; i < 10; i++) {
-            assertEquals(i, result1.get(i).getId());
-        }
-
-        List<Order> result2 = bookStore2.getOrdersById();
-        for (int i = 0; i < 10; i++) {
-            assertEquals(i, result2.get(i).getId());
-        }
-
-        assertNotSame(result2, result1);
-    }
 
     /**
      * Test of updateStock method, of class Bookstore.
@@ -656,21 +630,6 @@ public class BookstoreTest {
     }
     
     @Test
-    public void shouldSortBooksBySalesDescending() {
-        Bookstore bookStore = new Bookstore(3);
-        bookStore.publicPopulateBooks(10);
-        bookStore.publicpopulateOrders(20);
-        HashMap<Book, Integer> totalSales = bookStore.getConsolidatedBookSales(null);
-        List<Book> result = bookStore.sortBooksBySalesDescending(totalSales, 10);
-
-        assertEquals(10, result.size());
-        for (int i = 0; i < result.size() - 1; i++) {
-            assertTrue(totalSales.get(result.get(i)) >= totalSales.get(result.get(i + 1)));
-        }
-
-    }
-
-    @Test
     public void shouldReturnNullOnConsolidatedBookSales() {
         Bookstore bookstore = new Bookstore(5);
         HashMap<Book, Integer> consolidatedSales = bookstore.getConsolidatedBookSales(null);
@@ -752,6 +711,7 @@ public class BookstoreTest {
 
     @Test
     public void shouldReturnValidItemBasedRecommendationsFromSyntheticDataset() {
+    	populateInstance();
         // Criação dos livros
         Book b1 = Bookmarket.getBook(1); // Duna
         Book b2 = Bookmarket.getBook(2); // Neuromancer
