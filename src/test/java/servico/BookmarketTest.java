@@ -818,7 +818,7 @@ public class BookmarketTest {
     }
 
     @Test
-    public void shouldGetBestSellers() {
+    public void shouldGetRandomBestSellers() {
         Bookstore livraria = new Bookstore(3);
 
         Bookstore sebo = new Bookstore(4);
@@ -842,37 +842,100 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetTheBestSeller() {
-        Bookstore livraria = new Bookstore(3);
-
+        Bookstore bookstore36 = new Bookstore(36);
         Bookmarket bookmarketTest = new Bookmarket();
 
-        bookmarketTest.init(livraria);
-        Book bestSeller = null;
-        bookmarketTest.populate(1000, 500, 100, 1000, 2000);
-        boolean bookHasOrder = false;
-        while (!bookHasOrder) {
-             bestSeller = bookmarketTest.getABookAnyBook();
-            for (Order order : livraria.getOrdersById()) {
-                Book finalBestSeller = bestSeller;
-                if (order.getLines().stream().anyMatch(line -> line.getBook().getId() == finalBestSeller.getId())) {
-                    bookHasOrder = true;
-                    break;
+        bookmarketTest.init(bookstore36);
+        bookmarketTest.populate(1000, 500, 100, 1000, 500);
+
+        Book bestSeller = selectBookThatHasOrder(bookmarketTest, bookstore36);
+        List<Book> bestSellersSizeOne = new ArrayList<>();
+        bestSellersSizeOne.add(bestSeller);
+        updateQtyForBooks(bestSellersSizeOne, bookstore36, 1000);
+
+        List<Book> bestSellers = bookmarketTest.getBestSellers(1, null);
+        assertEquals(bestSeller, bestSellers.get(0));
+    }
+
+    /**
+     * Faz uma busca até encontrar um livro que apareça em algum pedido dessa livraria.
+     */
+    private Book selectBookThatHasOrder(Bookmarket bookmarket, Bookstore bookstore) {
+        Book bookWithOrder = null;
+        boolean found = false;
+        while (!found) {
+            Book candidate = bookmarket.getABookAnyBook();
+            if (bookHasOrder(candidate, bookstore)) {
+                bookWithOrder = candidate;
+                found = true;
+            }
+        }
+        return bookWithOrder;
+    }
+
+    /**
+     * Verifica se um determinado livro está em algum pedido de uma livraria.
+     */
+    private boolean bookHasOrder(Book book, Bookstore bookstore) {
+        return bookstore.getOrdersById().stream().anyMatch(order ->
+                order.getLines().stream().anyMatch(line -> line.getBook().getId() == book.getId())
+        );
+    }
+
+    /**
+     * Atualiza a quantidade dos livros selecionados para um valor alto (p.ex.: 1000)
+     * em todos os pedidos da livraria fornecida.
+     */
+    private void updateQtyForBooks(List<Book> books, Bookstore bookstore, int quantity) {
+        for (Order pedido : bookstore.getOrdersById()) {
+            for (OrderLine linha : pedido.getLines()) {
+                if (books.contains(linha.getBook())) {
+                    linha.updateQty(quantity);
                 }
             }
         }
-        for (Order order : livraria.getOrdersById()) {
-            for (OrderLine line : order.getLines()) {
-                if (line.getBook().getId() == bestSeller.getId()) {
-                    line.updateQty(1000);
+    }
+
+    @Test
+    public void shouldGetTheFiveBestSellers() {
+        Bookstore bookstore01 = new Bookstore(34);
+        Bookstore bookstore02 = new Bookstore(35);
+        Bookmarket bookmarketTest = new Bookmarket();
+        bookmarketTest.init(bookstore01,bookstore02);
+
+        bookmarketTest.populate(1000, 500, 100, 1000, 600);
+
+        List<Book> fiveSelectedBooks = new ArrayList<>();
+
+        int attempts = 0; //avoid infinite loop
+        while (fiveSelectedBooks.size() < 5 && attempts < 1000) {
+            Book possibleBook = bookmarketTest.getABookAnyBook();
+            if (!fiveSelectedBooks.contains(possibleBook)) {
+                if (bookHasOrder(possibleBook, bookstore01) || bookHasOrder(possibleBook, bookstore02)) {
+                    fiveSelectedBooks.add(possibleBook);
                 }
             }
+            attempts++;
         }
+        assertEquals("Não foi possível encontrar 5 livros em pedidos após várias tentativas",
+                5, fiveSelectedBooks.size());
 
-        List<Book> BestSellers = bookmarketTest.getBestSellers(1,null);
-        assertEquals(bestSeller,BestSellers.get(0));
+        updateQtyForBooks(fiveSelectedBooks, bookstore01, 5000);
+        updateQtyForBooks(fiveSelectedBooks, bookstore02, 5000);
+
+        List<Book> fiveBestsellers = bookmarketTest.getBestSellers(5, null);
+
+        assertEquals(5, fiveBestsellers.size());
+        for (Book selectedBook : fiveSelectedBooks) {
+            boolean existsInBestsellers = fiveBestsellers
+                    .stream()
+                    .anyMatch(bestSeller -> bestSeller.getId() == selectedBook.getId());
+
+            assertTrue("Livro com ID " + selectedBook.getId() + " não foi encontrado nos bestsellers.",
+                    existsInBestsellers);
         }
+    }
 
-        
     @Test
     public void shouldGetTheMinimumBookValueCost() {
 
