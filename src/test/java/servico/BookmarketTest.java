@@ -10,18 +10,13 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
+import dominio.*;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import dominio.Book;
-import dominio.Cart;
-import dominio.Customer;
-import dominio.Order;
 import servico.bookstore.Bookstore;
-import dominio.Review;
-import dominio.Stock;
 import servico.bookmarket.Bookmarket;
 import util.TPCW_Util;
 
@@ -845,29 +840,62 @@ public class BookmarketTest {
         assertEquals(tenBestSellers, tenBestBooksIntwentyBestSellers);
     }
 
-  @Test
-  public void shouldGetTheMinimumBookValueCost() {
-	  
-	  cleanTestObjects();
-	  startUpTestObjects();
+    @Test
+    public void shouldGetTheBestSeller() {
+        Bookstore livraria = new Bookstore(3);
+
+        Bookmarket bookmarketTest = new Bookmarket();
+
+        bookmarketTest.init(livraria);
+        Book bestSeller = null;
+        bookmarketTest.populate(1000, 500, 100, 1000, 2000);
+        boolean bookHasOrder = false;
+        while (!bookHasOrder) {
+             bestSeller = bookmarketTest.getABookAnyBook();
+            for (Order order : livraria.getOrdersById()) {
+                Book finalBestSeller = bestSeller;
+                if (order.getLines().stream().anyMatch(line -> line.getBook().getId() == finalBestSeller.getId())) {
+                    bookHasOrder = true;
+                    break;
+                }
+            }
+        }
+        for (Order order : livraria.getOrdersById()) {
+            for (OrderLine line : order.getLines()) {
+                if (line.getBook().getId() == bestSeller.getId()) {
+                    line.updateQty(1000);
+                }
+            }
+        }
+
+        List<Book> BestSellers = bookmarketTest.getBestSellers(1,null);
+        assertEquals(bestSeller,BestSellers.get(0));
+        }
+
+        
+    @Test
+    public void shouldGetTheMinimumBookValueCost() {
+
+      cleanTestObjects();
+      startUpTestObjects();
     Optional<Stock> saraivaMinCost = saraiva.getStocks().stream().min(Comparator.comparingDouble(Stock::getCost));
 
     Stock amazonSameBookMinCost = amazon.getStock(saraivaMinCost.get().getBook().getId());
-    	
-		Optional<Stock> bookmarketMinCost = bookmarket.getMinimumBookPrice(saraivaMinCost.get().getBook().getId());
-        
-		assertTrue(bookmarketMinCost.get().getCost() == saraivaMinCost.get().getCost());
-		
-		assertTrue(bookmarketMinCost.get().getIdBookstore() == saraiva.getId());
-		
-		assertTrue(amazonSameBookMinCost.getCost() > saraivaMinCost.get().getCost());
+
+        Optional<Stock> bookmarketMinCost = bookmarket.getMinimumBookPrice(saraivaMinCost.get().getBook().getId());
+
+        assertTrue(bookmarketMinCost.get().getCost() == saraivaMinCost.get().getCost());
+
+        assertTrue(bookmarketMinCost.get().getIdBookstore() == saraiva.getId());
+
+        assertTrue(amazonSameBookMinCost.getCost() > saraivaMinCost.get().getCost());
     }
 
     @Test
     public void shouldGetTheAverageCostFromABook() {
-    	cleanTestObjects();
-    	startUpTestObjects();
-    	
+        cleanTestObjects();
+        startUpTestObjects();
+
         Stock amazonStock = null;
         Stock saraivaStock = null;
         Book randomBook = null;
@@ -892,21 +920,21 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetUniqueReviews() {
-        List<Review> uniqueReviews = Bookmarket.getUniqueReviews();
+            List<Review> uniqueReviews = Bookmarket.getUniqueReviews();
 
-        // Verifica se o resultado não é nulo
-        assertNotNull("O resultado não pode ser nulo.", uniqueReviews);
-        assertFalse(uniqueReviews.isEmpty());
+            // Verifica se o resultado não é nulo
+            assertNotNull("O resultado não pode ser nulo.", uniqueReviews);
+            assertFalse(uniqueReviews.isEmpty());
 
-        // Verifica que não há duplicação: para cada par (cliente, livro) deve existir
-        // apenas uma review
-        Set<String> uniquePairs = new HashSet<>();
-        for (Review review : uniqueReviews) {
-            String key = review.getCustomer().getId() + "-" + review.getBook().getId();
-            assertFalse("Review duplicada encontrada para o par cliente-livro: " + key,
-                    uniquePairs.contains(key));
-            uniquePairs.add(key);
+            // Verifica que não há duplicação: para cada par (cliente, livro) deve existir
+            // apenas uma review
+            Set<String> uniquePairs = new HashSet<>();
+            for (Review review : uniqueReviews) {
+                String key = review.getCustomer().getId() + "-" + review.getBook().getId();
+                assertFalse("Review duplicada encontrada para o par cliente-livro: " + key,
+                        uniquePairs.contains(key));
+                uniquePairs.add(key);
+            }
         }
-    }
 
 }
