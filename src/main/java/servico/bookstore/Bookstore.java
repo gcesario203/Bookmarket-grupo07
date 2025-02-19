@@ -83,14 +83,14 @@ public class Bookstore implements Serializable {
     private static final long serialVersionUID = -3099048826035606338L;
 
     private static boolean populated;
-    private static final List<Country> countryById;
-    private static final Map<String, Country> countryByName;
-    private static final List<Address> addressById;
-    private static final Map<Address, Address> addressByAll;
-    private static final List<Customer> customersById;
-    private static final Map<String, Customer> customersByUsername;
-    private static final List<Author> authorsById;
-    private static final List<Book> booksById;
+    private static List<Country> countryById;
+    private static Map<String, Country> countryByName;
+    private static List<Address> addressById;
+    private static Map<Address, Address> addressByAll;
+    private static List<Customer> customersById;
+    private static Map<String, Customer> customersByUsername;
+    private static List<Author> authorsById;
+    private static List<Book> booksById;
 
     private Map<Book, Stock> stockByBook;
     private List<Cart> cartsById;
@@ -1076,10 +1076,10 @@ public class Bookstore implements Serializable {
      * @param subject Assunto que será utilizado para filtro de pesquisa por
      * melhores vendedores
      * @param numberOfBooks Quantidade de livros
-     * @return Retorna uma lista dos livros mais vendidos desta
+     * @return Retorna um hashmap contendo o livro e a quantidade de vendas
      * {@linkplain Bookstore} com tamanho limitado em 100
      */
-    public List<Book> getBestSellers(String subject, Integer numberOfBooks) {
+    public HashMap<Book, Integer> getBestSellers(String subject, Integer numberOfBooks) {
     	final Integer MINIMUM_BOOKS = 1;
         final Integer MAXIMUM_BOOKS = 100;
         
@@ -1089,10 +1089,7 @@ public class Bookstore implements Serializable {
         
         HashMap<Book, Integer> consolidatedBookSales = getConsolidatedBookSales(subject);
         
-        List<Book> sortBooksBySalesDescending = sortBooksBySalesDescending(consolidatedBookSales, numberOfBooks);
-
-        return sortBooksBySalesDescending.stream().filter(x -> x != null)
-        							     .collect(Collectors.toList());
+        return sortBooksBySalesDescending(consolidatedBookSales, numberOfBooks);
     }
     
     /**
@@ -1103,12 +1100,16 @@ public class Bookstore implements Serializable {
      * @param limit Quantidade de livros a serem retornados
      * @return Lista dos livros mais vendidos, limitada pelo parâmetro limit
      */
-    public List<Book>  sortBooksBySalesDescending(HashMap<Book, Integer> salesByBook, int limit) {
-        List<Book> topSellingBooks = salesByBook.entrySet().stream()
+    public HashMap<Book, Integer>  sortBooksBySalesDescending(HashMap<Book, Integer> salesByBook, int limit) {
+    	HashMap<Book, Integer> topSellingBooks = salesByBook.entrySet().stream()
                 .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
-                .limit(limit) // Filtra os N primeiros
-                .map(Map.Entry::getKey) // Extrai apenas os objetos Book
-                .collect(Collectors.toList());
+                .limit(limit)// Filtra os N primeiros
+                .collect(Collectors.toMap(
+			                Map.Entry::getKey, 
+			                Map.Entry::getValue, 
+			                (entry1, entry2) -> entry1, 
+			                HashMap::new
+			            ));// transforma novamente num hashmap
         return topSellingBooks;
     }
 
@@ -1132,7 +1133,7 @@ public class Bookstore implements Serializable {
             throw new RuntimeException("Parametros invalidos");
 
         if (populated) {
-            return false;
+        	flushGlobalDatabase();
         }
         rand = new Random(seed);
         populateCountries();
@@ -1143,6 +1144,23 @@ public class Bookstore implements Serializable {
         populateEvaluation(rand);
         populated = true;
         return true;
+    }
+    
+    /*
+     * Método responsável por limpar os dados das instancias globais/estaticas
+     * de armazenamento de classes de dominio;
+     */
+    private static void flushGlobalDatabase() {
+    	populated = false;
+    	rand = null;
+        countryById = new ArrayList<>();
+        countryByName = new HashMap<>();
+        addressById = new ArrayList<>();
+        addressByAll = new HashMap<>();
+        customersById = new ArrayList<>();
+        customersByUsername = new HashMap<>();
+        authorsById = new ArrayList<>();
+        booksById = new ArrayList<>();
     }
 
     /**
