@@ -853,7 +853,22 @@ public class BookmarketTest {
         assertTrue(twentyBestSellers.containsAll(tenBestSellers));
     }
 
+    @Test
+    public void shouldGetTheBestSeller() {
+        Bookstore bookstore36 = new Bookstore(36);
+        Bookmarket bookmarketTest = new Bookmarket();
 
+        bookmarketTest.init(bookstore36);
+        bookmarketTest.populate(1000, 500, 100, 1000, 500);
+
+        Book bestSeller = selectBookThatHasOrder(bookmarketTest, bookstore36);
+        List<Book> bestSellersSizeOne = new ArrayList<>();
+        bestSellersSizeOne.add(bestSeller);
+        updateQtyForBooks(bestSellersSizeOne, bookstore36, 1000);
+
+        List<Book> bestSellers = bookmarketTest.getBestSellers(1, null);
+        assertEquals(bestSeller, bestSellers.get(0));
+    }
 
     /**
      * Faz uma busca até encontrar um livro que apareça em algum pedido dessa livraria.
