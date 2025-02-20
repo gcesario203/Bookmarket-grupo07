@@ -825,7 +825,7 @@ public class Bookstore implements Serializable {
      * @param targetBook the book to search for in customer orders
      * @return a set of customer IDs who purchased the target book
      */
-    private Set<Integer> getClientIdsWhoBoughtTargetBook(Book targetBook) {
+    public Set<Integer> getClientIdsWhoBoughtTargetBook(Book targetBook) {
         Set<Integer> clientIds = new HashSet<>();
         Iterator<Order> orderIterator = ordersByCreation.iterator();
 
@@ -849,7 +849,7 @@ public class Bookstore implements Serializable {
      * @param targetBook the book to exclude from the counting
      * @return a map of book IDs to their purchase frequency counters
      */
-    private Map<Integer, BookstoreBookCounter> getPurchaseFrequency(Set<Integer> clientIds, Book targetBook) {
+    public Map<Integer, BookstoreBookCounter> getPurchaseFrequency(Set<Integer> clientIds, Book targetBook) {
         Map<Integer, BookstoreBookCounter> purchaseFrequency = new HashMap<>();
 
         ordersByCreation.stream()
@@ -978,7 +978,8 @@ public class Bookstore implements Serializable {
 
         if ((bIds != null && bIds.size() > 0) && (quantities != null && quantities.size() > 0)) {
             for (int i = 0; i < bIds.size(); i++) {
-                cart.get().changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
+                int bid = bIds.get(i);
+                cart.get().changeLine(stockByBook.get(getBook(bid).get()), booksById.get(bid), quantities.get(i));
             }
         }
 
