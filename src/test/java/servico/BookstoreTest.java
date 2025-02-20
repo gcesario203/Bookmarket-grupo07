@@ -176,7 +176,7 @@ public class BookstoreTest {
     @Test
     public void testGetCustomer_int() {
         int cId = 0;
-        Customer result = instance.getCustomer(cId).get();
+        Customer result = Bookstore.getCustomer(cId).get();
         assertEquals(cId, result.getId());
     }
 
@@ -185,8 +185,8 @@ public class BookstoreTest {
      */
     @Test
     public void testGetCustomer_String() {
-        String username = instance.getCustomer(10).get().getUname();
-        Customer result = instance.getCustomer(username).get();
+        String username = Bookstore.getCustomer(10).get().getUname();
+        Customer result = Bookstore.getCustomer(username).get();
         assertEquals(username, result.getUname());
 
     }

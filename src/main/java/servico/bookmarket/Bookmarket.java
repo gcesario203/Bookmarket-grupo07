@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -77,7 +78,7 @@ import util.TPCW_Util;
  */
 public class Bookmarket {
     private static Random random;
-    private static StateMachine stateMachine;
+    private StateMachine stateMachine;
 
     /**
      * Método utilizado para inicializar o Bookmarket e criar uma lista de
@@ -85,7 +86,7 @@ public class Bookmarket {
      *
      * @param state array de Bookstores criados para compor a máquina de estados
      */
-    public static void init(Bookstore... state) {
+    public void init(Bookstore... state) {
         random = new Random();
         try {
             stateMachine = StateMachine.create(state);
@@ -94,7 +95,7 @@ public class Bookmarket {
         }
     }
 
-    private static Stream<Bookstore> getBookstoreStream() {
+    private Stream<Bookstore> getBookstoreStream() {
         return stateMachine.getStateStream();
     }
 
@@ -184,7 +185,7 @@ public class Bookmarket {
      * @param type 		  Tipo de cliente
      * @return Customer Novo Customer cadastrado na plataforma
      */
-    private static Customer createNewCustomer(String fname, String lname,
+    private Customer createNewCustomer(String fname, String lname,
             String street1, String street2, String city, String state,
             String zip, String countryName, String phone, String email,
             Date birthdate, String data, dominio.customer.enums.Type type) {
@@ -200,14 +201,14 @@ public class Bookmarket {
         }
     }
     
-    public static Customer createNewSubscriber(String fname, String lname,
+    public Customer createNewSubscriber(String fname, String lname,
             String street1, String street2, String city, String state,
             String zip, String countryName, String phone, String email,
             Date birthdate, String data) {
     	return createNewCustomer(fname, lname, street1, street2, city, state, zip, countryName, phone, email, birthdate, data, Type.SUBSCRIBER);
     	
     }
-    public static Customer createNewCustomer(String fname, String lname,
+    public Customer createNewCustomer(String fname, String lname,
             String street1, String street2, String city, String state,
             String zip, String countryName, String phone, String email,
             Date birthdate, String data) {
@@ -257,7 +258,7 @@ public class Bookmarket {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Review> getReviewsByBookstore(int bookstoreId) {
+    public List<Review> getReviewsByBookstore(int bookstoreId) {
         return (List<Review>) stateMachine.execute(new GetReviewsByBookstoreAction(bookstoreId));
     }
 
@@ -270,7 +271,7 @@ public class Bookmarket {
      *
      * @param cId Id da sessão
      */
-    public static void refreshSession(int cId) {
+    public void refreshSession(int cId) {
         try {
             stateMachine.execute(new RefreshCustomerSessionAction(cId,
                     System.currentTimeMillis()));
@@ -355,7 +356,7 @@ public class Bookmarket {
      * @param book Livro que será utilizado no filtro de busca
      * @return Lista com os preços de um determinado livro dentro do marketPlace
      */
-    public static List<Double> getCosts(Book book) {
+    public List<Double> getCosts(Book book) {
                 return getBookstoreStream().map(store -> store.getStock(book.getId())).map(stock -> (Double) (stock == null ? 0.0 : stock.getCost()))
 
                 .collect(Collectors.toList());
@@ -371,7 +372,7 @@ public class Bookmarket {
      * @return Lista dos livros mais vendidos, ordenada por quantidade de vendas decrescente
      * @throws RuntimeException se numberOfBooks estiver fora do intervalo válido (1-100)
      */
-    public static List<Book> getBestSellers(Integer numberOfBooks, String subject) {
+    public List<Book> getBestSellers(Integer numberOfBooks, String subject) {
     	return (List<Book>) stateMachine.execute(new GetBestSellersAction(subject, numberOfBooks));
     }
 
@@ -385,7 +386,7 @@ public class Bookmarket {
      *         considerando todas as livrarias
      */
     @SuppressWarnings("unchecked")
-	public static HashMap<Book, Integer> getConsolidatedBookSales(String subject) {
+	public HashMap<Book, Integer> getConsolidatedBookSales(String subject) {
     	return (HashMap<Book, Integer>) stateMachine.execute(new GetConsolidateBookSalesAction(subject)); 
     }
 
@@ -399,7 +400,7 @@ public class Bookmarket {
      *         interação do usuário.
      */
     @SuppressWarnings("unchecked")
-    public static List<Book> getRecommendationByItens(int c_id) {
+    public List<Book> getRecommendationByItens(int c_id) {
         return (List<Book>) stateMachine.execute(new GetRecommendationByItensAction(c_id, 5));
     }
 
@@ -412,7 +413,7 @@ public class Bookmarket {
      *         usuários similares.
      */
     @SuppressWarnings("unchecked")
-    public static List<Book> getRecommendationByUsers(int c_id) {
+    public List<Book> getRecommendationByUsers(int c_id) {
         return (List<Book>) stateMachine.execute(new GetRecommendationByUsersAction(c_id, 5));
     }
 
@@ -424,7 +425,7 @@ public class Bookmarket {
      * @param idBook ID que representa o livro a ser consultado
      * @return Lista
      */
-    public static List<Stock> getStocks(final int idBook) {
+    public List<Stock> getStocks(final int idBook) {
         return getBookstoreStream()
                 .filter(store -> store.getStock(idBook) != null)
                 // transforma o stream de bookstore em stream de stock
@@ -440,7 +441,7 @@ public class Bookmarket {
      * @param idBook
      * @return
      */
-    public static Stock getStock(final int idBookstore, final int idBook) {
+    public Stock getStock(final int idBookstore, final int idBook) {
         return getBookstoreStream()
                 .filter(store -> store.getId() == idBookstore)
                 // transforma o stream de bookstore em stream de stock
@@ -455,7 +456,7 @@ public class Bookmarket {
      * @param i_id
      * @return
      */
-    public static List<Book> getRelated(int i_id) {
+    public List<Book> getRelated(int i_id) {
         Book book = Bookstore.getBook(i_id).get();
         ArrayList<Book> related = new ArrayList<>(5);
         related.add(book.getRelated1());
@@ -474,7 +475,7 @@ public class Bookmarket {
      * @param image
      * @param thumbnail
      */
-    public static void adminUpdate(int iId, double cost, String image,
+    public void adminUpdate(int iId, double cost, String image,
             String thumbnail) {
         try {
             stateMachine.execute(new UpdateBookAction(iId, cost, image,
@@ -493,7 +494,7 @@ public class Bookmarket {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static int createEmptyCart(int storeId, int customerId) {
+    public int createEmptyCart(int storeId, int customerId) {
         try {
             return ((Optional<Cart>) stateMachine.execute(new CreateCartAction(storeId,
                     System.currentTimeMillis(), customerId))).get().getId();
@@ -514,7 +515,7 @@ public class Bookmarket {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static Optional<Cart> doCart(int storeId, int SHOPPING_ID, Integer I_ID, List<Integer> ids,
+    public Optional<Cart> doCart(int storeId, int SHOPPING_ID, Integer I_ID, List<Integer> ids,
             List<Integer> quantities) {
         try {
         	Optional<Cart> cart = (Optional<Cart>) stateMachine.execute(new CartUpdateAction(storeId,
@@ -532,7 +533,7 @@ public class Bookmarket {
         }
     }
 
-    private static Book getExistingBookInAStock(int storeId) {
+    private Book getExistingBookInAStock(int storeId) {
         Bookstore bookstoreInstance = getBookstoreStream().filter(bk -> bk.getId() == storeId)
                 .collect(Collectors.toList())
                 .get(0);
@@ -549,7 +550,7 @@ public class Bookmarket {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static Optional<Cart> getCart(int storeId, int SHOPPING_ID) {
+    public Optional<Cart> getCart(int storeId, int SHOPPING_ID) {
     	return (Optional<Cart>)stateMachine.execute(new GetCartById(storeId, SHOPPING_ID));
     }
     
@@ -560,7 +561,7 @@ public class Bookmarket {
      * @param customerId Id do cliente
      */
     @SuppressWarnings("unchecked")
-    public static Optional<Cart> getCartByCustomer(int storeId, int customerId){
+    public Optional<Cart> getCartByCustomer(int storeId, int customerId){
     	return (Optional<Cart>)stateMachine.execute(new GetCartByCustomer(storeId, customerId));
     }
 
@@ -578,7 +579,7 @@ public class Bookmarket {
      * @param shipping
      * @return
      */
-    public static Order doBuyConfirm(int storeId, int shopping_id, int customer_id,
+    public Order doBuyConfirm(int storeId, int shopping_id, int customer_id,
             String cc_type, long cc_number, String cc_name, Date cc_expiry,
             String shipping) {
         long now = System.currentTimeMillis();
@@ -612,7 +613,7 @@ public class Bookmarket {
      * @param country
      * @return
      */
-    public static Order doBuyConfirm(int storeId, int shopping_id, int customer_id,
+    public Order doBuyConfirm(int storeId, int shopping_id, int customer_id,
             String cc_type, long cc_number, String cc_name, Date cc_expiry,
             String shipping, String street_1, String street_2, String city,
             String state, String zip, String country) {
@@ -635,7 +636,7 @@ public class Bookmarket {
      * @param bookId
      * @return o preço medio do livro nas bookstores
      */
-    public static double getBookPriceAverage(int bookId) {
+    public double getBookPriceAverage(int bookId) {
     	return (double) stateMachine.execute(new GetBookPriceAverageAction(bookId));
     }
 
@@ -657,7 +658,7 @@ public class Bookmarket {
      * encontra
      */
     @SuppressWarnings("unchecked")
-    public static Optional<Stock> getMinimumBookPrice(int bookId){
+    public Optional<Stock> getMinimumBookPrice(int bookId){
     	return (Optional<Stock>) stateMachine.execute(new GetMinimumBookPriceAction(bookId));
     }
 
@@ -672,7 +673,7 @@ public class Bookmarket {
      * @param orders
      * @return
      */
-    public static boolean populate(int items, int customers, int addresses,
+    public boolean populate(int items, int customers, int addresses,
             int authors, int orders) {
         try {
             return (Boolean) stateMachine.execute(new PopulateAction(random.nextLong(),
