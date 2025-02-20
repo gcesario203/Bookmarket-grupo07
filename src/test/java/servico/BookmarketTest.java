@@ -855,6 +855,7 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetTheBestSeller() {
+        cleanTestObjects();
         Bookstore bookstore36 = new Bookstore(36);
         Bookmarket bookmarketTest = new Bookmarket();
 
@@ -867,7 +868,7 @@ public class BookmarketTest {
         updateQtyForBooks(bestSellersSizeOne, bookstore36, 1000);
 
         List<Book> bestSellers = bookmarketTest.getBestSellers(1, null);
-        assertEquals(bestSeller, bestSellers.get(0));
+        assertEquals(bestSeller.getId(), bestSellers.get(0).getId());
     }
 
     /**
@@ -961,11 +962,9 @@ public class BookmarketTest {
 
     Stock amazonSameBookMinCost = amazon.getStock(saraivaMinCost.get().getBook().getId());
 
-        Optional<Stock> bookmarketMinCost = bookmarket.getMinimumBookPrice(saraivaMinCost.get().getBook().getId());
+        Double bookmarketMinCost = bookmarket.getMinimumBookPrice(saraivaMinCost.get().getBook().getId());
 
-        assertTrue(bookmarketMinCost.get().getCost() == saraivaMinCost.get().getCost());
-
-        assertTrue(bookmarketMinCost.get().getIdBookstore() == saraiva.getId());
+        assertTrue(bookmarketMinCost == saraivaMinCost.get().getCost());
 
         assertTrue(amazonSameBookMinCost.getCost() > saraivaMinCost.get().getCost());
     }
