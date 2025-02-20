@@ -653,9 +653,7 @@ public class Bookmarket {
      * das bookstores
      *
      * @param bookId
-     * @return Um Optional<Stock>, para caso não existir nenhum stock do livro em
-     * nenhuma bookstore, sendo informado no objeto Stock, em qual bookstore ele se
-     * encontra
+     * @return double com o menor custo do livro presente em alguma order
      */
     @SuppressWarnings("unchecked")
     public Optional<Stock> getMinimumBookPrice(int bookId){
@@ -684,4 +682,22 @@ public class Bookmarket {
         }
     }
 
+    public static HashMap<Book, Double> getRecommendation(int c_id) {
+        Customer customer = Bookstore.getCustomer(c_id).get();
+        List<Book> recommendationBooks = getRecommendationByUsers(c_id);
+        HashMap<Book, Double> booksPricing = new HashMap<>();
+        if(customer.getType() == Type.SUBSCRIBER) {
+            for (Book book : recommendationBooks) {
+                double price = getMinimumBookPrice(book.getId());
+                booksPricing.put(book, price);
+            }
+        }
+        else{ //(customer.getType() == Type.DEFAULT)
+            for (Book book : recommendationBooks) {
+                double price = getBookPriceAverage(book.getId());
+                booksPricing.put(book, price);
+            }
+        }
+        return booksPricing;
+    }
 }

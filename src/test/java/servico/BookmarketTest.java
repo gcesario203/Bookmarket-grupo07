@@ -956,11 +956,11 @@ public class BookmarketTest {
     @Test
     public void shouldGetTheMinimumBookValueCost() {
 
-      cleanTestObjects();
-      startUpTestObjects();
-    Optional<Stock> saraivaMinCost = saraiva.getStocks().stream().min(Comparator.comparingDouble(Stock::getCost));
+        cleanTestObjects();
+        startUpTestObjects();
+        Optional<Stock> saraivaMinCost = saraiva.getStocks().stream().min(Comparator.comparingDouble(Stock::getCost));
 
-    Stock amazonSameBookMinCost = amazon.getStock(saraivaMinCost.get().getBook().getId());
+        Stock amazonSameBookMinCost = amazon.getStock(saraivaMinCost.get().getBook().getId());
 
         Optional<Stock> bookmarketMinCost = bookmarket.getMinimumBookPrice(saraivaMinCost.get().getBook().getId());
 
