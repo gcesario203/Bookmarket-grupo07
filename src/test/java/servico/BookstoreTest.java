@@ -185,7 +185,13 @@ public class BookstoreTest {
      */
     @Test
     public void testGetCustomer_String() {
-        String username = Bookstore.getCustomer(10).get().getUname();
+        int id = 0;
+        Optional<Customer> customer = Bookstore.getCustomer(id);
+        while (!customer.isPresent()) {
+            id++;
+            customer = Bookstore.getCustomer(id);
+        }
+        String username = customer.get().getUname();
         Customer result = Bookstore.getCustomer(username).get();
         assertEquals(username, result.getUname());
 
@@ -591,7 +597,7 @@ public class BookstoreTest {
     public void shouldUpdateRelatedBooks() {
     	populateInstance();
     	
-        Book randomBook = instance.getABookAnyBook(new Random());
+        Book randomBook = Bookstore.getABookAnyBook(new Random());
 
         Book oldRelated1 = randomBook.getRelated1();
         Book oldRelated2 = randomBook.getRelated2();
@@ -601,7 +607,7 @@ public class BookstoreTest {
 
         instance.updateRelatedBooks(randomBook);
 
-        Book updatedBook = instance.getBook(randomBook.getId()).get();
+        Book updatedBook = Bookstore.getBook(randomBook.getId()).get();
 
         assertFalse(oldRelated1.getId() == updatedBook.getRelated1().getId());
         assertFalse(oldRelated2.getId() == updatedBook.getRelated2().getId());
