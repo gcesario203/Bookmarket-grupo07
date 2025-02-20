@@ -656,8 +656,12 @@ public class Bookmarket {
      * @return double com o menor custo do livro presente em alguma order
      */
     @SuppressWarnings("unchecked")
-    public Optional<Stock> getMinimumBookPrice(int bookId){
-    	return (Optional<Stock>) stateMachine.execute(new GetMinimumBookPriceAction(bookId));
+    public double getMinimumBookPrice(int bookId){
+    	Optional<Stock> minimunPriceStock = (Optional<Stock>) stateMachine.execute(new GetMinimumBookPriceAction(bookId));
+        	if(minimunPriceStock.isPresent()) {
+        		return minimunPriceStock.get().getCost();
+        	}
+        return 0;
     }
 
     /**
@@ -682,7 +686,7 @@ public class Bookmarket {
         }
     }
 
-    public static HashMap<Book, Double> getRecommendation(int c_id) {
+    public HashMap<Book, Double> getRecommendation(int c_id) {
         Customer customer = Bookstore.getCustomer(c_id).get();
         List<Book> recommendationBooks = getRecommendationByUsers(c_id);
         HashMap<Book, Double> booksPricing = new HashMap<>();

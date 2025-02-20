@@ -12,6 +12,8 @@ import java.util.Random;
 import java.util.Set;
 
 import dominio.*;
+
+import org.apache.zookeeper.Op;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -956,19 +958,18 @@ public class BookmarketTest {
     @Test
     public void shouldGetTheMinimumBookValueCost() {
 
-        cleanTestObjects();
-        startUpTestObjects();
-        Optional<Stock> saraivaMinCost = saraiva.getStocks().stream().min(Comparator.comparingDouble(Stock::getCost));
+        double saraivaCost = 10;
+        double amazonCost = 20;
+        int randomBookId = Bookmarket.getABookAnyBook().getId();
+        saraiva.updateStock(randomBookId, saraivaCost);
+        amazon.updateStock(randomBookId , amazonCost);
+        amazon.getStock(randomBookId).setQty(10);
+        saraiva.getStock(randomBookId).setQty(10);
+        
+        double bookmarketMinCost = bookmarket.getMinimumBookPrice(randomBookId);
 
-        Stock amazonSameBookMinCost = amazon.getStock(saraivaMinCost.get().getBook().getId());
-
-        Optional<Stock> bookmarketMinCost = bookmarket.getMinimumBookPrice(saraivaMinCost.get().getBook().getId());
-
-        assertTrue(bookmarketMinCost.get().getCost() == saraivaMinCost.get().getCost());
-
-        assertTrue(bookmarketMinCost.get().getIdBookstore() == saraiva.getId());
-
-        assertTrue(amazonSameBookMinCost.getCost() > saraivaMinCost.get().getCost());
+        assertTrue(bookmarketMinCost == saraivaCost);
+        assertTrue(bookmarketMinCost < amazonCost);
     }
 
     @Test
