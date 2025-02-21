@@ -1,25 +1,41 @@
 package servico;
 
-import dominio.*;
-import dominio.customer.enums.Type;
-import util.TPCW_Util;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 
-import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.junit.After;
-
-import servico.bookmarket.Bookmarket;
-import servico.bookstore.Bookstore;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import servico.bookstore.utils.MahoutUtils;
+
+import dominio.Address;
+import dominio.Author;
+import dominio.Book;
+import dominio.Cart;
+import dominio.Customer;
+import dominio.Order;
+import dominio.OrderLine;
+import dominio.Review;
+import dominio.Stock;
+import dominio.customer.enums.Type;
+import servico.bookmarket.Bookmarket;
+import servico.bookstore.Bookstore;
+import servico.bookstore.utils.BookstoreBookCounter;
 
 /**
  *
@@ -31,7 +47,7 @@ public class BookstoreTest {
     }
 
     static Bookstore instance;
-    
+
     private static void populateInstance() {
         long seed = 0;
         long now = System.currentTimeMillis();
@@ -176,7 +192,7 @@ public class BookstoreTest {
     @Test
     public void testGetCustomer_int() {
         int cId = 0;
-        Customer result = instance.getCustomer(cId).get();
+        Customer result = Bookstore.getCustomer(cId).get();
         assertEquals(cId, result.getId());
     }
 
@@ -185,8 +201,14 @@ public class BookstoreTest {
      */
     @Test
     public void testGetCustomer_String() {
-        String username = instance.getCustomer(10).get().getUname();
-        Customer result = instance.getCustomer(username).get();
+        int id = 0;
+        Optional<Customer> customer = Bookstore.getCustomer(id);
+        while (!customer.isPresent()) {
+            id++;
+            customer = Bookstore.getCustomer(id);
+        }
+        String username = customer.get().getUname();
+        Customer result = Bookstore.getCustomer(username).get();
         assertEquals(username, result.getUname());
 
     }
@@ -591,23 +613,105 @@ public class BookstoreTest {
     public void shouldUpdateRelatedBooks() {
     	populateInstance();
     	
-        Book randomBook = instance.getABookAnyBook(new Random());
+        Book randomBook = Bookstore.getABookAnyBook(new Random());
+        // Garante que o livro tenha todos os relacionamentos
+        while (randomBook.getRelated1() == null ||
+                randomBook.getRelated2() == null ||
+                randomBook.getRelated3() == null ||
+                randomBook.getRelated4() == null ||
+                randomBook.getRelated5() == null) {
+            randomBook = Bookstore.getABookAnyBook(new Random());
+        }
+        List<Book> relatedBooks = new ArrayList<>();
+        relatedBooks.add(randomBook.getRelated1());
+        relatedBooks.add(randomBook.getRelated2());
+        relatedBooks.add(randomBook.getRelated3());
+        relatedBooks.add(randomBook.getRelated4());
+        relatedBooks.add(randomBook.getRelated5());
 
-        Book oldRelated1 = randomBook.getRelated1();
-        Book oldRelated2 = randomBook.getRelated2();
-        Book oldRelated3 = randomBook.getRelated3();
-        Book oldRelated4 = randomBook.getRelated4();
-        Book oldRelated5 = randomBook.getRelated5();
+        // Obtem o número de vendas conjuntas com o livro mais relacionado
+        Set<Integer> clientIds = instance.getClientIdsWhoBoughtTargetBook(randomBook);
+        Map<Integer, BookstoreBookCounter> purchaseFrequency = instance.getPurchaseFrequency(clientIds, randomBook);
+        BookstoreBookCounter maxRelated = purchaseFrequency.entrySet().stream()
+                .max((entry1, entry2) -> entry1.getValue().getCount() > entry2.getValue().getCount() ? 1 : -1)
+                .get().getValue();
+        int numSales = maxRelated.getCount();
+
+        // Pega um novo livro não relacionado
+        Book newRelated = Bookstore.getABookAnyBook(new Random());
+        while (relatedBooks.contains(newRelated)) {
+            newRelated = Bookstore.getABookAnyBook(new Random());
+        }
+
+        // Cria vendas conjuntas com o novo livro
+        for (int i = 0; i < numSales + 1; i++) {
+            createOrder(instance, null, Arrays.asList(newRelated.getId(), randomBook.getId()), Arrays.asList(10, 10));
+        }
 
         instance.updateRelatedBooks(randomBook);
 
-        Book updatedBook = instance.getBook(randomBook.getId()).get();
+        Book updatedBook = Bookstore.getBook(randomBook.getId()).get();
 
-        assertFalse(oldRelated1.getId() == updatedBook.getRelated1().getId());
-        assertFalse(oldRelated2.getId() == updatedBook.getRelated2().getId());
-        assertFalse(oldRelated3.getId() == updatedBook.getRelated3().getId());
-        assertFalse(oldRelated4.getId() == updatedBook.getRelated4().getId());
-        assertFalse(oldRelated5.getId() == updatedBook.getRelated5().getId());
+        List<Book> updatedRelatedBooks = new ArrayList<>();
+        updatedRelatedBooks.add(updatedBook.getRelated1());
+        updatedRelatedBooks.add(updatedBook.getRelated2());
+        updatedRelatedBooks.add(updatedBook.getRelated3());
+        updatedRelatedBooks.add(updatedBook.getRelated4());
+        updatedRelatedBooks.add(updatedBook.getRelated5());
+
+        assertTrue(updatedRelatedBooks.contains(newRelated));
+    }
+
+    public Order createOrder(Bookstore bookstoreInstance, Customer customer, List<Integer> bookIds,
+            List<Integer> quantities) {
+        if (customer == null) {
+            customer = Bookstore.createCustomer("John",
+                    "Doe",
+                    "123 Main St",
+                    "Apt 4B",
+                    "Springfield",
+                    "IL",
+                    "62704",
+                    "USA",
+                    "555-1234",
+                    "john.doe@example.com",
+                    10.0,
+                    new Date(90, 4, 15),
+                    "data",
+                    System.currentTimeMillis(),
+                    dominio.customer.enums.Type.DEFAULT);
+        }
+
+        // Passo 2: Crie um carrinho de compras
+        Optional<Cart> cartOpt = bookstoreInstance.createCart(customer.getId(), System.currentTimeMillis());
+        Cart cart = cartOpt.get();
+
+        // Passo 3: Adicione livros ao carrinho
+        bookstoreInstance.cartUpdate(cart.getId(), null, bookIds, quantities, System.currentTimeMillis());
+
+        // Passo 4: Confirme a compra
+        String comment = "Cliente frequente, gosta de livros de ficção.";
+        String ccType = "Visa";
+        long ccNumber = 4111111111111111L; // Número fictício para exemplo
+        String ccName = "John Doe";
+        Date ccExpiry = new Date(126, 11, 31); // 31 de dezembro de 2026 (anos baseados em 1900)
+        String shipping = "Expresso";
+        Date shippingDate = new Date(); // Data atual
+        int addressId = -1; // Use o endereço padrão do cliente
+        long now = System.currentTimeMillis();
+
+        return bookstoreInstance.confirmBuy(
+                customer.getId(),
+                cart.getId(),
+                comment,
+                ccType,
+                ccNumber,
+                ccName,
+                ccExpiry,
+                shipping,
+                shippingDate,
+                addressId,
+                now);
     }
 
     @Test
