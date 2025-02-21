@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -644,7 +645,7 @@ public class BookstoreTest {
 
         // Cria vendas conjuntas com o novo livro
         for (int i = 0; i < numSales + 1; i++) {
-            createOrder(instance, null, List.of(newRelated.getId(), randomBook.getId()), List.of(10, 10));
+            createOrder(instance, null, Arrays.asList(newRelated.getId(), randomBook.getId()), Arrays.asList(10, 10));
         }
 
         instance.updateRelatedBooks(randomBook);
