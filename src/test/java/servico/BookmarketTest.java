@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -973,24 +974,16 @@ public class BookmarketTest {
         cleanTestObjects();
         startUpTestObjects();
 
-        Stock amazonStock = null;
-        Stock saraivaStock = null;
-        Book randomBook = null;
+        double saraivaCost = 10;
+        double amazonCost = 20;
+        int randomBookId = Bookmarket.getABookAnyBook().getId();
+        saraiva.updateStock(randomBookId, saraivaCost);
+        amazon.updateStock(randomBookId , amazonCost);
+        amazon.getStock(randomBookId).setQty(10);
+        saraiva.getStock(randomBookId).setQty(10);
 
-        while (true) {
-            try {
-                randomBook = bookmarket.getABookAnyBook();
-                amazonStock = amazon.getStock(randomBook.getId());
-                saraivaStock = saraiva.getStock(randomBook.getId());
-                if (amazonStock != null && saraivaStock != null)
-                    break;
-            } catch (Exception e) {
-                continue;
-            }
-        }
-
-        double averageValue = bookmarket.getBookPriceAverage(randomBook.getId());
-        double averageValueFromStocks = (amazonStock.getCost() + saraivaStock.getCost()) / 2;
+        double averageValueFromStocks = (saraivaCost + amazonCost) / 2;
+        double averageValue = bookmarket.getBookPriceAverage(randomBookId);
 
         assertTrue(averageValue == averageValueFromStocks);
     }
@@ -1177,6 +1170,22 @@ public class BookmarketTest {
 
         // Verifica se foram retornadas 5 recomendações
         assertNotNull(recommendations);
+        assertEquals(5, recommendations.size());
+    }
+
+    @Test
+    public void shouldGetFiveRecommendationsWithNonSyntheticData() {
+
+        cleanTestObjects();
+        startUpTestObjects();
+
+        // Seleciona um livro aleatório
+        Customer c1 = amazon.getACustomerAnyCustomer(new Random());
+
+        // Obtém recomendações baseadas nos itens avaliados pelo cliente
+        Map<Book, Double> recommendations = bookmarket.getRecommendation(c1.getId());
+
+        // Verifica se foram retornadas 5 recomendações
         assertEquals(5, recommendations.size());
     }
 
