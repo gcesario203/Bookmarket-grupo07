@@ -394,14 +394,14 @@ public class Bookmarket {
      * Obtém recomendações de livros com base nos itens previamente avaliados pelo
      * usuário.
      * 
-     * @param c_id Identificador único do usuário para o qual as recomendações serão
+     * @param bookId Identificador único do livro para o qual as recomendações serão
      *             geradas.
      * @return Uma lista contendo até 5 livros recomendados com base no histórico de
      *         interação do usuário.
      */
     @SuppressWarnings("unchecked")
-    public List<Book> getRecommendationByItems(int c_id) {
-        return (List<Book>) stateMachine.execute(new GetRecommendationByItensAction(c_id, 5));
+    public List<Book> getRecommendationByItems(int bookId) {
+        return (List<Book>) stateMachine.execute(new GetRecommendationByItensAction(bookId, 5));
     }
 
     /**
@@ -686,9 +686,60 @@ public class Bookmarket {
         }
     }
 
+
+    /**
+     * Método utilizado para gerar as recomendações para um usúario. garante que sempre vai retornar 5 livros
+     *
+     * @param c_id identificar único do cliente
+     * @return booksPricing estrutura de dados com os livros recomendados e seus respectivos preços
+     */
     public HashMap<Book, Double> getRecommendation(int c_id) {
         Customer customer = Bookstore.getCustomer(c_id).get();
         List<Book> recommendationBooks = getRecommendationByUsers(c_id);
+
+        // Fallback 1 - Se a lista tiver menos de 5 livros, tenta recomendar por itens
+        if (recommendationBooks.size() < 5 && !recommendationBooks.isEmpty()) {
+            List<Book> newRecommendations = new ArrayList<>();
+            for (Book book : new ArrayList<>(recommendationBooks)) { // Evita concorrência
+                List<Book> recommendationBooksForBook = getRecommendationByItems(book.getId());
+                for (Book recommendedBook : recommendationBooksForBook) {
+                    if (!recommendationBooks.contains(recommendedBook) && recommendationBooks.size() + newRecommendations.size() < 5) {
+                        newRecommendations.add(recommendedBook);
+                    }
+                }
+            }
+            recommendationBooks.addAll(newRecommendations);
+        }
+
+        // Fallback 2 - Se ainda tiver menos de 5, busca livros relacionados
+        if (recommendationBooks.size() < 5 && !recommendationBooks.isEmpty()) {
+            List<Book> newRecommendations = new ArrayList<>();
+            for (Book book : new ArrayList<>(recommendationBooks)) { // Evita concorrência
+                List<Book> relatedBooks = getRelated(book.getId());
+                for (Book relatedBook : relatedBooks) {
+                    if (!recommendationBooks.contains(relatedBook) && recommendationBooks.size() + newRecommendations.size() < 5) {
+                        newRecommendations.add(relatedBook);
+                    }
+                }
+            }
+            recommendationBooks.addAll(newRecommendations);
+        }
+
+        // Fallback 3 - Se ainda não chegou a 5 livros, busca best-sellers
+        if (recommendationBooks.size() < 5) {
+            List<Book> bestSellers = getBestSellers(10, null);
+            for (Book bestSeller : bestSellers) {
+                if (!recommendationBooks.contains(bestSeller) && recommendationBooks.size() < 5) {
+                    recommendationBooks.add(bestSeller);
+                }
+            }
+        }
+
+        // Fallback 4 - Se ainda não chegou a 5, pega qualquer livro aleatório
+        while (recommendationBooks.size() < 5) {
+            recommendationBooks.add(getABookAnyBook());
+        }
+
         HashMap<Book, Double> booksPricing = new HashMap<>();
         if(customer.getType() == Type.SUBSCRIBER) {
             for (Book book : recommendationBooks) {

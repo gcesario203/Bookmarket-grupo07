@@ -1,7 +1,6 @@
 package servico;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,10 +9,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import dominio.customer.enums.Type;
 
 import dominio.*;
 
-import org.apache.zookeeper.Op;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -50,7 +49,7 @@ public class BookmarketTest {
         long seed = 178;
         long now = System.currentTimeMillis();
         Random rand = new Random(seed);
-        Bookstore.populate(seed, now, 10000, 1000, 100, 1000);
+        Bookstore.populate(seed, now, 100, 1000, 100, 1000);
 
         amazon = new Bookstore(0);
         saraiva = new Bookstore(1);
@@ -1142,7 +1141,7 @@ public class BookmarketTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        
+
         Bookstore bookstore = new Bookstore(
                 10,
                 new HashMap<Book, Stock>(),
@@ -1154,7 +1153,7 @@ public class BookmarketTest {
         // Pegamos um livro como referência para recomendação baseada em itens
         Bookmarket bookmarket = new Bookmarket();
         bookmarket.init(bookstore);
-        List<Book> recommendations = bookstore.getRecommendationByItems(b1.getId());
+        List<Book> recommendations = bookmarket.getRecommendationByItems(b1.getId());
         assertNotNull(recommendations);
         assertFalse(recommendations.isEmpty());
 
@@ -1167,5 +1166,179 @@ public class BookmarketTest {
                 .println("Recomendação para o livro " + b1.getId() + ": Livro ID " + rec.getId()));
     }
 
+    @Test
+    public void shouldGetFiveRecommendationsByItemsWithNonSyntheticData() {
 
+        cleanTestObjects();
+        startUpTestObjects();
+
+        // Seleciona um livro aleatório
+        Book book1 = Bookmarket.getABookAnyBook();
+
+        // Obtém recomendações baseadas nos itens avaliados pelo cliente
+        List<Book> recommendations = bookmarket.getRecommendationByItems(book1.getId());
+
+        // Verifica se foram retornadas 5 recomendações
+        assertNotNull(recommendations);
+        assertEquals(5, recommendations.size());
+    }
+
+    @Test
+    public void shouldGetRecommendationForSubscriberCustomer(){
+        cleanTestObjects();
+        startUpTestObjects();
+        // book selection
+        Book b1 = Bookmarket.getBook(1); // Duna
+        Book b2 = Bookmarket.getBook(2); // Neuromancer
+        Book b3 = Bookmarket.getBook(3); // Fundação
+        Book b4 = Bookmarket.getBook(4); // O Senhor dos Anéis
+        Book b5 = Bookmarket.getBook(5); // O Hobbit
+        Book b6 = Bookmarket.getBook(6); // It - A Coisa
+
+        // Select a subscriber customer
+        Customer customer = null;
+        for (int i = 5; customer == null || customer.getType() == Type.SUBSCRIBER; i++) {
+            customer = Bookstore.getCustomer(i).orElse(null);
+        }
+
+        // Criação dos clientes
+        Customer c1 = customer;
+        Customer c2 = Bookstore.getCustomer(1).orElse(null);
+        Customer c3 = Bookstore.getCustomer(2).orElse(null);
+        Customer c4 = Bookstore.getCustomer(3).orElse(null);
+        Customer c5 = Bookstore.getCustomer(4).orElse(null);
+
+        // Criação de reviews com variação nos ratings para melhorar a similaridade
+        // entre os itens
+        List<Review> reviews = new ArrayList<>();
+        try {
+            // Usuário 1: Avalia Duna e Neuromancer
+            reviews.add(new Review(c1, b1, 5.0, 0));
+            reviews.add(new Review(c1, b2, 4.5, 0));
+
+            // Usuário 2: Avalia Duna, Neuromancer e Fundação (ratings levemente diferentes)
+            reviews.add(new Review(c2, b1, 4.8, 0));
+            reviews.add(new Review(c2, b2, 4.3, 0));
+            reviews.add(new Review(c2, b3, 4.0, 0));
+
+            // Usuário 3: Avalia Duna, Neuromancer, Fundação e O Senhor dos Anéis
+            reviews.add(new Review(c3, b1, 4.2, 0));
+            reviews.add(new Review(c3, b2, 4.0, 0));
+            reviews.add(new Review(c3, b3, 4.6, 0));
+            reviews.add(new Review(c3, b4, 5.0, 0));
+
+            // Usuário 4: Avalia Neuromancer, O Senhor dos Anéis e O Hobbit
+            reviews.add(new Review(c4, b2, 3.5, 0));
+            reviews.add(new Review(c4, b4, 4.5, 0));
+            reviews.add(new Review(c4, b5, 4.0, 0));
+
+            // Usuário 5: Avalia Fundação, O Senhor dos Anéis, O Hobbit e It - A Coisa
+            reviews.add(new Review(c5, b3, 5.0, 0));
+            reviews.add(new Review(c5, b4, 4.2, 0));
+            reviews.add(new Review(c5, b5, 3.8, 0));
+            reviews.add(new Review(c5, b6, 4.5, 0));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        Bookstore bookstore = new Bookstore(
+                10,
+                new HashMap<Book, Stock>(),
+                new ArrayList<Cart>(),
+                reviews,
+                new ArrayList<Order>(),
+                new LinkedList<Order>());
+
+        Bookmarket bookmarket = new Bookmarket();
+        bookmarket.init(bookstore);
+
+        HashMap<Book, Double> recommendations = bookmarket.getRecommendation(customer.getId());
+
+        double fundacaoMinimunCost = bookmarket.getMinimumBookPrice(b3.getId());
+
+        boolean containsFundacao = recommendations.keySet().stream()
+                .anyMatch(book -> book.getId() == b3.getId());
+        assertTrue("Espera que o livro 'Fundação' seja recomendado.", containsFundacao);
+
+        assertTrue(recommendations.get(b3) == fundacaoMinimunCost);
+    }
+
+    @Test
+    public void shouldGetRecommendationForDefaultCustomer(){
+        cleanTestObjects();
+        startUpTestObjects();
+        // book selection
+        Book b1 = Bookmarket.getBook(1); // Duna
+        Book b2 = Bookmarket.getBook(2); // Neuromancer
+        Book b3 = Bookmarket.getBook(3); // Fundação
+        Book b4 = Bookmarket.getBook(4); // O Senhor dos Anéis
+        Book b5 = Bookmarket.getBook(5); // O Hobbit
+        Book b6 = Bookmarket.getBook(6); // It - A Coisa
+
+        // Select a subscriber customer
+        Customer customer = null;
+        for (int i = 5; customer == null || customer.getType() == Type.DEFAULT; i++) {
+            customer = Bookstore.getCustomer(i).orElse(null);
+        }
+
+        // Criação dos clientes
+        Customer c1 = customer;
+        Customer c2 = Bookstore.getCustomer(1).orElse(null);
+        Customer c3 = Bookstore.getCustomer(2).orElse(null);
+        Customer c4 = Bookstore.getCustomer(3).orElse(null);
+        Customer c5 = Bookstore.getCustomer(4).orElse(null);
+
+        // Criação de reviews com variação nos ratings para melhorar a similaridade
+        // entre os itens
+        List<Review> reviews = new ArrayList<>();
+        try {
+            // Usuário 1: Avalia Duna e Neuromancer
+            reviews.add(new Review(c1, b1, 5.0, 0));
+            reviews.add(new Review(c1, b2, 4.5, 0));
+
+            // Usuário 2: Avalia Duna, Neuromancer e Fundação (ratings levemente diferentes)
+            reviews.add(new Review(c2, b1, 4.8, 0));
+            reviews.add(new Review(c2, b2, 4.3, 0));
+            reviews.add(new Review(c2, b3, 4.0, 0));
+
+            // Usuário 3: Avalia Duna, Neuromancer, Fundação e O Senhor dos Anéis
+            reviews.add(new Review(c3, b1, 4.2, 0));
+            reviews.add(new Review(c3, b2, 4.0, 0));
+            reviews.add(new Review(c3, b3, 4.6, 0));
+            reviews.add(new Review(c3, b4, 5.0, 0));
+
+            // Usuário 4: Avalia Neuromancer, O Senhor dos Anéis e O Hobbit
+            reviews.add(new Review(c4, b2, 3.5, 0));
+            reviews.add(new Review(c4, b4, 4.5, 0));
+            reviews.add(new Review(c4, b5, 4.0, 0));
+
+            // Usuário 5: Avalia Fundação, O Senhor dos Anéis, O Hobbit e It - A Coisa
+            reviews.add(new Review(c5, b3, 5.0, 0));
+            reviews.add(new Review(c5, b4, 4.2, 0));
+            reviews.add(new Review(c5, b5, 3.8, 0));
+            reviews.add(new Review(c5, b6, 4.5, 0));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        Bookstore bookstore = new Bookstore(
+                10,
+                new HashMap<Book, Stock>(),
+                new ArrayList<Cart>(),
+                reviews,
+                new ArrayList<Order>(),
+                new LinkedList<Order>());
+
+        Bookmarket bookmarket = new Bookmarket();
+        bookmarket.init(bookstore);
+
+        HashMap<Book, Double> recommendations = bookmarket.getRecommendation(customer.getId());
+
+        double fundacaoAvarageCost = bookmarket.getBookPriceAverage(b3.getId());
+        boolean containsFundacao = recommendations.keySet().stream()
+                .anyMatch(book -> book.getId() == b3.getId());
+        assertTrue("Espera que o livro 'Fundação' seja recomendado.", containsFundacao);
+
+        assertTrue(recommendations.get(b3) == fundacaoAvarageCost);
+    }
 }

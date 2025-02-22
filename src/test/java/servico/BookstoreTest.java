@@ -492,6 +492,7 @@ public class BookstoreTest {
 
     @Test
     public void shouldRemoveAReview() throws IOException {
+    	populateInstance();
         Review review = instance.getReviews().get(0);
 
         instance.removeReviewById(review.getId());
@@ -611,7 +612,8 @@ public class BookstoreTest {
 
     @Test
     public void shouldUpdateRelatedBooks() {
-    	populateInstance();
+    	Bookstore store = new Bookstore(1664);
+        store.populateInstanceBookstore(10000, new Random(), 0);
     	
         Book randomBook = Bookstore.getABookAnyBook(new Random());
         // Garante que o livro tenha todos os relacionamentos
@@ -630,8 +632,8 @@ public class BookstoreTest {
         relatedBooks.add(randomBook.getRelated5());
 
         // Obtem o número de vendas conjuntas com o livro mais relacionado
-        Set<Integer> clientIds = instance.getClientIdsWhoBoughtTargetBook(randomBook);
-        Map<Integer, BookstoreBookCounter> purchaseFrequency = instance.getPurchaseFrequency(clientIds, randomBook);
+        Set<Integer> clientIds = store.getClientIdsWhoBoughtTargetBook(randomBook);
+        Map<Integer, BookstoreBookCounter> purchaseFrequency = store.getPurchaseFrequency(clientIds, randomBook);
         BookstoreBookCounter maxRelated = purchaseFrequency.entrySet().stream()
                 .max((entry1, entry2) -> entry1.getValue().getCount() > entry2.getValue().getCount() ? 1 : -1)
                 .get().getValue();
@@ -645,10 +647,10 @@ public class BookstoreTest {
 
         // Cria vendas conjuntas com o novo livro
         for (int i = 0; i < numSales + 1; i++) {
-            createOrder(instance, null, Arrays.asList(newRelated.getId(), randomBook.getId()), Arrays.asList(10, 10));
+            createOrder(store, null, Arrays.asList(newRelated.getId(), randomBook.getId()), Arrays.asList(10, 10));
         }
 
-        instance.updateRelatedBooks(randomBook);
+        store.updateRelatedBooks(randomBook);
 
         Book updatedBook = Bookstore.getBook(randomBook.getId()).get();
 
