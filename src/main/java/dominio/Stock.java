@@ -13,12 +13,12 @@ public class Stock {
     private int qty;
 
     /**
-     * Cria uma classe que representa o stock do sistema.
+     * Creates a class that represents a system stock.
      *
-     * @param idBookstore Identificador do Bookstore do estoque.
-     * @param book Livro em estoque.
-     * @param cost Custo unitário do livro em estoque.
-     * @param qty Quantidade em estoque.
+     * @param idBookstore Stock's bookstore identifier.
+     * @param book Stock's book.
+     * @param cost Stock's book unit cost.
+     * @param qty Stock's quantity.
      */
     public Stock(int idBookstore, Book book, double cost, int qty) {
         this.idBookstore = idBookstore;
@@ -28,63 +28,63 @@ public class Stock {
     }
 
     /**
-     * Método que recupera livro em estoque.
+     * Stock's book getter.
      *
-     * @return Recupera livro em estoque.
+     * @return Retrieves Stock's book.
      */
     public Book getBook() {
         return book;
     }
 
     /**
-     * Método que adiciona quantidade em estoque.
+     * Stock's quantity addition method.
      *
-     * @param amount Adiciona quantidade em estoque.
+     * @param amount Adds stock quantity.
      */
     public void addQty(int amount) {
         qty += amount;
     }
 
     /**
-     * Método que recupera custo unitário do livro em estoque.
+     * Stock's book unit cost getter.
      *
-     * @return Recupera custo em estoque.
+     * @return Retrieves Stock's cost.
      */
     public double getCost() {
         return cost;
     }
 
     /**
-     * Método que define custo unitário do livro em estoque.
+     * Stock's book unit cost setter.
      *
-     * @param cost Define custo em estoque.
+     * @param cost Sets Stock's cost.
      */
     public void setCost(double cost) {
         this.cost = cost;
     }
 
     /**
-     * Método que recupera quantidade em estoque.
+     * Stock's quantity getter.
      *
-     * @return Recupera quantidade em estoque.
+     * @return Retrieves Stock's quantity getter.
      */
     public int getQty() {
         return qty;
     }
 
     /**
-     * Método que define quantidade em estoque.
+     * Stock's quantity setter.
      *
-     * @param qty Define quantidade em estoque.
+     * @param qty Sets Stock's quantity.
      */
     public void setQty(int qty) {
         this.qty = qty;
     }
 
     /**
-     * Método que recupera o identificador do Bookstore do estoque.
+     * Stock's bookstore identifier getter.
      *
-     * @return Recupera o identificador do Bookstore do estoque.
+     * @return Retrieves Stock's bookstore identifier.
      */
     public int getIdBookstore() {
         return idBookstore;

@@ -76,10 +76,10 @@ public class Cart implements Serializable {
 
 	/**
 	 *
-	 * @param id   Identificador do carrinho de compras.
-	 * @param time Tempo do carrinho de compras.
-	 * @param customer Cliente que está criando o carrinho de compras
-	 * @param bookstoreId Id da bookstore cujo qual o carrinho pertence
+	 * @param id   Shopping cart identifier.
+	 * @param time Shopping cart time.
+	 * @param customer Client creating shopping cart
+	 * @param bookstoreId Bookstore's id that shopping cart belong
 	 */
     public Cart(int id, Date time, Customer customer, int bookstoreId) {
         this.id = id;
@@ -90,27 +90,27 @@ public class Cart implements Serializable {
     }
 
 	/**
-	 * Método que recupera o identificador do carrinho de compras.
+	 * Shopping cart identifier getter.
 	 * 
-	 * @return Recupera o identificador do carrinho de compras.
+	 * @return Retrieves a shopping cart identifier.
 	 */
     public int getId() {
         return id;
     }
 
 	/**
-	 * Método que recupera o tempo do carrinho de compras.
+	 * Shopping cart time getter
 	 * 
-	 * @return Recupera o tempo do carrinho de compras.
+	 * @return Retrieves a shopping cart time.
 	 */
     public Date getTime() {
         return time;
     }
 
 	/**
-	 * Método que define o tempo do carrinho de compras.
+	 * Shopping cart time setter
 	 * 
-	 * @param time Define o tempo do carrinho de compras.
+	 * @param time Sets a shopping cart time.
 	 */
     public void setTime(Date time) {
         this.time = time;
@@ -130,9 +130,9 @@ public class Cart implements Serializable {
     }
 
 	/**
-	 * Método que recupera uma lista de itens do carrinho de compras.
+	 * Shopping cart list of items getter
 	 * 
-	 * @return Recupera uma lista de itens do carrinho de compras.
+	 * @return Retrieves a shopping cart list of items.
 	 */
     public Collection<CartLine> getLines() {
         return linesByBookId.values();
@@ -153,9 +153,9 @@ public class Cart implements Serializable {
      * }
      * </pre>
      *
-     * @param stock Estoque.
-     * @param book Livro.
-     * @param quantity Quantidade.
+     * @param stock Stock.
+     * @param book Book.
+     * @param quantity Quantity.
      */
     public void increaseLine(Stock stock, Book book, int quantity) {
         CartLine line = linesByBookId.get(book.getId());
@@ -186,9 +186,9 @@ public class Cart implements Serializable {
      * }
      * </pre>
      *
-     * @param stock Estoque.
-     * @param book Livro.
-     * @param quantity Quantidade.
+     * @param stock Stock.
+     * @param book Book.
+     * @param quantity Quantity.
      */
     public void changeLine(Stock stock, Book book, int quantity) {
         CartLine line = linesByBookId.get(book.getId());
@@ -209,8 +209,8 @@ public class Cart implements Serializable {
 	 * return aggregateCost * ((100 - discount) * 0.01);
 	 * </pre>
 	 *
-	 * @param discount Desconto a se aplicado.
-	 * @return valor do livro com desconto.
+	 * @param discount Discount to be applied.
+	 * @return Book price with discount.
 	 */
     public double subTotal(double discount) {
         return aggregateCost * ((100 - discount) * 0.01);
@@ -221,8 +221,8 @@ public class Cart implements Serializable {
      * return subTotal(discount) * 0.0825;
      * </pre>
      *
-     * @param discount Desconto a ser aplicado.
-     * @return valor do livro com desconto.
+     * @param discount Discount to be applied.
+     * @return Book price with discount.
      */
     public double tax(double discount) {
         return subTotal(discount) * 0.0825;
@@ -233,7 +233,7 @@ public class Cart implements Serializable {
      * return 3.00 + (1.00 * aggregateQuantity);
      * </pre>
      *
-     * @return valor do frete.
+     * @return Shipment price.
      */
     public double shipCost() {
         return 3.00 + (1.00 * aggregateQuantity);
@@ -244,8 +244,8 @@ public class Cart implements Serializable {
      * return subTotal(discount) + shipCost() + tax(discount);
      * </pre>
      *
-     * @param discount Desconto a ser aplicado.
-     * @return valor total do livro.
+     * @param discount Discount to be applied.
+     * @return Book total price.
      */
     public double total(double discount) {
         return subTotal(discount) + shipCost() + tax(discount);

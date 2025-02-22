@@ -6,9 +6,7 @@ import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.ExpecificBookstoreAction;
 
 public class GetReviewsByBookstoreAction extends ExpecificBookstoreAction{
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 8136710222147009776L;
 
 	public GetReviewsByBookstoreAction(int bookstoreId) {

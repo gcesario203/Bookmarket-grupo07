@@ -90,21 +90,21 @@ public class Book implements Serializable {
 
     /**
      *
-     * @param id - o id da instância de Book
-     * @param title - o título
-     * @param pubDate - a data da publicação
-     * @param publisher - o responsável pela publicação
-     * @param subject - o assunto
-     * @param desc - a descrição
-     * @param thumbnail - uma imagem reduzida para listagens
-     * @param image - uma imagem em alta resolução
-     * @param srp - o preço conforme o Sistema de Registro de Preços
-     * @param avail - a data de disponibilidade
-     * @param isbn - o código ISBN
-     * @param page - a quantidade de páginas
-     * @param backing - as informações sobre apoiadores
-     * @param dimensions - as dimensões
-     * @param author - o autor
+     * @param id - Book's instance id
+     * @param title - The title
+     * @param pubDate - The publication date
+     * @param publisher - The person responsible for publication
+     * @param subject - The subject
+     * @param desc - The description
+     * @param thumbnail - A Shrinked image for listing
+     * @param image - A High resolution image
+     * @param srp - A price according the Price Register System
+     * @param avail - An available date
+     * @param isbn - An ISBN code
+     * @param page - The page quantity
+     * @param backing - The supporters information
+     * @param dimensions - The dimensions
+     * @param author - The author
      */
     public Book(int id, String title, Date pubDate, String publisher,
             String subject, String desc, String thumbnail,
@@ -135,7 +135,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera o título
+     * @return Title getter
      */
     public String getTitle() {
         return title;
@@ -143,7 +143,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera uma imagem reduzida para listagens
+     * @return Shrinked image for listing getter
      */
     public String getThumbnail() {
         return thumbnail;
@@ -151,7 +151,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @param thumbnail - uma imagem reduzida para listagens
+     * @param thumbnail - A Shrinked image for listing
      */
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
@@ -160,7 +160,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera uma imagem em alta resolução
+     * @return High resolution image getter
      */
     public String getImage() {
         return image;
@@ -168,7 +168,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @param image - uma imagem em alta resolução
+     * @param image - A High resolution image
      */
     public void setImage(String image) {
         this.image = image;
@@ -176,7 +176,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera o autor
+     * @return Author getter
      */
     public Author getAuthor() {
         return author;
@@ -184,7 +184,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera o preço conforme o Sistema de Registro de Preços
+     * @return Price according the Price Register System getter
      */
     public double getSrp() {
         return srp;
@@ -193,7 +193,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera a descrição
+     * @return Description getter
      */
     public String getDesc() {
         return desc;
@@ -201,7 +201,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera a quantidade de páginas
+     * @return Page quantity getter
      */
     public int getPage() {
         return page;
@@ -209,7 +209,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera as informações sobre apoiadores
+     * @return Supporters information getter
      */
     public String getBacking() {
         return backing;
@@ -217,7 +217,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera a data da publicação
+     * @return Publication date getter
      */
     public Date getPubDate() {
         return pubDate;
@@ -225,7 +225,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @param pubDate - a data da publicação
+     * @param pubDate - A publication date
      */
     public void setPubDate(Date pubDate) {
         this.pubDate = pubDate;
@@ -233,7 +233,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera o responsável pela publicação
+     * @return Person responsible for publication getter
      */
     public String getPublisher() {
         return publisher;
@@ -241,7 +241,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera o código ISBN
+     * @return ISBN code getter
      */
     public String getIsbn() {
         return isbn;
@@ -249,7 +249,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera o id da instância de Book
+     * @return Instance Book id getter
      */
     public int getId() {
         return id;
@@ -257,7 +257,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera as dimensões
+     * @return Dimensions getter
      */
     public String getDimensions() {
         return dimensions;
@@ -265,7 +265,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera o assunto
+     * @return Subject getter
      */
     public String getSubject() {
         return subject;
@@ -273,7 +273,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera a data de disponibilidade
+     * @return Available date getter
      */
     public Date getAvail() {
         return avail;
@@ -281,7 +281,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera um livro relacionado com este
+     * @return Related book with this getter
      */
     public Book getRelated1() {
         return related1;
@@ -289,7 +289,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera um livro relacionado com este
+     * @return Related book with this getter
      */
     public Book getRelated2() {
         return related2;
@@ -297,7 +297,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera um livro relacionado com este
+     * @return Related book with this getter
      */
     public Book getRelated3() {
         return related3;
@@ -305,7 +305,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera um livro relacionado com este
+     * @return Related book with this getter
      */
     public Book getRelated4() {
         return related4;
@@ -313,7 +313,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return getter que recupera um livro relacionado com este
+     * @return Related book with this getter
      */
     public Book getRelated5() {
         return related5;
@@ -321,7 +321,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @param related1 - um livro relacionado com este
+     * @param related1 - A related book with this
      */
     public void setRelated1(Book related1) {
         this.related1 = related1;
@@ -329,7 +329,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @param related2 - um livro relacionado com este
+     * @param related2 - A related book with this
      */
     public void setRelated2(Book related2) {
         this.related2 = related2;
@@ -337,7 +337,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @param related3 - um livro relacionado com este
+     * @param related3 - A related book with this
      */
     public void setRelated3(Book related3) {
         this.related3 = related3;
@@ -345,7 +345,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @param related4 - um livro relacionado com este
+     * @param related4 - A related book with this
      */
     public void setRelated4(Book related4) {
         this.related4 = related4;
@@ -353,7 +353,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @param related5 - um livro relacionado com este
+     * @param related5 - A related book with this
      */
     public void setRelated5(Book related5) {
         this.related5 = related5;
@@ -361,7 +361,7 @@ public class Book implements Serializable {
     
     /**
      * 
-     * @return uma lista de todos os livros relacionados
+     * @return A list of all related books
      */
     public List<Book> getAllRelated() {
     	List<Book> related = new ArrayList<>();
@@ -377,8 +377,8 @@ public class Book implements Serializable {
 
     /**
      *
-     * @param o - a instância de Book a ser comparada
-     * @return um boolean que representa a igualdade entre esta instância e a representada por <code>o</code>
+     * @param o - Book instance to be compared
+     * @return A boolean that represents equality between this instance and the one represented by <code>o</code>
      */
     @Override
     public boolean equals(Object o) {
@@ -391,7 +391,7 @@ public class Book implements Serializable {
 
     /**
      *
-     * @return um int representando o hash code desta instância de Book
+     * @return An int representing this book instance hash code
      */
     @Override
     public int hashCode() {

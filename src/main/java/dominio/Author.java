@@ -71,13 +71,13 @@ public class Author implements Serializable {
     private final String bio;
 
 	/**
-	 * Método construtor da classe Author.
+	 * Constructor method of Author's class.
 	 *
-	 * @param fname     Primeiro nome do autor.
-	 * @param mname     Nome do meio do autor.
-	 * @param lname     Último nome do autor.
-	 * @param birthdate Data de aniversário do autor.
-	 * @param bio       Biografia do autor.
+	 * @param fname     Author's first name.
+	 * @param mname     Author's middle name.
+	 * @param lname     Author's last name.
+	 * @param birthdate Author's birthday.
+	 * @param bio       Author's biography.
 	 */
     public Author(String fname, String mname, String lname, Date birthdate,
             String bio) {
@@ -89,45 +89,45 @@ public class Author implements Serializable {
     }
 
 	/**
-	 * Método que recupera o primeiro nome do autor.
+	 * Author's first name getter.
 	 *
-	 * @return Primeiro nome do autor.
+	 * @return Author's first name.
 	 */
     public String getFname() {
         return fname;
     }
 
 	/**
-	 * Método que recupera o último nome do autor.
+	 * Author's last name getter.
 	 * 
-	 * @return Último nome do autor.
+	 * @return Author's last name.
 	 */
     public String getLname() {
         return lname;
     }
 
 	/**
-	 * Método que recupera o nome do meio do autor.
+	 * Author's middle name getter.
 	 * 
-	 * @return Nome do meio do autor.
+	 * @return Author's middle name.
 	 */
     public String getMname() {
         return mname;
     }
 
 	/**
-	 * Método que recupera a data de aniversário do autor.
+	 * Author's birthday date getter.
 	 * 
-	 * @return Date birthdate Data de aniversário do autor.
+	 * @return Date birthdate Author's birthday date.
 	 */
     public Date getBirthdate() {
         return birthdate;
     }
 
 	/**
-	 * Método que recupera a biografia do autor.
+	 * Author's biography getter.
 	 * 
-	 * @return Biografia do autor.
+	 * @return Author's biography.
 	 */
     public String getBio() {
         return bio;
