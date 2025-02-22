@@ -5,6 +5,7 @@ import servico.bookstore.Bookstore;
 import servico.bookstore.utils.MahoutUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,6 +53,8 @@ public class GetRecommendationByItensAction extends BookstoreAction {
 
         List<Object> recommendedBooks = recommendedItems.stream()
                 .map(i -> Bookstore.getBook((int) i.getItemID()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
 
         return recommendedBooks;

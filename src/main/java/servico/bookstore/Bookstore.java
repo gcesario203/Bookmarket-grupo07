@@ -83,22 +83,22 @@ public class Bookstore implements Serializable {
     private static final long serialVersionUID = -3099048826035606338L;
 
     private static boolean populated;
-    private static final List<Country> countryById;
-    private static final Map<String, Country> countryByName;
-    private static final List<Address> addressById;
-    private static final Map<Address, Address> addressByAll;
-    private static final List<Customer> customersById;
-    private static final Map<String, Customer> customersByUsername;
-    private static final List<Author> authorsById;
-    private static final List<Book> booksById;
+    private static List<Country> countryById;
+    private static Map<String, Country> countryByName;
+    private static List<Address> addressById;
+    private static Map<Address, Address> addressByAll;
+    private static List<Customer> customersById;
+    private static Map<String, Customer> customersByUsername;
+    private static List<Author> authorsById;
+    private static List<Book> booksById;
 
-    private final Map<Book, Stock> stockByBook;
-    private final List<Cart> cartsById;
-    private final List<Review> reviewsByIds;
-    private final List<Order> ordersById;
-    private final LinkedList<Order> ordersByCreation;
+    private Map<Book, Stock> stockByBook;
+    private List<Cart> cartsById;
+    private List<Order> ordersById;
+    private List<Review> reviewsByIds;
+    private LinkedList<Order> ordersByCreation;
     private final int id;
-
+    
     /**
      * Bloco static que executa a inicialização dos atriutos estáticos da
      * Bookstore
@@ -112,6 +112,7 @@ public class Bookstore implements Serializable {
         customersByUsername = new HashMap<>();
         authorsById = new ArrayList<>();
         booksById = new ArrayList<>();
+        
     }
 
     /**
@@ -122,22 +123,14 @@ public class Bookstore implements Serializable {
      */
     public Bookstore(final int id) {
         this.id = id;
-        cartsById = new ArrayList<>();
-        ordersById = new ArrayList<>();
-        reviewsByIds = new ArrayList<>();
-        ordersByCreation = new LinkedList<>();
-        stockByBook = new HashMap<>();
+        resetBookstoreData();
     }
 
     public Bookstore(final int id, Map<Book, Stock> stockByBook, List<Cart> cartsById, List<Review> reviewsByIds,
             List<Order> ordersById, LinkedList<Order> ordersByCreation) {
         this.id = id;
-
-        this.cartsById = new ArrayList<>();
-        this.reviewsByIds = new ArrayList<>();
-        this.ordersById = new ArrayList<>();
-        this.ordersByCreation = new LinkedList<>();
-        this.stockByBook = new HashMap<>();
+        
+        resetBookstoreData();
 
         this.stockByBook.putAll(stockByBook);
         this.cartsById.addAll(cartsById);
@@ -329,7 +322,7 @@ public class Bookstore implements Serializable {
     }
 
     public List<Review> getReviews() {
-        return this.reviewsByIds;
+        return reviewsByIds;
     }
 
     public Optional<Review> getReviewById(int id) {
@@ -456,7 +449,7 @@ public class Bookstore implements Serializable {
     public static void refreshCustomerSession(int cId, long now) throws Exception {
         Optional<Customer> customer = getCustomer(cId);
         
-        if(customer.isEmpty())
+        if(!customer.isPresent())
         	throw new Exception("Customer not exists");
         
         customer.get().setLogin(new Date(now));
@@ -512,9 +505,9 @@ public class Bookstore implements Serializable {
      * @return uma lista de livros recomendados derivados da similaridade entre
      *         itens
      */
-    public List<Book> getRecommendationByItens(int c_id) {
+    public List<Book> getRecommendationByItems(int c_id) {
         int maxRecommendations = 5;
-        return getRecommendationByItens(c_id, maxRecommendations);
+        return getRecommendationByItems(c_id, maxRecommendations);
     }
 
     /**
@@ -533,7 +526,7 @@ public class Bookstore implements Serializable {
      * @return uma lista de livros recomendados derivados da similaridade entre
      *         itens
      */
-    public List<Book> getRecommendationByItens(int c_id, int maxRecommendations) {
+    public List<Book> getRecommendationByItems(int c_id, int maxRecommendations) {
         List<RecommendedItem> itemRecommendations = MahoutUtils.recommendItemBased(reviewsByIds, c_id,
                 maxRecommendations);
         List<Book> recommendedBooks = new ArrayList<>();
@@ -705,25 +698,33 @@ public class Bookstore implements Serializable {
      * Processa todos os pedidos e suas linhas para contabilizar a quantidade
      * total vendida de cada livro.
      *
+     * @param subject - o assunto do livro
      * @return Mapa onde a chave é o livro e o valor é a quantidade total vendida
      *         nesta livraria
      */
-    public HashMap<Book, Integer> getConsolidatedBookSales() {
-        HashMap<Book, Integer> salesByBook = new HashMap<Book, Integer>();
-
-        for (Order order : ordersById) {
-            for (OrderLine line : order.getLines()) {
-                Book book = line.getBook();
-                Integer qtd = line.getQty();
-                if (salesByBook.containsKey(book)) {
-                    salesByBook.put(book, salesByBook.get(book) + qtd);
-                } else {
-                    salesByBook.put(book, qtd);
-                }
-            }
-
-        }
-        return salesByBook;
+    public HashMap<Book, Integer> getConsolidatedBookSales(String subject) {
+        HashMap<Book, Integer> bookSalesList = ordersById.stream()
+                .flatMap(order -> order.getLines().stream()) // Converte os pedidos em uma única stream de linhas de pedido
+                .collect(Collectors.toMap(
+                        OrderLine::getBook, // Chave: o livro
+                        OrderLine::getQty,  // Valor: a quantidade vendida
+                        Integer::sum,       // Em caso de chave repetida, soma os valores
+                        HashMap::new        // Usa um HashMap como implementação do Map
+                ));
+        
+        // Caso o tema do livro seja vazio, já retorna a lista de livros que possuem vendas
+        if(subject == null || subject.isEmpty())
+        	return bookSalesList;
+        
+        // se não, filtra pelo livro e retorna o HashMap filtrado
+        return bookSalesList.entrySet().stream()
+        							   .filter(entry -> subject.equals(entry.getKey().getSubject()))
+        							   .collect(Collectors.toMap(
+        						                Map.Entry::getKey, 
+        						                Map.Entry::getValue, 
+        						                (entry1, entry2) -> entry1, 
+        						                HashMap::new
+        						            ));
     }
 
     /**
@@ -824,7 +825,7 @@ public class Bookstore implements Serializable {
      * @param targetBook the book to search for in customer orders
      * @return a set of customer IDs who purchased the target book
      */
-    private Set<Integer> getClientIdsWhoBoughtTargetBook(Book targetBook) {
+    public Set<Integer> getClientIdsWhoBoughtTargetBook(Book targetBook) {
         Set<Integer> clientIds = new HashSet<>();
         Iterator<Order> orderIterator = ordersByCreation.iterator();
 
@@ -848,7 +849,7 @@ public class Bookstore implements Serializable {
      * @param targetBook the book to exclude from the counting
      * @return a map of book IDs to their purchase frequency counters
      */
-    private Map<Integer, BookstoreBookCounter> getPurchaseFrequency(Set<Integer> clientIds, Book targetBook) {
+    public Map<Integer, BookstoreBookCounter> getPurchaseFrequency(Set<Integer> clientIds, Book targetBook) {
         Map<Integer, BookstoreBookCounter> purchaseFrequency = new HashMap<>();
 
         ordersByCreation.stream()
@@ -927,11 +928,11 @@ public class Bookstore implements Serializable {
     public Optional<Cart> createCart(int customerId, long now) {
     	Optional<Customer> customer = getCustomer(customerId);
     	
-    	if(customer.isEmpty())
+    	if(!customer.isPresent())
     		return Optional.empty();
     	
     	Optional<Cart> createdCart = getCartByCustomer(customerId);
-    	if(createdCart.isEmpty()) {
+    	if(!createdCart.isPresent()) {
             int idCart = cartsById.size();
             Cart cart = new Cart(idCart, new Date(now), customer.get(), this.getId());
             cartsById.add(cart);
@@ -968,7 +969,7 @@ public class Bookstore implements Serializable {
             List<Integer> quantities, long now) {
         Optional<Cart> cart = getCart(cId);
         
-        if(cart.isEmpty())
+        if(!cart.isPresent())
         	return Optional.empty();
         
         if (bId != null) {
@@ -977,7 +978,8 @@ public class Bookstore implements Serializable {
 
         if ((bIds != null && bIds.size() > 0) && (quantities != null && quantities.size() > 0)) {
             for (int i = 0; i < bIds.size(); i++) {
-                cart.get().changeLine(stockByBook.get(getBook(bId).get()), booksById.get(bIds.get(i)), quantities.get(i));
+                int bid = bIds.get(i);
+                cart.get().changeLine(stockByBook.get(getBook(bid).get()), booksById.get(bid), quantities.get(i));
             }
         }
 
@@ -1036,7 +1038,7 @@ public class Bookstore implements Serializable {
     public Optional<Customer> updateCustomerType(int customerId, dominio.customer.enums.Type type) {
     	Optional<Customer> customerToChange = getCustomer(customerId);
     	
-    	if(customerToChange.isEmpty())
+    	if(!customerToChange.isPresent())
     		return Optional.empty();
     	
     	customerToChange.get().setType(type);
@@ -1057,8 +1059,63 @@ public class Bookstore implements Serializable {
         cart.clear();
         return order;
     }
+    
+    /**
+     * Para realizar a busca por bestSellers o sistema aproveita do
+     * relacionamento de {@linkplain OrderLine} com {@linkplain Book}. É
+     * assumido que cada OrderLine possui apenas 01 {@linkplain Book}, neste
+     * caso a quantidade de vendas é identificada por esta relação. Sempre que
+     * acontece a criação de uma orderLine, é assumido que uma compra foi feita.
+     *
+     * É utilizado um limite de 100 livros para o resultado da pesquisa para
+     * evitar desperdício de memória no retorno do método. Este limite é
+     * estipulado por
+     *
+     * Com isto, é importante salientar que este método utiliza as vendas desta
+     * instância para recuperar os livros vendidos.
+     *
+     * @param subject Assunto que será utilizado para filtro de pesquisa por
+     * melhores vendedores
+     * @param numberOfBooks Quantidade de livros
+     * @return Retorna um hashmap contendo o livro e a quantidade de vendas
+     * {@linkplain Bookstore} com tamanho limitado em 100
+     */
+    public HashMap<Book, Integer> getBestSellers(String subject, Integer numberOfBooks) {
+    	final Integer MINIMUM_BOOKS = 1;
+        final Integer MAXIMUM_BOOKS = 100;
+        
+        if (numberOfBooks < MINIMUM_BOOKS || numberOfBooks > MAXIMUM_BOOKS) {
+            throw new RuntimeException("Número de livros solicitado deve estar entre 1 e 100");
+        }
+        
+        HashMap<Book, Integer> consolidatedBookSales = getConsolidatedBookSales(subject);
+        
+        return sortBooksBySalesDescending(consolidatedBookSales, numberOfBooks);
+    }
+    
+    /**
+     * Retorna uma lista ordenada dos livros mais vendidos a partir de um mapa de vendas totais.
+     * A ordenação é feita em ordem decrescente de quantidade vendida.
+     *
+     * @param salesByBook Mapa contendo a quantidade total de vendas para cada livro
+     * @param limit Quantidade de livros a serem retornados
+     * @return Lista dos livros mais vendidos, limitada pelo parâmetro limit
+     */
+    public HashMap<Book, Integer>  sortBooksBySalesDescending(HashMap<Book, Integer> salesByBook, int limit) {
+    	HashMap<Book, Integer> topSellingBooks = salesByBook.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // Ordena por vendas (descendente)
+                .limit(limit)// Filtra os N primeiros
+                .collect(Collectors.toMap(
+			                Map.Entry::getKey, 
+			                Map.Entry::getValue, 
+			                (entry1, entry2) -> entry1, 
+			                HashMap::new
+			            ));// transforma novamente num hashmap
+        return topSellingBooks;
+    }
 
     private static Random rand;
+    
 
     /**
      * Randomly populates Addresses, Customers, Authors and Books lists.
@@ -1077,7 +1134,7 @@ public class Bookstore implements Serializable {
             throw new RuntimeException("Parametros invalidos");
 
         if (populated) {
-            return false;
+        	flushGlobalDatabase();
         }
         rand = new Random(seed);
         populateCountries();
@@ -1088,6 +1145,23 @@ public class Bookstore implements Serializable {
         populateEvaluation(rand);
         populated = true;
         return true;
+    }
+    
+    /*
+     * Método responsável por limpar os dados das instancias globais/estaticas
+     * de armazenamento de classes de dominio;
+     */
+    private static void flushGlobalDatabase() {
+    	populated = false;
+    	rand = null;
+        countryById = new ArrayList<>();
+        countryByName = new HashMap<>();
+        addressById = new ArrayList<>();
+        addressByAll = new HashMap<>();
+        customersById = new ArrayList<>();
+        customersByUsername = new HashMap<>();
+        authorsById = new ArrayList<>();
+        booksById = new ArrayList<>();
     }
 
     /**
@@ -1232,8 +1306,24 @@ public class Bookstore implements Serializable {
         setRelatedBooks(number, rand);
 
     }
-
+    
+    /**
+     * Método responsável por limpar os dados atuais da bookstore
+     */
+    private void resetBookstoreData() {
+        cartsById = new ArrayList<>();
+        ordersById = new ArrayList<>();
+        ordersByCreation = new LinkedList<>();
+        stockByBook = new HashMap<>();
+        reviewsByIds = new ArrayList<>();
+    }
+    
     public void populateInstanceBookstore(int number, Random rand, long now) {
+    	// Limpa o gerador de id
+    	servico.shared.IdGenerator.getInstance().reset();
+    	
+    	resetBookstoreData();
+    	
         populateOrders(number, rand, now);
         populateStocks(number, rand, now);
         populateReviews(number, rand);
@@ -1247,7 +1337,8 @@ public class Bookstore implements Serializable {
 
         for (int i = 0; i < number; i++) {
             try {
-                createReview(getACustomerAnyCustomer(rand), getABookAnyBook(rand), (int) (Math.random() * 6));
+            	int rating = rand.nextInt(6); // Garantindo que a aleatoriedade seja controlada pelo objeto rand
+                createReview(getACustomerAnyCustomer(rand), getABookAnyBook(rand), rating);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
