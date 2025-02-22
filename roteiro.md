@@ -38,17 +38,20 @@ Eu, como cliente, quero receber cinco sugestões de livros do meu interesse com 
 - [shouldGetFiveRecommendationsWithNonSyntheticData](src/test/java/servico/BookmarketTest.java#:1177)
   
 #### Testes do bookstore
+- [shouldReturnValidItemsRecommendationsFromSyntheticDataset](src/test/java/servico/BookstoreTest.java#:817)
+- [shouldReturnValidRecommendationsFromSyntheticDataset](src/test/java/servico/BookstoreTest.java#:746)
+- [shouldGetTheAverageCostFromABook](src/test/java/servico/BookstoreTest.java#:973)
+- [shouldUpdateRelatedBooks](src/test/java/servico/BookstoreTest.java#:614)
 
-- Mostrar testes no bookmarket
-- Mostrar testes do getRecommendationsByUsers no bookmarket
-- Mostrar implementação do Mahout
-- Mostrar implementação do tipo do cliente (enum)
-- Mostrar teste do getBookPriceAverage
+#### Domínio
+- [Mahout](servico/bookstore/utils/MahoutUtils.java)
+- [Type Enum](dominio/Customer.java#:346)
 
 ## 4° Caso de uso
 ```
 Eu, como assinante, quero receber cinco sugestões de livros do meu interesse pelo menor valor disponível no Bookmarket.
 ```
-- Mostrar testes no bookmarket
-- Mostrar teste do getMinimumBookPrice
+#### Testes do bookmarket
+- [shouldGetRecommendationForSubscriberCustomer](src/test/java/servico/BookmarketTest.java#:1193)
+- [shouldGetTheMinimumBookValueCost](src/test/java/servico/BookmarketTest.java#:956)
 	
