@@ -505,9 +505,9 @@ public class Bookstore implements Serializable {
      * @return uma lista de livros recomendados derivados da similaridade entre
      *         itens
      */
-    public List<Book> getRecommendationByItens(int c_id) {
+    public List<Book> getRecommendationByItems(int c_id) {
         int maxRecommendations = 5;
-        return getRecommendationByItens(c_id, maxRecommendations);
+        return getRecommendationByItems(c_id, maxRecommendations);
     }
 
     /**
@@ -526,7 +526,7 @@ public class Bookstore implements Serializable {
      * @return uma lista de livros recomendados derivados da similaridade entre
      *         itens
      */
-    public List<Book> getRecommendationByItens(int c_id, int maxRecommendations) {
+    public List<Book> getRecommendationByItems(int c_id, int maxRecommendations) {
         List<RecommendedItem> itemRecommendations = MahoutUtils.recommendItemBased(reviewsByIds, c_id,
                 maxRecommendations);
         List<Book> recommendedBooks = new ArrayList<>();
