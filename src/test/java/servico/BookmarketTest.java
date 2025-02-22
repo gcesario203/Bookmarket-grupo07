@@ -1185,6 +1185,8 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetRecommendationForSubscriberCustomer(){
+        cleanTestObjects();
+        startUpTestObjects();
         // book selection
         Book b1 = Bookmarket.getBook(1); // Duna
         Book b2 = Bookmarket.getBook(2); // Neuromancer
@@ -1195,16 +1197,16 @@ public class BookmarketTest {
 
         // Select a subscriber customer
         Customer customer = null;
-        for (int i = 1; customer == null || customer.getType() == Type.SUBSCRIBER; i++) {
+        for (int i = 5; customer == null || customer.getType() == Type.SUBSCRIBER; i++) {
             customer = Bookstore.getCustomer(i).orElse(null);
         }
 
         // Criação dos clientes
         Customer c1 = customer;
-        Customer c2 = Bookstore.getCustomer(2).orElse(null);
-        Customer c3 = Bookstore.getCustomer(3).orElse(null);
-        Customer c4 = Bookstore.getCustomer(4).orElse(null);
-        Customer c5 = Bookstore.getCustomer(5).orElse(null);
+        Customer c2 = Bookstore.getCustomer(1).orElse(null);
+        Customer c3 = Bookstore.getCustomer(2).orElse(null);
+        Customer c4 = Bookstore.getCustomer(3).orElse(null);
+        Customer c5 = Bookstore.getCustomer(4).orElse(null);
 
         // Criação de reviews com variação nos ratings para melhorar a similaridade
         // entre os itens
@@ -1263,6 +1265,8 @@ public class BookmarketTest {
 
     @Test
     public void shouldGetRecommendationForDefaultCustomer(){
+        cleanTestObjects();
+        startUpTestObjects();
         // book selection
         Book b1 = Bookmarket.getBook(1); // Duna
         Book b2 = Bookmarket.getBook(2); // Neuromancer
@@ -1273,16 +1277,16 @@ public class BookmarketTest {
 
         // Select a subscriber customer
         Customer customer = null;
-        for (int i = 1; customer == null || customer.getType() == Type.DEFAULT; i++) {
+        for (int i = 5; customer == null || customer.getType() == Type.DEFAULT; i++) {
             customer = Bookstore.getCustomer(i).orElse(null);
         }
 
         // Criação dos clientes
         Customer c1 = customer;
-        Customer c2 = Bookstore.getCustomer(2).orElse(null);
-        Customer c3 = Bookstore.getCustomer(3).orElse(null);
-        Customer c4 = Bookstore.getCustomer(4).orElse(null);
-        Customer c5 = Bookstore.getCustomer(5).orElse(null);
+        Customer c2 = Bookstore.getCustomer(1).orElse(null);
+        Customer c3 = Bookstore.getCustomer(2).orElse(null);
+        Customer c4 = Bookstore.getCustomer(3).orElse(null);
+        Customer c5 = Bookstore.getCustomer(4).orElse(null);
 
         // Criação de reviews com variação nos ratings para melhorar a similaridade
         // entre os itens
