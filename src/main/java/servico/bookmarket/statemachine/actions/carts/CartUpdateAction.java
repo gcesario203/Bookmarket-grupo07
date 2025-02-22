@@ -21,7 +21,7 @@ public class CartUpdateAction extends ExpecificBookstoreAction {
     final long now;
 
     /**
-     * Método construtor da classe.
+     * Class constructor method.
      *
      * @param id
      * @param id2
@@ -40,7 +40,7 @@ public class CartUpdateAction extends ExpecificBookstoreAction {
     }
 
     /**
-     * Atualiza um carrinho de compras em um {@linkplain Bookstore}.
+     * Updates shopping cart with a  {@linkplain Bookstore}.
      *
      * @param bookstore
      * @return

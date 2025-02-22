@@ -11,14 +11,12 @@ import servico.bookmarket.statemachine.actions.BookstoreAction;
 import dominio.Review;
 
 /**
- * Ação responsável por obter reviews únicos, considerando a média das avaliações
- * em caso de duplicação (mesmo cliente e mesmo livro).
+ * Action responsible for getting unique reviews, considering rating average, in case of duplication.
  * <p>
- * Esse método agrupa as reviews pelo par (cliente, livro) e, para cada grupo,
- * calcula a média das avaliações. Em seguida, cria uma nova instância de {@code Review}
- * com o mesmo cliente e livro, e com a avaliação sendo a média calculada.
- * Caso ocorra um {@code IOException} durante a criação da review, uma {@code RuntimeException}
- * será lançada.
+ * This method groups reviews by pair (customer, book) and, for each group, calculates average rating.
+ * Then, creates a new instance of {@code Review} with same customer and book,and with rating being
+ * calculated average.
+ * If a {@code IOException} occurs during rating creation, a {@code RuntimeException} will be triggered.
  * </p>
  */
 public class GetUniqueReviewsAction extends BookstoreAction {
@@ -26,12 +24,12 @@ public class GetUniqueReviewsAction extends BookstoreAction {
 
     @Override
     public Object executeOnBookstore(Stream<Bookstore> bookstore) {
-        // Agrupa as reviews por chave composta pelo ID do cliente e do livro
+        // Group reviews for compound keys by customer's id ad book
         Map<String, List<Review>> groupedReviews = bookstore
                 .flatMap(b -> b.getReviews().stream())
                 .collect(Collectors.groupingBy(r -> r.getCustomer().getId() + "-" + r.getBook().getId()));
 
-        // Para cada grupo, calcula a média das avaliações e cria uma review única
+        // For each group, calculates rating average and creates a unique review
         return groupedReviews.values().stream()
                 .map(reviewsGroup -> {
                     Review baseReview = reviewsGroup.get(0);
@@ -42,7 +40,7 @@ public class GetUniqueReviewsAction extends BookstoreAction {
                     try {
                         return new Review(baseReview.getCustomer(), baseReview.getBook(), averageRating, 0);
                     } catch (IOException e) {
-                        throw new RuntimeException("Erro ao criar a review com média", e);
+                        throw new RuntimeException("Error when creating average rating", e);
                     }
                 })
                 .collect(Collectors.toList());

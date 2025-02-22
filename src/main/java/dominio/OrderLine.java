@@ -59,27 +59,24 @@ import java.io.Serializable;
 /**
  * *<img src="./doc-files/OrderLine.png" alt="OrderLine"> <br>
  * <a href="./doc-files/OrderLine.html"> code </a>
- *
- * Esta classe existe para que seja possível criar uma representaçào da venda de
- * um item na biblioteca. É importante salientar que todas as modificações que
- * existem na quantidade são refletidas . Isto é feito pois cada OrderLine
- * possui relação com um {@linkplain Book}
+ * This class exists to make possible create an item order on bookstore.
+ * It is important highlight that all quantity changes are reflected.
+ * This is done because each Orderline has relation with a {@linkplain Book}
  */
 public class OrderLine implements Serializable {
 
     private static final long serialVersionUID = -5063511252485472431L;
 
     private final Book book;
-    private final int qty;
+    private int qty;
     private final double discount;
     private final String comments;
 
     /**
-     *
-     * @param book Livro do item da venda..
-     * @param qty Quantidade do item da venda..
-     * @param discount Dessconto do item da venda..
-     * @param comments Comentários do item da venda..
+     * @param book Item's order book.
+     * @param qty Item's order quantity.
+     * @param discount Item's order discount.
+     * @param comments Item's order comments.
      */
     public OrderLine(Book book, int qty, double discount, String comments) {
         this.book = book;
@@ -89,39 +86,42 @@ public class OrderLine implements Serializable {
     }
 
     /**
-     * Método que recupera o livro do item da venda.
+     * Item's order book getter.
      *
-     * @return Recupera o livro do item da venda.
+     * @return Retrieves Item's order book.
      */
     public Book getBook() {
         return book;
     }
 
     /**
-     * Método que recupera a quantidade do item da venda.
+     * Item's order quantity getter.
      *
-     * @return Recupera a quantidade do item da venda.
+     * @return Retrieves Item's order quantity.
      */
     public int getQty() {
         return qty;
     }
 
     /**
-     * Método que recupera o desconto do item da venda.
+     * Item's order discount getter.
      *
-     * @return Recupera o desconto do item da venda.
+     * @return Retrieves Item's order discount.
      */
     public double getDiscount() {
         return discount;
     }
 
     /**
-     * Método que recupera os comentários do item da venda.
+     * Item's order comments getter.
      *
-     * @return Recupera os comentários do item da venda.
+     * @return Retrieves Item's order comments.
      */
     public String getComments() {
         return comments;
     }
 
+    public void updateQty(int qty) {
+        this.qty = qty;
+    }
 }

@@ -69,9 +69,8 @@ public class CartLine implements Serializable {
 
 	/**
 	 *
-	 * @param qty  Quantidade itens relacionados ao mesmo Book para o carrinho de
-	 *             compras.
-	 * @param book Livro relacionado com o carrinho de compras.
+	 * @param qty  Related items quantity with same Book for shopping cart
+	 * @param book Related book with shopping cart.
 	 */
     public CartLine(int qty, Book book) {
         this.qty = qty;
@@ -79,27 +78,27 @@ public class CartLine implements Serializable {
     }
 
 	/**
-	 * Define a quantidade de itens relacionados ao mesmo Book para o carrinho
+	 * Sets Related items quantity with same Book for shopping cart
 	 *
-	 * @param qty quantidade de itens
+	 * @param qty Items quantity
 	 */
     public void setQty(int qty) {
         this.qty = qty;
     }
 
 	/**
-	 * Recupera a quantidade de itens relacionados com o livro em um carrinho
+	 * Related items quantity with same Book for shopping cart getter
 	 *
-	 * @return Quantidade de itens do carrinho para o mesmo livro
+	 * @return Related items quantity with same Book for shopping cart
 	 */
     public int getQty() {
         return qty;
     }
 
 	/**
-	 * Recupera o livro relacionado com o carrinho
+	 * Related Book for shopping cart getter
 	 *
-	 * @return Um dos livros que está no carrinho
+	 * @return One of the books in the cart
 	 */
     public Book getBook() {
         return book;

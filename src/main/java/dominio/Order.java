@@ -100,17 +100,17 @@ public class Order implements Serializable {
 	 * }
 	 * </pre>
 	 *
-	 * @param id              Identficador da venda.
-	 * @param customer        Cliente da venda.
-	 * @param date            Data da venda.
-	 * @param cart            Carrinho de compras da venda.
-	 * @param comment         Coementário da venda.
-	 * @param shipType        Tipo do frete da venda.
-	 * @param shipDate        Data do frete da venda.
-	 * @param status          Status da venda.
-	 * @param billingAddress  Endereço de cobrança da venda.
-	 * @param shippingAddress Endereço de entrega da venda.
-	 * @param cc              Cartão de crédito da venda.
+	 * @param id              Order identifier.
+	 * @param customer        Order's Customer.
+	 * @param date            Sell date.
+	 * @param cart            Order's shopping cart.
+	 * @param comment         Order's comment.
+	 * @param shipType        Order's ship type.
+	 * @param shipDate        Order's ship date.
+	 * @param status          Order's status.
+	 * @param billingAddress  Order's billing address.
+	 * @param shippingAddress Order's shipping address.
+	 * @param cc              Order's credit card.
 	 */
     public Order(int id, Customer customer, Date date, Cart cart,
             String comment, String shipType, Date shipDate, String status,
@@ -137,116 +137,116 @@ public class Order implements Serializable {
     }
 
 	/**
-	 * Método que recupera o identificador da venda.
+	 * Order's identifier getter.
 	 * 
-	 * @return Recupera o identificador da venda.
+	 * @return Retrieves Order's identifier.
 	 */
     public int getId() {
         return id;
     }
 
 	/**
-	 * Método que recupera o cliente da venda.
+	 * Order's Customer getter.
 	 * 
-	 * @return Recupera o cliente da venda.
+	 * @return Retrieves Order's Customer.
 	 */
     public Customer getCustomer() {
         return customer;
     }
 
 	/**
-	 * Método que recupera a data da venda.
+	 * Sell date getter.
 	 * 
-	 * @return Recupera a data da venda.
+	 * @return Retrieves sell date.
 	 */
     public Date getDate() {
         return date;
     }
 
 	/**
-	 * Método que recupera o subtotal da venda.
+	 * Order's subtotal getter.
 	 * 
-	 * @return Recupera o subtotal da venda.
+	 * @return Retrieves Order's subtotal.
 	 */
     public double getSubtotal() {
         return subtotal;
     }
 
 	/**
-	 * Método que recupera a taxa da venda.
+	 * Order's tax getter.
 	 * 
-	 * @return Recupera a taxa da venda.
+	 * @return Retrieves Order's tax.
 	 */
     public double getTax() {
         return tax;
     }
 
 	/**
-	 * Método que recupera o valor total da venda.
+	 * Order's total value getter.
 	 * 
-	 * @return Recupera o valor total da venda.
+	 * @return Retrieves Order's total value.
 	 */
     public double getTotal() {
         return total;
     }
 
 	/**
-	 * Método que recupera o tipo de frete da venda.
+	 * Order's ship type getter.
 	 * 
-	 * @return Recupera o tipo de frete da venda.
+	 * @return Retrieves Order's ship type.
 	 */
     public String getShipType() {
         return shipType;
     }
 
 	/**
-	 * Método que recupera a data do frete da venda.
+	 * Order's ship date getter.
 	 * 
-	 * @return Recupera a data do frete da venda.
+	 * @return Retrieves Order's ship date.
 	 */
     public Date getShipDate() {
         return shipDate;
     }
 
 	/**
-	 * Método que recupera o status da venda.
+	 * Order's status getter.
 	 * 
-	 * @return Recupera o status da venda.
+	 * @return Retrieves Order's status.
 	 */
     public String getStatus() {
         return status;
     }
 
 	/**
-	 * Método que recupera o endereço de cobrança da venda.
+	 * Order's billing address getter.
 	 * 
-	 * @return Recupera o endereço de cobrança da venda.
+	 * @return Retrieves Order's billing address.
 	 */
     public Address getBillingAddress() {
         return billingAddress;
     }
 
 	/**
-	 * Método que recupera o endereço de entrega da venda.
+	 * Order's shipping address getter.
 	 * 
-	 * @return Recupera o endereço de entrega da venda.
+	 * @return Retrieves Order's shipping address.
 	 */
     public Address getShippingAddress() {
         return shippingAddress;
     }
 
 	/**
-	 * Método que recupera o cartão de crédito da venda.
+	 * Order's credit card getter.
 	 * 
-	 * @return Recupera o cartão de crédito da venda.
+	 * @return Retrieves Order's credit card.
 	 */
     public CCTransaction getCC() {
         return cc;
     }
 
     /**
-     * Método que recupera itens da venda.
-     * @return Recupera itens da venda.
+     * Order's items getter.
+     * @return Retrieves Order's items.
      */
     public ArrayList<OrderLine> getLines() {
         return lines;

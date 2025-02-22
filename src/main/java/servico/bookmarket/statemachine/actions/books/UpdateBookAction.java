@@ -7,7 +7,7 @@ import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 
 /**
- * Classe que implementa as ações relacionadas a atualização do livro.
+ * This class adds book update actions.
  */
 public class UpdateBookAction extends BookstoreAction {
 
@@ -20,7 +20,7 @@ public class UpdateBookAction extends BookstoreAction {
     long now;
 
     /**
-     * Método construtor da classe.
+     * Class constructor method.
      *
      * @param id
      * @param cost
@@ -38,8 +38,7 @@ public class UpdateBookAction extends BookstoreAction {
     }
 
     /**
-     * Executa o método na {@linkplain Bookstore} que atualiza os dados de
-     * um livro específico.
+     * Execute method on {@linkplain Bookstore} that updates data of a specific book
      *
      * @param bookstore
      * @return

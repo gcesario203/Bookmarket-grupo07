@@ -7,7 +7,7 @@ import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.ExpecificBookstoreAction;
 
 /**
- * Classe que implementa as ações relacionadas a confirmação de compra.
+ * Class that adds order confirmation actions.
  */
 public class ConfirmBuyAction extends ExpecificBookstoreAction {
 
@@ -25,7 +25,7 @@ public class ConfirmBuyAction extends ExpecificBookstoreAction {
     long now;
 
     /**
-     * Método construtor da classe.
+     * Class constructor method.
      *
      * @param customerId
      * @param cartId
@@ -58,8 +58,7 @@ public class ConfirmBuyAction extends ExpecificBookstoreAction {
     }
 
     /**
-     * Confirma a compra de um carrinho de compras de um
-     * {@linkplain Bookstore}.
+     * Confirms a shopping cart order of a {@linkplain Bookstore}.
      *
      * @param bookstore
      * @return

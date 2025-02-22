@@ -76,14 +76,14 @@ public class CCTransaction implements Serializable {
 
     /**
      *
-     * @param type Tipo do cartão de crédito.
-     * @param num Número do cartão de crédito.
-     * @param name Nome do cartão de crédito.
-     * @param expire Data de expiração do cartão de crédito.
-     * @param authId Id de autenticação do cartão de crédito.
-     * @param amount Quantidade do cartão de crédito.
-     * @param date Data do cartão de crédito.
-     * @param country País do cartão de crédito.
+     * @param type Credit card type.
+     * @param num Credit card number.
+     * @param name Credit card name.
+     * @param expire Credit card expiration date.
+     * @param authId Credit card authenticator id.
+     * @param amount Credit card amount.
+     * @param date Credit card date.
+     * @param country Credit card country.
      */
     public CCTransaction(String type, long num, String name, Date expire,
             String authId, double amount, Date date, Country country) {
@@ -98,72 +98,72 @@ public class CCTransaction implements Serializable {
     }
 
 	/**
-	 * Método que recupera o tipo do cartão de crédito.
+	 * Credit card type getter.
 	 * 
-	 * @return Recupera o tipo do cartão de crédito.
+	 * @return Retrieves credit card type.
 	 */
     public String getType() {
         return type;
     }
 
 	/**
-	 * Método que recupera o número do cartão de crédito.
+	 * Credit card number getter.
 	 * 
-	 * @return Recupera o número do cartão de crédito.
+	 * @return Retrieves credit card number.
 	 */
     public long getNum() {
         return num;
     }
 
 	/**
-	 * Método que recupera o nome do cartão de crédito.
+	 * Credit card name getter.
 	 * 
-	 * @return Recupera o nome do cartão de crédito.
+	 * @return Retrieves credit card name.
 	 */
     public String getName() {
         return name;
     }
 
 	/**
-	 * Método a data de expiração do cartão de crédito.
+	 * Credit card expiration date getter.
 	 * 
-	 * @return Recupera a data de expiração do cartão de crédito.
+	 * @return Retrieves credit card expiration date.
 	 */
     public Date getExpire() {
         return expire;
     }
 
 	/**
-	 * Método que recupera o id de autentição do cartão de crédito.
+	 * Credit card authenticator id getter.
 	 * 
-	 * @return Recupera o id de autenticação do cartão de crédito.
+	 * @return Retrieves credit card authenticator id.
 	 */
     public String getAuthId() {
         return authId;
     }
 
 	/**
-	 * Método que recupera a quantidade do cartão de crédito.
+	 * Credit card amount getter.
 	 * 
-	 * @return Recupera a quantidade do cartão de crédito.
+	 * @return Retrieves dredit card amount.
 	 */
     public double getAmount() {
         return amount;
     }
 
 	/**
-	 * Método que recupera a data do cartão de crédito.
+	 * Credit card date getter.
 	 * 
-	 * @return Recupera a data do cartão de crédito.
+	 * @return Retrieves credit card date.
 	 */
     public Date getDate() {
         return date;
     }
 
 	/**
-	 * Método que recupera o país do cartão de crédito.
+	 * Credit card country getter.
 	 * 
-	 * @return Recupera o país do cartão de crédito.
+	 * @return Retrieves credit card country.
 	 */
     public Country getCountry() {
         return country;

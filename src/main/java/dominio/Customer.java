@@ -89,23 +89,23 @@ public class Customer implements Serializable {
 
     /**
      *
-     * @param id Id que representa a classe
-     * @param uname Nome de identificação do Customer
-     * @param passwd senha do Customer
-     * @param fname primeiro nome do Customer
-     * @param lname último nome do customer
-     * @param phone telefone do Customer
-     * @param email email do customer
-     * @param since data de início do custoemr
-     * @param lastVisit última visita ao customer
-     * @param login data de login do customer
-     * @param expiration data de expiração de login
-     * @param discount desconto possibilitado 
-     * @param balance balanço contábil
+     * @param id Class Id
+     * @param uname Customer's identification name
+     * @param passwd Customer's password
+     * @param fname Customer's first name
+     * @param lname Customer's last name
+     * @param phone Customer's telephone
+     * @param email Customer's email
+     * @param since Customer's initial date
+     * @param lastVisit Customer's last visit
+     * @param login Customer's login date
+     * @param expiration Login expiration date
+     * @param discount Possible discount
+     * @param balance Accounting balance
      * @param ytdPmt ytdPmt
-     * @param birthdate data de nascimento do Customer
-     * @param data Dados do Customer
-     * @param address Endereço do Customer
+     * @param birthdate Customer's birthday date
+     * @param data Customer's data
+     * @param address Customer's address
      */
     public Customer(int id, String uname, String passwd, String fname,
             String lname, String phone, String email, Date since,
@@ -151,162 +151,162 @@ public class Customer implements Serializable {
     }
 
     /**
-     * Define a data de login do Customer.
+     * Sets Customer's login date.
      *
-     * @param login representação do horário de login do Customer
+     * @param login  Customer's login date representation
      */
     public void setLogin(Date login) {
         this.login = login;
     }
 
     /**
-     * Define uma data de expiração para o login do Customer.
+     * Sets Customer's expiration login date.
      *
-     * @param expiration data representando o limite para expiração do login do Customer.
+     * @param expiration Customer's expiration login date representation
      */
     public void setExpiration(Date expiration) {
         this.expiration = expiration;
     }
 
     /**
-     * Recupera o primeiro nome do Customer
+     * Customer's first name getter
      *
-     * @return primeiro nome do Customer
+     * @return Customer's first name
      */
     public String getFname() {
         return fname;
     }
 
     /**
-     * Recupera o último nome do Customer
+     * Customer's last name getter
      *
-     * @return último nome do Customer
+     * @return Customer's last name
      */
     public String getLname() {
         return lname;
     }
 
     /**
-     * Recupera o ID da classe
+     * Class Id getter
      *
-     * @return Id que representa a classe
+     * @return Class Id
      */
     public int getId() {
         return id;
     }
 
     /**
-     * Recupera a senha do Customer
+     * Customer's password getter
      *
-     * @return senha do Customer 
+     * @return Customer's password
      */
     public String getPasswd() {
         return passwd;
     }
 
     /**
-     * Recupera o desconto que este Customer possibilita
+     * Possible discount getter
      *
-     * @return desconto possibilitado pelo Customer.
+     * @return Possible discount for the Customer.
      */
     public double getDiscount() {
         return discount;
     }
 
     /**
-     * Recupera endereço do Address
+     * Customer's address getter
      *
-     * @return Endereço do Customer
+     * @return Customer's address
      */
     public Address getAddress() {
         return address;
     }
 
     /**
-     * Recupera telefone do Customer
+     * Customer's telephone getter
      *
-     * @return telefone do customer
+     * @return Customer's telephone
      */
     public String getPhone() {
         return phone;
     }
 
     /**
-     * Recupera o email do Customer
+     * Customer's email getter
      *
-     * @return email do Customer
+     * @return Customer's email
      */
     public String getEmail() {
         return email;
     }
 
     /**
-     * Recupera o nome de identificação do Customer
+     * Customer's identification name getter
      *
-     * @return nome de identificação do Customer.
+     * @return Customer's identification name
      */
     public String getUname() {
         return uname;
     }
 
     /**
-     * Insere uma nova compra no log de compra recente
+     * Insert a new recent order log into a new order
      *
-     * @param order que representa a última compra efetuada
+     * @param order that represents order made
      */
     public void logOrder(Order order) {
         mostRecentOrder = order;
     }
 
     /**
-     * Recupera a última compra efetuada
+     * Last order made getter
      *
-     * @return última compra efetuada neste Customer.
+     * @return Customer's last order made
      */
     public Order getMostRecentOrder() {
         return mostRecentOrder;
     }
 
     /**
-     * Recupera data de início do customer
+     * Customer's initial date getter
      *
-     * @return data em que o Customer iniciou as atividades
+     * @return Customer's initial date
      */
     public Date getSince() {
         return since;
     }
 
     /**
-     * Recupera última visita ao Customer
+     * Customer's last visit getter
      *
-     * @return Data da última visita ao customer
+     * @return Customer's last visit
      */
     public Date getLastVisit() {
         return lastVisit;
     }
 
     /**
-     * Recupera data de login do Customer
+     * Customer's login date getter
      *
-     * @return Data de login
+     * @return Customer's login date
      */
     public Date getLogin() {
         return login;
     }
 
     /**
-     * Recupera data de expiração apra o login do Customer
+     * Customer's login expiration date getter
      *
-     * @return data de expiração de login
+     * @return Customer's login expiration date
      */
     public Date getExpiration() {
         return expiration;
     }
 
     /**
-     * Recupera o balanço contábil
+     * Accounting balance getter
      *
-     * @return balanço contábil
+     * @return Accounting balance
      */
     public double getBalance() {
         return balance;
@@ -322,18 +322,18 @@ public class Customer implements Serializable {
     }
 
     /**
-     * Recupera data de nascimento do Customer
+     * Customer's birthday date getter
      *
-     * @return Data de nascimento do Customer
+     * @return Customer's birthday date
      */
     public Date getBirthdate() {
         return birthdate;
     }
 
     /**
-     * Recupera dados do Customer
+     * Customer's data getter
      *
-     * @return dados do Customer
+     * @return Customer's data
      */
     public String getData() {
         return data;
@@ -460,9 +460,5 @@ public class Customer implements Serializable {
         
         return true;
     }
-
-   
-
-
 
 }

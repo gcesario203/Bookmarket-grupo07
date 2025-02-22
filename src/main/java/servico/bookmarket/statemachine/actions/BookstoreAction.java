@@ -7,15 +7,13 @@ import servico.bookstore.Bookstore;
 import servico.bookmarket.interfaces.Action;
 
 /**
- * Classe abstrata para representar os métodos padrões da implementação das
- * ações na {@linkplain Bookstore}.
- *
+ * Abstract class to represent {@linkplain Bookstore} implementation actions patterns methods.
  */
 public abstract class BookstoreAction implements Action<Stream<Bookstore>>,
         Serializable {
 
     /**
-     * Determina em qual {@linkplain Bookstore} a ação será executada.
+     * Determine on which {@linkplain Bookstore} action will be executed.
      *
      * @param sm
      * @return
@@ -26,8 +24,8 @@ public abstract class BookstoreAction implements Action<Stream<Bookstore>>,
     }
 
     /**
-     * Método abstrato que será implementado na classe concreta determinando
-     * qual ação será executada no {@linkplain Bookstore}.
+     * Abstract method that will be implemented on a concrete class determining
+     * which action will be executed on {@linkplain Bookstore}.
      *
      * @param bookstore
      * @return
