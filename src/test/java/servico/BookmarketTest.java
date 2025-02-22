@@ -49,7 +49,7 @@ public class BookmarketTest {
         long seed = 178;
         long now = System.currentTimeMillis();
         Random rand = new Random(seed);
-        Bookstore.populate(seed, now, 10000, 1000, 100, 1000);
+        Bookstore.populate(seed, now, 100, 1000, 100, 1000);
 
         amazon = new Bookstore(0);
         saraiva = new Bookstore(1);
@@ -1153,7 +1153,7 @@ public class BookmarketTest {
         // Pegamos um livro como referência para recomendação baseada em itens
         Bookmarket bookmarket = new Bookmarket();
         bookmarket.init(bookstore);
-        List<Book> recommendations = bookstore.getRecommendationByItems(b1.getId());
+        List<Book> recommendations = bookmarket.getRecommendationByItems(b1.getId());
         assertNotNull(recommendations);
         assertFalse(recommendations.isEmpty());
 
@@ -1164,6 +1164,23 @@ public class BookmarketTest {
 
         recommendations.forEach(rec -> System.out
                 .println("Recomendação para o livro " + b1.getId() + ": Livro ID " + rec.getId()));
+    }
+
+    @Test
+    public void shouldGetFiveRecommendationsByItemsWithNonSyntheticData() {
+
+        cleanTestObjects();
+        startUpTestObjects();
+
+        // Seleciona um livro aleatório
+        Book book1 = Bookmarket.getABookAnyBook();
+
+        // Obtém recomendações baseadas nos itens avaliados pelo cliente
+        List<Book> recommendations = bookmarket.getRecommendationByItems(book1.getId());
+
+        // Verifica se foram retornadas 5 recomendações
+        assertNotNull(recommendations);
+        assertEquals(5, recommendations.size());
     }
 
     @Test
