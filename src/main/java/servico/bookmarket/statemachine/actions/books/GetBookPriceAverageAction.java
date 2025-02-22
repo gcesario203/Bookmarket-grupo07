@@ -9,9 +9,9 @@ import servico.bookmarket.statemachine.actions.BookstoreAction;
 import servico.bookstore.Bookstore;
 
 /**
- * Classe que implementa as ações relacionadas a busca do valor médio do livro.
+ * This class adds average book price search related actions.
  */
-public class GetBookPriceAverageAction  extends BookstoreAction{
+public class GetBookPriceAverageAction extends BookstoreAction{
 	private static final long serialVersionUID = 1L;
 	int bookId;
 	
@@ -31,6 +31,4 @@ public class GetBookPriceAverageAction  extends BookstoreAction{
 		return stocks.stream().mapToDouble(stock -> stock.getCost())
 							  .sum() / stocks.size();
 	}
-	
-	
 }

@@ -15,10 +15,8 @@ import dominio.Review;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 
 /**
- * Ação que gera recomendações de livros com base em itens previamente
- * avaliados.
- * Utiliza um sistema de recomendação baseado em itens, considerando as
- * avaliações feitas pelo usuário.
+ * Generates books recomendation based on rated items before.
+ * Uses recommendation system based on items, considering previous ratings done by costumer.
  */
 public class GetRecommendationByItensAction extends BookstoreAction {
     private static final long serialVersionUID = 7439962163328790677L;
@@ -27,11 +25,11 @@ public class GetRecommendationByItensAction extends BookstoreAction {
     int numOfRecommendations;
 
     /**
-     * Construtor da ação de recomendação baseada em itens.
+     * Class constructor method.
      *
-     * @param customerId           Identificador único do usuário para o qual as
-     *                             recomendações serão geradas.
-     * @param numOfRecommendations Número máximo de livros recomendados.
+     * @param customerId           Identifier of a single user
+     *                             that recommendation will be generated.
+     * @param numOfRecommendations Maximum number of recommended books.
      */
     public GetRecommendationByItensAction(int customerId, int numOfRecommendations) {
         this.customerId = customerId;
@@ -39,13 +37,10 @@ public class GetRecommendationByItensAction extends BookstoreAction {
     }
 
     /**
-     * Executa a recomendação de livros com base na similaridade entre itens
-     * avaliados pelo usuário.
+     * Executes books recommendation based on similarity of customer's rated items.
      *
-     * @param bookstore Stream da livraria contendo os dados necessários para gerar
-     *                  as recomendações.
-     * @return Uma lista de livros recomendados baseada na similaridade entre os
-     *         itens previamente avaliados.
+     * @param bookstore Bookstore stream that has necessary data to generate recommendation.
+     * @return A list of recommended books based on previous rated items similarity.
      */
     @SuppressWarnings("unchecked")
     @Override

@@ -15,10 +15,8 @@ import dominio.Review;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 
 /**
- * Ação que gera recomendações de livros com base na similaridade entre
- * usuários.
- * Utiliza um sistema de recomendação baseado em usuários, considerando as
- * avaliações feitas.
+ * Book recommendationns actions based on customers similarity.
+ * Uses a recommendation system based on customers, considering ratings done.
  */
 public class GetRecommendationByUsersAction extends BookstoreAction {
     private static final long serialVersionUID = 2798556125861360648L;
@@ -27,11 +25,10 @@ public class GetRecommendationByUsersAction extends BookstoreAction {
     int numOfRecommendations;
 
     /**
-     * Construtor da ação de recomendação baseada em usuários.
+     * Class constructor method.
      *
-     * @param customerId           Identificador único do usuário para o qual as
-     *                             recomendações serão geradas.
-     * @param numOfRecommendations Número máximo de livros recomendados.
+     * @param customerId           Unique identifier os customer that recommendations will be generated.
+     * @param numOfRecommendations Maximum number of recommended books.
      */
     public GetRecommendationByUsersAction(int customerId, int numOfRecommendations) {
         this.customerId = customerId;
@@ -39,13 +36,10 @@ public class GetRecommendationByUsersAction extends BookstoreAction {
     }
 
     /**
-     * Executa a recomendação de livros com base nas avaliações de usuários
-     * semelhantes.
+     * Executes books recommendation based on customer ratings.
      *
-     * @param bookstore Stream da livraria contendo os dados necessários para gerar
-     *                  as recomendações.
-     * @return Uma lista de livros recomendados baseada na similaridade entre
-     *         usuários.
+     * @param bookstore Bookstore stream that has necessary data to generate recommendation.
+     * @return A list of recommended books based on customer's similarity.
      */
     @SuppressWarnings("unchecked")
     @Override

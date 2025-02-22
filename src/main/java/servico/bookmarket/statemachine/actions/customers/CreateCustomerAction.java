@@ -7,7 +7,7 @@ import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 
 /**
- * Classe que implementa as ações relacionadas a criação de cliente.
+ * This class adds customer creation actions.
  */
 public class CreateCustomerAction extends BookstoreAction {
 
@@ -30,7 +30,7 @@ public class CreateCustomerAction extends BookstoreAction {
     dominio.customer.enums.Type type;
 
     /**
-     * Método construtor da classe.
+     * Class constructor method.
      *
      * @param fname
      * @param lname
@@ -69,9 +69,7 @@ public class CreateCustomerAction extends BookstoreAction {
     }
 
     /**
-     * Método que injeta o cliente com suas respectivas informações dentro
-     * da {@linkplain Bookstore}.
-     *
+     * Customer with it inside information injection method for {@linkplain Bookstore}.
      * @param bookstore
      * @return
      */

@@ -40,6 +40,7 @@ import servico.bookmarket.statemachine.actions.shared.PopulateAction;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,42 +50,39 @@ import java.util.stream.Stream;
 import util.TPCW_Util;
 
 /**
+ * This class exists with final object of represent a bookmarket inside the system.
+ * It is responsible for managing a list of {@linkplain Bookstore} that represents
+ * existing bookmarkets. To use contained bookstores contained on bookmarket control,
+ * {@linkplain Bookmarket} uses a state machine that is activated using a COMMAND
+ * pattern variation. Each state of this machine is represented by one of the
+ * registered ({@linkplain Bookstore}). The COMMAND pattern variation is based on top
+ * of {@linkplain Action} interface. All executed actions by state machine implements
+ *  this interface, making possible a better understanding e decouple of actions
+ *  logic to be taken by the system, accoring it state.
  *
- * 
- * Esta classe existe com o objetivo final de representar o marketplace dentro
- * do sistema. Ela é responsável por gerenciar uma lista de
- * {@linkplain Bookstore} que representam as lojas existentes. Para realizar o
- * controle das lojas contidas no marketplace, {@linkplain Bookmarket} utiliza
- * uma máquina de estados que é acionada utilizando uma variação do padrão
- * COMMAND. Cada estado desta máquina é representado por uma das lojas
- * ({@linkplain Bookstore}) cadastradas. A variação do padrão COMMAND é baseada
- * em cima da interface {@linkplain Action}. Todas as ações executadas pela
- * máquina de estados implementam esta interface, tornando possível melhor
- * entendimento e desacoplamento da lógica de ações a serem tomadas pelo sistema
- * de acordo com seu estado.
+ * <p>
+ * Each piece of logic beneath each condition is separated into a handler,
+ * making possible a simple states machine creation and less verbose.
+ *</p>
  *
- * Cada pedaço da lógica por baixo de cada condição é separado em um manipulador
- * do comando, tornando possível a criação da máquina de estados simples e pouco
- * verborrágica.
- *
- * O mecanismo de execução criado para os estados da máquina permitem a
- * modularização de comandos para praticamente todos os modelos utilizados
- * dentro do sistema. Para realizar este feito, os comandos específicos dos
- * modelos implementam a interface {@linkplain Action} com um método default e
- * criam uma abstração chamada {@linkplain BookstoreAction}. Esta abstração
- * define que o tipo de dado que é tratado em suas execuções é um stream,
- * facilitando assim a manipulação de listas dentro do sistema atual.
- *
+ * <p>
+ * An execution mechanism created for machine states allows a modularization for
+ * praticaly all used models inside the system. To accomplish this feat, specific
+ * models commands implements the interface {@linkplain Action} with a default method
+ * and creates a abstraction called {@linkplain BookstoreAction}. This abstraction
+ * defines a data type that is treated in your executions is a stream, making ease
+ * the manipulation of inside lists of the actual system.
+ * </p>
  */
 public class Bookmarket {
     private static Random random;
     private StateMachine stateMachine;
 
     /**
-     * Método utilizado para inicializar o Bookmarket e criar uma lista de
-     * Bookstores vinculadas ao Bookmarket.
+     * This method is used for class initialization and creates a Bookstores linked
+     * with Bookmarket.
      *
-     * @param state array de Bookstores criados para compor a máquina de estados
+     * @param state Array of created Bookstores to compose the state machine.
      */
     public void init(Bookstore... state) {
         random = new Random();
@@ -100,24 +98,22 @@ public class Bookmarket {
     }
 
     /**
-     * Método utilizado para pegar o customer pelo uname cadastrado na
-     * Bookstore.
+     * This method is used to get customer by registered uname on Bookstore.
      *
-     * @param UNAME Uname de identificação do Customer
-     * @return Customer Customer recuperado na lista cadastrada no sistema
+     * @param UNAME Customer's uname identifier
+     * @return Customer Retrieved customer on system registered list.
      */
     public static Customer getCustomer(String UNAME) {
         return Bookstore.getCustomer(UNAME).get();
     }
 
     /**
-     * Método utilizado para pegar o nome completo do customer cadastrado na
-     * Bookstore pelo id. Retorna um array de string com o nome completo.
+     * This method is used to get customer's complete name registered o Bookstore
+     * by id. Returns a string array with complete name.
      *
      * @param c_id Id
-     * @return String[] Nome completo do user sendo: getName()[0] = primeiro
-     *         nome; getName()[1] = último nome; getName()[2] = Nome de
-     *         identificação;
+     * @return String[] User's complete name: getName()[0] =  first name;
+     *         getName()[1] = Last name; getName()[2] = Identifier name;
      */
     public static String[] getName(int c_id) {
 
@@ -131,22 +127,22 @@ public class Bookmarket {
     }
 
     /**
-     * Método utilizado para pegar o username do customer cadastrado na
-     * Bookstore pelo id. Retorna a string do username.
+     * This method is used to get customer's username registered on Bookstore
+     * by id. Returns a username string.
      *
      * @param C_ID ID
-     * @return String Nome de usuário do Customer
+     * @return String customer's string name
      */
     public static String getUserName(int C_ID) {
         return Bookstore.getCustomer(C_ID).get().getUname();
     }
 
     /**
-     * Método utilizado para pegar a password do customer cadastrado na
-     * Bookstore pelo username. Retorna a string da password.
+     * This method gets customer's password registered on Bookstore by username
+     * Returns password string
      *
-     * @param C_UNAME Nome de usuário
-     * @return String Senha do usuário especificado
+     * @param C_UNAME User name
+     * @return String Specified user's password
      */
     public static String getPassword(String C_UNAME) {
         return Bookstore.getCustomer(C_UNAME).get().getPasswd();
@@ -154,36 +150,36 @@ public class Bookmarket {
     }
 
     /**
-     * Método utilizado para pegar a compra mais recente do customer na
-     * Bookstore pelo username. Retorna o objeto da compra.
+     * This method is used to gets most recent order by the customer on
+     * Bookstore by username. Returns order's object.
      *
-     * @param c_uname Nome do usuário
-     * @return Order Compra mais recente do Customer
+     * @param c_uname User's name
+     * @return Order Customer's recent order
      */
     public static Order getMostRecentOrder(String c_uname) {
         return Bookstore.getCustomer(c_uname).get().getMostRecentOrder();
     }
 
     /**
-     * Método utilizado para cadastrar um novo usuário na Bookstore. O desconto
-     * é gerado randomicamente. É excutado o estado de CreationCustomerAction
-     * para a criação do customer. Se algum erro ocorre na criação, é gerado um
+     * This methods is used to register a new customer on Bookstore. The discount
+     * is randomly generated. It is executed by CreationCustomerAction state for
+     * customer creation. If an error occurs during creation, it is generated a
      * RuntimeExpection.
      *
-     * @param fname       Primeiro nome do usuário
-     * @param lname       último nome do usuário
-     * @param street1     Endereço 1
-     * @param street2     Endereço 2
-     * @param city        Cidade do usuário
-     * @param state       Estado do usuário
-     * @param zip         Código postal
-     * @param countryName Nome do país
-     * @param phone       telefone do usuário
-     * @param email       email do usuário
-     * @param birthdate   Data de nascimento do usuário
-     * @param data        Dados do usuário
-     * @param type 		  Tipo de cliente
-     * @return Customer Novo Customer cadastrado na plataforma
+     * @param fname       Customer's first name
+     * @param lname       Customer's last name
+     * @param street1     Address 1
+     * @param street2     Address 2
+     * @param city        Customer's city
+     * @param state       Customer's state
+     * @param zip         Zip code
+     * @param countryName Country's name
+     * @param phone       Customer's telephone
+     * @param email       Customer's email
+     * @param birthdate   Customer's birthday date
+     * @param data        Customer's data
+     * @param type 		  Customer's type
+     * @return Customer New customer registered on platform
      */
     private Customer createNewCustomer(String fname, String lname,
             String street1, String street2, String city, String state,
@@ -263,13 +259,12 @@ public class Bookmarket {
     }
 
     /**
-     * Método utilizado para execução da máquina de estado
-     * RefreshCustomerSessionAction, passando como parametros o id do customer
-     * cadastrado na Bookstore, e data atual em milesegundos. Esse estado
-     * executa o método de refresh interno do Bookstore, que irá renovar a
-     * sessão do usuário em duas horas.
+     * This method executes a state machine RefreshCustomerSessionAction,
+     * passing as parameter id and customer registered on Bookstore, and actual
+     * date, in milliseconds. This state executes the internal Bookstore method,
+     * that will renew customer session in two hours.
      *
-     * @param cId Id da sessão
+     * @param cId Session Id
      */
     public void refreshSession(int cId) {
         try {
@@ -282,10 +277,10 @@ public class Bookmarket {
     }
 
     /**
-     * Método utilizado para retornar um livro específico através do id.
+     * Specific book by id getter.
      *
-     * @param i_id Id do livro desejado
-     * @return Livro recuperado dentro da plataforma
+     * @param i_id Desired book id
+     * @return Retrieved book inside the platform
      */
     public static Book getBook(int i_id) {
 
@@ -294,10 +289,9 @@ public class Bookmarket {
     }
 
     /**
-     * Método utilizado para retornar um livro randômico através do
-     * {@linkplain Bookstore}.
+     * Random book through {@linkplain Bookstore} getter.
      *
-     * @return Um livro qualquer cadastrado dentro da plataforma
+     * @return Any book registered within the platform.
      */
     public static Book getABookAnyBook() {
         return Bookstore.getABookAnyBook(random);
@@ -305,56 +299,55 @@ public class Bookmarket {
     }
 
     /**
-     * Método utilizado para retornar uma lista de livros filtrados através de
-     * um parâmetro do tipo string representando o assunto do livro.
+     * This method is used to return a list of filtered books by a parameter of
+     * String type represented by book subject.
      *
-     * @param search_key Assunto do livro para filtrar busca
-     * @return Lista de livros que atendem aos critérios de filtro por assunto
+     * @param search_key Book subject for filter search.
+     * @return A list of books that serve filter by subject criteria.
      */
     public static List<Book> doSubjectSearch(String search_key) {
         return Bookstore.getBooksBySubject(search_key);
     }
 
     /**
-     * Método utilizado para retornar uma lista de livros filtrados através de
-     * um parâmetro do tipo string representando o título do livro.
+     * This method used to return a list of books filtered through String type parameter,
+     * representing book's title.
      *
-     * @param search_key Título do livro para filtrar busca
-     * @return Lista de livros que atendem aos critérios de filtro por título
+     * @param search_key Book title to filter search.
+     * @return A list of book that meet criteria filter by title.
      */
     public static List<Book> doTitleSearch(String search_key) {
         return Bookstore.getBooksByTitle(search_key);
     }
 
     /**
-     * Método utilizado para retornar uma lista de livros filtrados através de
-     * um parâmetro do tipo string representando o autor do livro.
+     * This method returns a list of filtered books through String type
+     * parameter represented by book's author.
      *
-     * @param search_key Autor do livro para filtrar busca
-     * @return Lista de livros que atendem aos critérios de filtro por autor
+     * @param search_key Book's author to filter search.
+     * @return A list of books that accomplish filter criteria by author.
      */
     public static List<Book> doAuthorSearch(String search_key) {
         return Bookstore.getBooksByAuthor(search_key);
     }
 
     /**
-     * Método utilizado para retornar uma lista de livros cuja data de
-     * publicação seja da mais recente para a mais antiga, filtrados pelo
-     * assunto.
+     * A list of books that publication date is from most recent to most old,
+     * filtering by subject getter.
      *
-     * @param subject Assunto do livro para filtrar a busca
-     * @return Lista de livros com data de publicação mais recente
+     * @param subject Book subject to search filter.
+     * @return A list of books with most recent publication date.
      */
     public static List<Book> getNewProducts(String subject) {
         return Bookstore.getNewBooks(subject);
     }
 
     /**
-     * Retorna todos os preços de um determinado livro, passado por parâmetro,
-     * para cada {@linkplain Bookstore} existente no {@linkplain Bookmarket}.
+     * All prices determined by a book, passed by parameter, for each
+     * {@linkplain Bookstore} existing on {@linkplain Bookmarket} getter.
      *
-     * @param book Livro que será utilizado no filtro de busca
-     * @return Lista com os preços de um determinado livro dentro do marketPlace
+     * @param book A book that will be used on search filter.
+     * @return A list of prices, determined by book inside Bookmarket.
      */
     public List<Double> getCosts(Book book) {
                 return getBookstoreStream().map(store -> store.getStock(book.getId())).map(stock -> (Double) (stock == null ? 0.0 : stock.getCost()))
@@ -365,34 +358,33 @@ public class Bookmarket {
 
 
     /**
-     * Identifica os livros mais vendidos considerando todas as livrarias no sistema.
+     * Identifies most sold books considering all bookstores in the system.
      *
-     * @param numberOfBooks Quantidade de livros a serem retornados (entre 1 e 100)
-     * @param subject Tema dos livros mais vendidos
-     * @return Lista dos livros mais vendidos, ordenada por quantidade de vendas decrescente
-     * @throws RuntimeException se numberOfBooks estiver fora do intervalo válido (1-100)
+     * @param numberOfBooks Returned books to be returned quantity (1 to 100).
+     * @return A list of most sold books, ordered by descending number of orders.
+     * @throws RuntimeException If numberOfBooks is out of valid interval (1-100).
      */
     public List<Book> getBestSellers(Integer numberOfBooks, String subject) {
     	return (List<Book>) stateMachine.execute(new GetBestSellersAction(subject, numberOfBooks));
     }
 
     /**
-     * Consolida o total de vendas de todos os livros em todas as livrarias do
-     * sistema.
-     * Combina os contadores de vendas de cada livraria em um único mapa agregado.
+     * Consolidate order total of all books in all system's bookstores.
+     * Combine orders counters of each bookstore in an unique aggregate map.
      *
      * @param subject - tema dos livros das livrarias
      * @return Mapa onde a chave é o livro e o valor é a quantidade total vendida
      *         considerando todas as livrarias
+     * @return Map where book is the key and value is order quantity total, considering
+     *         all bookstores.
      */
     @SuppressWarnings("unchecked")
 	public HashMap<Book, Integer> getConsolidatedBookSales(String subject) {
-    	return (HashMap<Book, Integer>) stateMachine.execute(new GetConsolidateBookSalesAction(subject)); 
+    	return (HashMap<Book, Integer>) stateMachine.execute(new GetConsolidateBookSalesAction(subject));
     }
 
     /**
-     * Obtém recomendações de livros com base nos itens previamente avaliados pelo
-     * usuário.
+     * Books recommendations based on previous rating items by the customer.
      * 
      * @param bookId Identificador único do livro para o qual as recomendações serão
      *             geradas.
@@ -405,12 +397,10 @@ public class Bookmarket {
     }
 
     /**
-     * Obtém recomendações de livros com base em usuários com perfis semelhantes.
+     * Books recommendation based on similar profiles getter.
      * 
-     * @param c_id Identificador único do usuário para o qual as recomendações serão
-     *             geradas.
-     * @return Uma lista contendo até 5 livros recomendados com base em perfis de
-     *         usuários similares.
+     * @param c_id Unique identifier of customer, for which recommendation will be generated.
+     * @return A list containing 5 recommend books based on customers profile similarities.
      */
     @SuppressWarnings("unchecked")
     public List<Book> getRecommendationByUsers(int c_id) {
@@ -418,12 +408,11 @@ public class Bookmarket {
     }
 
     /**
-     * Retorna a disponibilidade um livro na lista de {@linkplain Bookstore} do
-     * {@linkplain Bookmarket}, à partir de um parâmetro de identifição do
-     * livro.
+     * Book availability on {@linkplain Bookstore} list of {@linkplain Bookmarket},
+     * based on book identification parameter getter.
      *
-     * @param idBook ID que representa o livro a ser consultado
-     * @return Lista
+     * @param idBook Id that represents a book to be consulted.
+     * @return List
      */
     public List<Stock> getStocks(final int idBook) {
         return getBookstoreStream()
@@ -434,8 +423,7 @@ public class Bookmarket {
     }
 
     /**
-     * Retorna a disponibilidade de um livro em uma {@linkplain Bookstore}
-     * específica.
+     * Available book of a specific {@linkplain Bookstore} getter.
      *
      * @param idBookstore
      * @param idBook
@@ -451,7 +439,7 @@ public class Bookmarket {
     }
 
     /**
-     * Retorna uma lista de livros que sejam relacionados a um livro específico.
+     * A list of books related to a specific book getter.
      *
      * @param i_id
      * @return
@@ -468,7 +456,7 @@ public class Bookmarket {
     }
 
     /**
-     * Método utilizado para atualizar os dados de um livro específico.
+     * Updates data on specific book.
      *
      * @param iId
      * @param cost
@@ -486,8 +474,7 @@ public class Bookmarket {
     }
 
     /**
-     * Cria um carrinho de compras vazio atrelado a uma determinada
-     * {@linkplain Bookstore}.
+     * Creates an empty shopping cart linked with a determined {@linkplain Bookstore}.
      *
      * @param storeId
      * @param customerId
@@ -504,8 +491,8 @@ public class Bookmarket {
     }
 
     /**
-     * Executa a atualização do carrinho de compras, se o carrinho estiver vazio
-     * adiciona um livro qualquer ao carrinho de compras.
+     * This method executes a shopping cart update. If cart is empty, adds any book
+     * to shopping cart.
      *
      * @param storeId
      * @param SHOPPING_ID
@@ -542,8 +529,7 @@ public class Bookmarket {
     }
 
     /**
-     * Retorna o carrinho de compras específico de um {@linkplain Bookstore}
-     * específico.
+     * Specified shopping cart of {@linkplain Bookstore} getter.
      *
      * @param SHOPPING_ID
      * @param storeId
@@ -555,10 +541,10 @@ public class Bookmarket {
     }
     
     /**
-     * Metodo utilizado para buscar um carrinho de um cliente
+     * Get a shopping cart of a customer getter.
      *
-     * @param storeId Id do bookstore cujo qual é necessario buscar o carrinho
-     * @param customerId Id do cliente
+     * @param storeId Bookstore id, used to get shopping cart.
+     * @param customerId Customer's id.
      */
     @SuppressWarnings("unchecked")
     public Optional<Cart> getCartByCustomer(int storeId, int customerId){
@@ -566,8 +552,8 @@ public class Bookmarket {
     }
 
     /**
-     * Método utilizado para execução da ação ConfirmBuyAction na máquina de
-     * estado para a confirmação da compra.
+     * This method executes a ConfirmBuyAction of state machine for order
+     * confirmation.
      *
      * @param storeId
      * @param shopping_id
@@ -594,8 +580,8 @@ public class Bookmarket {
     }
 
     /**
-     * Método utilizado para execução da ação ConfirmBuyAction na máquina de
-     * estado para a confirmação da compra.
+     * This method executes an action ConfirmBuyAction of a state machine
+     * for order confirmation.
      *
      * @param storeId
      * @param shopping_id
@@ -631,10 +617,10 @@ public class Bookmarket {
     }
     
     /**
-     * Método utilizado para pegar o valor medio do livro em todas as bookstores
+     * Average price on all bookstores getter
      *
      * @param bookId
-     * @return o preço medio do livro nas bookstores
+     * @return An average price on all bookstores
      */
     public double getBookPriceAverage(int bookId) {
     	return (double) stateMachine.execute(new GetBookPriceAverageAction(bookId));
@@ -649,11 +635,11 @@ public class Bookmarket {
     }
     
     /**
-     * Metodo utilizado para pegar o menor custo de um livro determinado
-     * das bookstores
+     * Lowest cost of a book determined on bookstores getter
      *
      * @param bookId
-     * @return double com o menor custo do livro presente em alguma order
+     * @return An Optional<Stock>, in case there is no book stock in no bookstore, informed
+     * on Stock object, on which bookstore is found
      */
     @SuppressWarnings("unchecked")
     public double getMinimumBookPrice(int bookId){
@@ -665,8 +651,8 @@ public class Bookmarket {
     }
 
     /**
-     * Método utilizado para execução da ação PopulateAction na máquina de
-     * estado para adição de dados na {@linkplain Bookstore}.
+     * This method executes a PopulateAction on state machine for data addition
+     * on {@linkplain Bookstore}.
      *
      * @param items
      * @param customers

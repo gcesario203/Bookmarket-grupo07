@@ -93,73 +93,73 @@ public class Address implements Serializable {
     }
 
     /**
-	 * Recupera o ID do classe.
+	 * Retrieves class ID.
      *
-	 * @return retorna o ID que representa o endereço
+	 * @return return an ID that represents address
      */
     public int getId() {
         return id;
     }
 
     /**
-     * Recupera a primeira rua cadastrada.
+     * Retrieves first registered street.
      *
-     * @return String street1   Primeira rua cadastrada
+     * @return String street1   First registered street
      */
     public String getStreet1() {
         return street1;
     }
 
     /**
-     *Recupera a segunda rua cadastrada.
+     * Retrieves second registered street.
      *
-     * @return String street2   Segunda rua cadastrada
+     * @return String street2   Second registered street
      */
     public String getStreet2() {
         return street2;
     }
 
     /**
-     * Recupera a cidade cadastrada.
+     * Retrieves registered city.
      *
-     * @return String city   Cidade cadastrada
+     * @return String city   Registered city
      */
     public String getCity() {
         return city;
     }
 
     /**
-     * Recupera o estado cadastrado.
+     * Retrieves registered state.
      *
-     * @return String state   Estado cadastrado
+     * @return String state   Registered state
      */
     public String getState() {
         return state;
     }
 
     /**
-     * REcupera o código postal.
+     * Retrieves zipcode.
      *
-     * @return String zip   código postal
+     * @return String zip   zipcode
      */
     public String getZip() {
         return zip;
     }
 
     /**
-     * Recupera o país cadastrado.
+     * Retrieves registered country.
      *
-     * @return Country country   País cadastrado
+     * @return Country country   Registered country
      */
     public Country getCountry() {
         return country;
     }
 
     /**
-     * Verifica se um objeto é igual ao outro.
+     * Verify if an object is the same as the other.
      *
-     * @param o Objeto a ser comparado
-     * @return Verdade se e somente se o objeto for o mesmo.
+     * @param o Object to be compared
+     * @return True only if the object is the same.
      */
     @Override
     public boolean equals(Object o) {
@@ -176,9 +176,9 @@ public class Address implements Serializable {
     }
 
     /**
-     * Utilizado em auxílio com o equals para identificar um objeto igual.
+     * Used to help "equals", to identify an identical object.
      *
-     * @return hash de identificação da classe.
+     * @return identification hash of the class.
      */
     @Override
     public int hashCode() {

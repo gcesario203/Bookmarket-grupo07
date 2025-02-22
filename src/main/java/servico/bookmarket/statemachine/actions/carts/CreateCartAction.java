@@ -6,8 +6,7 @@ import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.ExpecificBookstoreAction;
 
 /**
- * Classe que implementa as ações relacionadas a criação do carrinho de
- * compras.
+ * Class that adds shopping cart creation actions.
  */
 public class CreateCartAction extends ExpecificBookstoreAction {
 
@@ -17,8 +16,7 @@ public class CreateCartAction extends ExpecificBookstoreAction {
     int customerId;
 
     /**
-     * Método construtor do carrinho de compras para um
-     * {@linkplain Bookstore} específico.
+     * Constructor method for a specific {@linkplain Bookstore}.
      *
      * @param now
      */
@@ -30,8 +28,7 @@ public class CreateCartAction extends ExpecificBookstoreAction {
     }
 
     /**
-     * Cria um carrinho de compras para um {@linkplain Bookstore}
-     * específico.
+     * Creates a shopping cart for a specific {@linkplain Bookstore}
      *
      * @param bookstore
      * @return

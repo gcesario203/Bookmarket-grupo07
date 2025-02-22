@@ -70,10 +70,10 @@ public class Country implements Serializable {
 
     /**
      *
-     * @param id Id que representa o país 
-     * @param name Nome do país
-     * @param currency moeda do país
-     * @param exchange taxa de cambio do país
+     * @param id Country id representation
+     * @param name Country name
+     * @param currency Country currency
+     * @param exchange Country exchange tax
      */
     public Country(int id, String name, String currency, double exchange) {
         this.id = id;
@@ -83,46 +83,46 @@ public class Country implements Serializable {
     }
 
     /**
-     * Recupera o ID da classe de representação do país.
+     * Class id representing country getter
      * 
-     * @return id da classe que representa o país
+     * @return Class id representing country
      */
     public int getId() {
         return id;
     }
 
     /**
-     * Recupera o nome do país.
+     * Country name getter.
      *
-     * @return nome do país
+     * @return country name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Recupera a moeda local do país
+     * Country currency getter
      *
-     * @return moeda local.
+     * @return Local currency.
      */
     public String getCurrency() {
         return currency;
     }
 
     /**
-     * Reucpera o valor de cambio do país
+     * Country exchange tax getter
      * 
-     * @return valor de cambio
+     * @return Country exchange tax value
      */
     public double getExchange() {
         return exchange;
     }
 
     /**
-     * Verifica se um objeto é igual ao outro.
+     * Used to identify an identical object.
      *
-     * @param o Objeto a ser comparado
-     * @return Verdade se e somente se o objeto for o mesmo.
+     * @param o Object to be compared
+     * @return True if only object is the same.
      */
     @Override
     public boolean equals(Object o) {
@@ -134,9 +134,9 @@ public class Country implements Serializable {
     }
 
     /**
-     * Utilizado em auxílio com o equals para identificar um objeto igual.
+     * Used to help "equals", to identify an identical object.
      *
-     * @return hash de identificação da classe.
+     * @return identification hash of the class.
      */
     @Override
     public int hashCode() {

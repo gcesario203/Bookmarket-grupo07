@@ -62,11 +62,11 @@ public class MahoutUtils {
             Recommender recommender = new GenericUserBasedRecommender(dataModel, neighborhood, similarity);
             return recommender.recommend(userId, numRecs);
         } catch (IllegalArgumentException e) {
-            System.out.println("DataModel does not have preference values ");
+            System.out.println("DataModel does not have preference values");
             return Collections.emptyList();
 
         } catch (TasteException e) {
-            System.out.println("An error occurs while accessing the DataModel ");
+            System.out.println("An error occurs while accessing the DataModel");
             return Collections.emptyList();
 
         } catch (Exception e) {

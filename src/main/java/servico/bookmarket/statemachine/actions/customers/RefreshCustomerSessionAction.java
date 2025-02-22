@@ -6,7 +6,7 @@ import servico.bookstore.Bookstore;
 import servico.bookmarket.statemachine.actions.BookstoreAction;
 
 /**
- * Classe que implementa as ações relacionadas a sessão do cliente.
+ * Class that adds customer session actions.
  */
 public class RefreshCustomerSessionAction extends BookstoreAction {
 
@@ -16,7 +16,7 @@ public class RefreshCustomerSessionAction extends BookstoreAction {
     long now;
 
     /**
-     * Método construtor da classe.
+     * Class constructor method.
      *
      * @param id
      * @param now
@@ -27,8 +27,7 @@ public class RefreshCustomerSessionAction extends BookstoreAction {
     }
 
     /**
-     * Executa a função do {@linkplain Bookstore} que atualiza a sessão do
-     * cliente.
+     * Executes function of {@linkplain Bookstore} that updates customer session.
      *
      * @param bookstore
      * @return
