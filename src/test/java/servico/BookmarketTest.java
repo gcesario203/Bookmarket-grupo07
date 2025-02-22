@@ -1153,7 +1153,7 @@ public class BookmarketTest {
         // Pegamos um livro como referência para recomendação baseada em itens
         Bookmarket bookmarket = new Bookmarket();
         bookmarket.init(bookstore);
-        List<Book> recommendations = bookmarket.getRecommendationByItems(c1.getId());
+        List<Book> recommendations = bookmarket.getRecommendationByItems(b1.getId());
         assertNotNull(recommendations);
         assertFalse(recommendations.isEmpty());
 
