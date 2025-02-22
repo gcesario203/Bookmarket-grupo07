@@ -400,7 +400,7 @@ public class Bookmarket {
      *         interação do usuário.
      */
     @SuppressWarnings("unchecked")
-    public List<Book> getRecommendationByItens(int c_id) {
+    public List<Book> getRecommendationByItems(int c_id) {
         return (List<Book>) stateMachine.execute(new GetRecommendationByItensAction(c_id, 5));
     }
 

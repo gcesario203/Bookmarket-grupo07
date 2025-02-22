@@ -742,8 +742,6 @@ public class BookstoreTest {
 
     @Test
     public void shouldReturnValidRecommendationsFromSyntheticDataset() {
-    	
-    	populateInstance();
         // Criação dos livros
         Book b1 = Bookmarket.getBook(1); // Duna
         Book b2 = Bookmarket.getBook(2); // Neuromancer
@@ -814,8 +812,7 @@ public class BookstoreTest {
     }
 
     @Test
-    public void shouldReturnValidItemBasedRecommendationsFromSyntheticDataset() {
-    	populateInstance();
+    public void shouldReturnValidItemsRecommendationsFromSyntheticDataset() {
         // Criação dos livros
         Book b1 = Bookmarket.getBook(1); // Duna
         Book b2 = Bookmarket.getBook(2); // Neuromancer
@@ -831,8 +828,7 @@ public class BookstoreTest {
         Customer c4 = Bookstore.getCustomer(4).orElse(null);
         Customer c5 = Bookstore.getCustomer(5).orElse(null);
 
-        // Criação de reviews com variação nos ratings para melhorar a similaridade
-        // entre os itens
+        // Criação de reviews com variação nos ratings para evitar valores idênticos
         List<Review> reviews = new ArrayList<>();
         try {
             // Usuário 1: Avalia Duna e Neuromancer
@@ -863,7 +859,7 @@ public class BookstoreTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
+        
         Bookstore bookstore = new Bookstore(
                 10,
                 new HashMap<Book, Stock>(),
@@ -872,20 +868,18 @@ public class BookstoreTest {
                 new ArrayList<Order>(),
                 new LinkedList<Order>());
 
-        // Usuário 1 avaliou somente b1 e b2; espera-se que itens similares a eles sejam
-        // recomendados.
-        List<Book> recommendations = bookstore.getRecommendationByUsers(c1.getId(), 3);
+        // Pegamos um livro como referência para recomendação baseada em itens
+        List<Book> recommendations = bookstore.getRecommendationByItems(b1.getId());
         assertNotNull(recommendations);
         assertFalse(recommendations.isEmpty());
 
-        // Validação: verifica se o livro "Fundação" (b3) está entre as recomendações
+        // Validação: verificar se o livro "Fundação" (b3) foi recomendado, pois tem maior correlação com Duna
         boolean containsFundacao = recommendations.stream()
                 .anyMatch(rec -> rec.getId() == b3.getId());
         assertTrue("Espera que o livro 'Fundação' seja recomendado.", containsFundacao);
 
-        // Impressão das recomendações para depuração
         recommendations.forEach(rec -> System.out
-                .println("Item-based recommendation for user " + c1.getId() + ": Book ID " + rec.getId()));
+                .println("Recomendação para o livro " + b1.getId() + ": Livro ID " + rec.getId()));
     }
 
 }
