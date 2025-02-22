@@ -1195,7 +1195,7 @@ public class BookmarketTest {
 
         // Select a subscriber customer
         Customer customer = null;
-        for (int i = 1; customer == null || customer.getType() != Type.SUBSCRIBER; i++) {
+        for (int i = 1; customer == null || customer.getType() == Type.SUBSCRIBER; i++) {
             customer = Bookstore.getCustomer(i).orElse(null);
         }
 
@@ -1273,7 +1273,7 @@ public class BookmarketTest {
 
         // Select a subscriber customer
         Customer customer = null;
-        for (int i = 1; customer == null || customer.getType() != Type.DEFAULT; i++) {
+        for (int i = 1; customer == null || customer.getType() == Type.DEFAULT; i++) {
             customer = Bookstore.getCustomer(i).orElse(null);
         }
 
@@ -1331,7 +1331,6 @@ public class BookmarketTest {
         HashMap<Book, Double> recommendations = bookmarket.getRecommendation(customer.getId());
 
         double fundacaoAvarageCost = bookmarket.getBookPriceAverage(b3.getId());
-
         boolean containsFundacao = recommendations.keySet().stream()
                 .anyMatch(book -> book.getId() == b3.getId());
         assertTrue("Espera que o livro 'Fundação' seja recomendado.", containsFundacao);
