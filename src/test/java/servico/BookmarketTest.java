@@ -840,8 +840,6 @@ public class BookmarketTest {
 
         bookmarketTest.populate(1000, 500, 100, 1000, 200);
 
-        HashMap<Book, Integer> totalSales = bookmarket.getConsolidatedBookSales(null);
-         
         List<Book> tenBestSellers = bookmarketTest.getBestSellers(10, null);
         List<Book> twentyBestSellers = bookmarketTest.getBestSellers(20, null);
         assertTrue(tenBestSellers.size() == 10);
@@ -905,7 +903,6 @@ public class BookmarketTest {
             for (OrderLine linha : pedido.getLines()) {
                 if (books.contains(linha.getBook())) {
                     linha.updateQty(quantity);
-                    return;
                 }
             }
         }
@@ -921,7 +918,7 @@ public class BookmarketTest {
         int attempts = 0; //avoid infinite loop
         while (fiveSelectedBooks.size() < 5 && attempts < 1000) {
             Book possibleBook = Bookmarket.getABookAnyBook();
-            if (possibleBook.equals(bestSeller)) {
+            if (possibleBook.getId() == bestSeller.getId()) {
                 continue;
             }
 
@@ -942,13 +939,13 @@ public class BookmarketTest {
         List<Book> fiveBestsellers = bookmarket.getBestSellers(5, null);
 
         assertEquals(5, fiveBestsellers.size());
-        for (Book selectedBook : fiveSelectedBooks) {
-            boolean existsInBestsellers = fiveBestsellers
-                    .stream()
-                    .anyMatch(bs -> bs.getId() == bs.getId());
+        for (Book bestseller : fiveBestsellers) {
+            boolean existsInSelectedBooks = fiveSelectedBooks
+                .stream()
+                .anyMatch(sb -> sb.getId() == bestseller.getId());
 
-            assertTrue("Livro com ID " + selectedBook.getId() + " não foi encontrado nos bestsellers.",
-                    existsInBestsellers);
+            assertTrue("Livro com ID " + bestseller.getId() + " não foi encontrado nos livros selecionados.",
+                existsInSelectedBooks);
         }
         
         startUpTestObjects();
