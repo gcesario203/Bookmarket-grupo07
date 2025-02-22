@@ -492,6 +492,7 @@ public class BookstoreTest {
 
     @Test
     public void shouldRemoveAReview() throws IOException {
+    	populateInstance();
         Review review = instance.getReviews().get(0);
 
         instance.removeReviewById(review.getId());
