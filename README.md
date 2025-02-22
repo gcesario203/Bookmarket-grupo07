@@ -6,6 +6,8 @@
 #### Stephenson Oliveira (ex189571)
 #### Vitor Gomes (ex188807)
 
+📚 [Wiki](https://gcesario203.github.io/Bookmarket-grupo07/index.html)
+
 Este repositório contém o código-fonte e documentação do projeto BookMarket, um sistema de e-commerce para livros usados desenvolvido como parte da disciplina INF329 – Prática de Engenharia de Software, ministrada pelo Prof. Luiz Eduardo Busato na UNICAMP.
 
 ## Objetivos
