@@ -288,7 +288,7 @@ public class Bookstore implements Serializable {
      * @param random Dado randômico / aleatório
      * @return customersById Consumidor do Id escolhido
      */
-    private Customer getACustomerAnyCustomer(Random random) {
+    public Customer getACustomerAnyCustomer(Random random) {
         return customersById.get(random.nextInt(customersById.size()));
     }
 
